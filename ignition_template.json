@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.0",
-  "description": "ComfyUI for WAN 2.2 video generation (T2V and I2V) with safe restart architecture and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.0",
+  "name": "Ignition WAN v1.0.1",
+  "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.1",
   "ports": [
     {
       "privatePort": 8188,
@@ -24,29 +24,24 @@
   ],
   "environmentVariables": [
     {
-      "key": "HUGGINGFACE_MODELS",
-      "value": "wan2.2_t2v_bundle",
-      "description": "WAN model preset. Options: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle. Or individual keys: wan2.2_t2v_fp8, wan2.2_i2v_fp8, umt5_xxl_fp8, wan_vae, clip_vision_h"
-    },
-    {
-      "key": "HF_TOKEN",
-      "value": "",
-      "description": "HuggingFace API token (optional, for private repos)"
-    },
-    {
       "key": "CIVITAI_MODELS",
       "value": "",
-      "description": "Comma-separated CivitAI model version IDs (for extra checkpoints)"
+      "description": "Comma-separated CivitAI model version IDs"
     },
     {
       "key": "CIVITAI_LORAS",
       "value": "",
-      "description": "Comma-separated CivitAI LoRA version IDs"
+      "description": "Comma-separated CivitAI LoRA model version IDs"
     },
     {
       "key": "CIVITAI_VAES",
       "value": "",
-      "description": "Comma-separated CivitAI VAE version IDs"
+      "description": "Comma-separated CivitAI VAE model version IDs"
+    },
+    {
+      "key": "HUGGINGFACE_MODELS",
+      "value": "wan2.2_t2v_bundle",
+      "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
@@ -54,14 +49,14 @@
       "description": "CivitAI API token (optional, for faster downloads)"
     },
     {
+      "key": "HF_TOKEN",
+      "value": "",
+      "description": "HuggingFace API token (optional, for private repos)"
+    },
+    {
       "key": "FILEBROWSER_PASSWORD",
       "value": "runpod",
       "description": "Password for file browser access"
-    },
-    {
-      "key": "FORCE_MODEL_SYNC",
-      "value": "false",
-      "description": "Set to true to force re-download of all models"
     }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
