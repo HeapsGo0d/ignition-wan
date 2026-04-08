@@ -1,6 +1,6 @@
 #!/bin/bash
-# Ignition RunPod Template Creator
-# Creates a RunPod template with pre-configured settings for Ignition
+# Ignition WAN RunPod Template Creator
+# Creates a RunPod template with pre-configured settings for WAN 2.2 video generation
 # Supports both local file generation and direct RunPod API deployment
 
 set -e
@@ -14,9 +14,9 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOCKER_IMAGE="heapsgo0d/ignition-comfyui:latest"
-TEMPLATE_NAME="Ignition ComfyUI Latest"
-TEMPLATE_DESCRIPTION="Dynamic ComfyUI with safe restart architecture and runtime Manager UI toggle - Simple, elegant, functional with RTX 5090 support"
+DOCKER_IMAGE="heapsgo0d/ignition-wan:latest"
+TEMPLATE_NAME="Ignition WAN Latest"
+TEMPLATE_DESCRIPTION="ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support"
 
 # Disk defaults (can be overridden interactively or via env)
 CONTAINER_DISK_GB="${CONTAINER_DISK_GB:-200}"
@@ -32,8 +32,8 @@ fi
 print_banner() {
     echo -e "${CYAN}"
     echo "╔═══════════════════════════════════════════╗"
-    echo "║           🚀 IGNITION TEMPLATE           ║"
-    echo "║        RunPod Template Creator v1.0       ║"
+    echo "║        🎬 IGNITION WAN TEMPLATE          ║"
+    echo "║     RunPod WAN 2.2 Template Creator       ║"
     echo "╚═══════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -116,80 +116,74 @@ get_configuration() {
     
     # Auto-generate image and template names based on version
     if [[ "$VERSION_TAG" == "latest" ]]; then
-        DOCKER_IMAGE="heapsgo0d/ignition-comfyui:latest"
-        TEMPLATE_NAME="Ignition ComfyUI Latest"
+        DOCKER_IMAGE="heapsgo0d/ignition-wan:latest"
+        TEMPLATE_NAME="Ignition WAN Latest"
     else
-        DOCKER_IMAGE="heapsgo0d/ignition-comfyui:$VERSION_TAG"
-        TEMPLATE_NAME="Ignition ComfyUI $VERSION_TAG"
+        DOCKER_IMAGE="heapsgo0d/ignition-wan:$VERSION_TAG"
+        TEMPLATE_NAME="Ignition WAN $VERSION_TAG"
     fi
     
     echo "  → Docker Image: $DOCKER_IMAGE"
     echo "  → Template Name: $TEMPLATE_NAME"
     echo ""
     
-    # CivitAI Models with default
-    echo -e "${BLUE}CivitAI Models:${NC}"
-    read -p "CivitAI model IDs [1569593,919063,450105]: " input_civitai
-    CIVITAI_MODELS=${input_civitai:-"1569593,919063,450105"}
+    # CivitAI Models (optional extras - LoRAs etc)
+    echo -e "${BLUE}CivitAI Models (optional - for extra checkpoints):${NC}"
+    read -p "CivitAI model IDs [leave blank for none]: " input_civitai
+    CIVITAI_MODELS=${input_civitai:-""}
     echo ""
-    
+
     # CivitAI LoRAs with default
-    echo -e "${BLUE}CivitAI LoRAs:${NC}"
-    read -p "CivitAI LoRA IDs [182404,445135,86788,565308]: " input_loras
-    CIVITAI_LORAS=${input_loras:-"182404,445135,86788,565308"}
+    echo -e "${BLUE}CivitAI LoRAs (optional):${NC}"
+    read -p "CivitAI LoRA IDs [leave blank for none]: " input_loras
+    CIVITAI_LORAS=${input_loras:-""}
     echo ""
-    
-    # CivitAI VAEs with default
-    echo -e "${BLUE}CivitAI VAEs:${NC}"
-    read -p "CivitAI VAE IDs [1674314]: " input_vaes
-    CIVITAI_VAES=${input_vaes:-"1674314"}
+
+    # CivitAI VAEs (optional)
+    echo -e "${BLUE}CivitAI VAEs (optional):${NC}"
+    read -p "CivitAI VAE IDs [leave blank for none]: " input_vaes
+    CIVITAI_VAES=${input_vaes:-""}
     echo ""
-    
-    # CivitAI FLUX with default
-    echo -e "${BLUE}CivitAI FLUX Models:${NC}"
-    read -p "CivitAI FLUX model IDs [153568]: " input_flux
-    CIVITAI_FLUX=${input_flux:-"153568"}
-    echo ""
-    
-    # Image Generation Model Preset Selection
-    echo -e "${BLUE}Image Generation Model:${NC}"
-    echo "  1) FLUX.1-dev (default - best quality, ~70s/gen)"
-    echo "  2) FLUX.1-schnell (fast - 4 steps, ~7s/gen)"
-    echo "  3) Qwen-Image (generation - excellent text rendering)"
-    echo "  4) Qwen-Image-Edit (editing - inpainting, object removal)"
-    echo "  5) Qwen-Image + Edit (both generation & editing)"
+
+    # WAN 2.2 Model Preset Selection
+    echo -e "${BLUE}WAN 2.2 Video Model Preset:${NC}"
+    echo "  1) WAN 2.2 T2V FP8 bundle (default - text-to-video, ~15GB, RTX 5090 recommended)"
+    echo "  2) WAN 2.2 I2V FP8 bundle (image-to-video, ~15GB + CLIP vision)"
+    echo "  3) WAN 2.2 Full bundle (both T2V + I2V, ~29GB)"
+    echo "  4) WAN 2.2 T2V FP16 bundle (max quality T2V, ~29GB)"
+    echo "  5) WAN 2.2 I2V FP16 bundle (max quality I2V, ~29GB)"
     echo "  6) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
-            HUGGINGFACE_MODELS="flux1-dev,clip_l,t5xxl_fp16,ae"
-            echo "  → Selected: FLUX.1-dev"
+            HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
+            echo "  → Selected: WAN 2.2 T2V FP8 (text-to-video)"
             ;;
         2)
-            HUGGINGFACE_MODELS="flux1-schnell,clip_l,t5xxl_fp16,ae"
-            echo "  → Selected: FLUX.1-schnell (fast)"
+            HUGGINGFACE_MODELS="wan2.2_i2v_bundle"
+            echo "  → Selected: WAN 2.2 I2V FP8 (image-to-video)"
             ;;
         3)
-            HUGGINGFACE_MODELS="qwen_image_fp8,qwen_text_encoder_fp8,qwen_vae,qwen_lightning_8step"
-            echo "  → Selected: Qwen-Image (generation)"
+            HUGGINGFACE_MODELS="wan2.2_full_bundle"
+            echo "  → Selected: WAN 2.2 Full (T2V + I2V)"
             ;;
         4)
-            HUGGINGFACE_MODELS="qwen_image_edit_2509_fp8,qwen_text_encoder_fp8,qwen_vae"
-            echo "  → Selected: Qwen-Image-Edit (editing)"
+            HUGGINGFACE_MODELS="wan2.2_t2v_fp16,umt5_xxl_fp8,wan_vae"
+            echo "  → Selected: WAN 2.2 T2V FP16 (max quality)"
             ;;
         5)
-            HUGGINGFACE_MODELS="qwen_image_fp8,qwen_image_edit_2509_fp8,qwen_text_encoder_fp8,qwen_vae,qwen_lightning_8step"
-            echo "  → Selected: Qwen-Image + Edit (both)"
+            HUGGINGFACE_MODELS="wan2.2_i2v_fp16,umt5_xxl_fp8,wan_vae,clip_vision_h"
+            echo "  → Selected: WAN 2.2 I2V FP16 (max quality)"
             ;;
         6)
-            read -p "Enter model names (comma-separated): " input_hf
+            read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
-            HUGGINGFACE_MODELS="flux1-dev,clip_l,t5xxl_fp16,ae"
-            echo "  → Invalid selection, defaulting to FLUX.1-dev"
+            HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
+            echo "  → Invalid selection, defaulting to WAN 2.2 T2V FP8"
             ;;
     esac
     echo ""
@@ -293,14 +287,9 @@ generate_template() {
       "description": "Comma-separated CivitAI VAE model version IDs"
     },
     {
-      "key": "CIVITAI_FLUX",
-      "value": "$CIVITAI_FLUX",
-      "description": "Comma-separated CivitAI FLUX model version IDs"
-    },
-    {
-      "key": "HUGGINGFACE_MODELS", 
+      "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "Comma-separated HuggingFace repository names"
+      "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
@@ -352,11 +341,10 @@ print_summary() {
     echo "  Storage: $(make_storage_note)"
     echo ""
     echo -e "${BLUE}Model Configuration:${NC}"
-    echo "  CivitAI Models: ${CIVITAI_MODELS:-'None specified'}"
-    echo "  CivitAI LoRAs: ${CIVITAI_LORAS:-'None specified'}"
-    echo "  CivitAI VAEs: ${CIVITAI_VAES:-'None specified'}"
-    echo "  CivitAI FLUX: ${CIVITAI_FLUX:-'None specified'}"
-    echo "  HuggingFace Models: ${HUGGINGFACE_MODELS:-'None specified'}"
+    echo "  WAN Model Preset: ${HUGGINGFACE_MODELS:-'None specified'}"
+    echo "  CivitAI Models: ${CIVITAI_MODELS:-'None'}"
+    echo "  CivitAI LoRAs: ${CIVITAI_LORAS:-'None'}"
+    echo "  CivitAI VAEs: ${CIVITAI_VAES:-'None'}"
     echo ""
     echo -e "${BLUE}Access:${NC}"
     echo "  ComfyUI: http://[pod-id]-8188.proxy.runpod.net"
@@ -368,19 +356,19 @@ print_summary() {
 # Generate usage instructions
 generate_instructions() {
     cat > RUNPOD_USAGE.md << EOF
-# 🚀 Ignition RunPod Deployment Guide
+# 🎬 Ignition WAN RunPod Deployment Guide
 
 ## Quick Start
 
-1. **Import Template**:
+1. **Import Template** (or use \`./template.sh --deploy\` for direct API deployment):
    - Go to RunPod Templates
    - Click "New Template"
    - Upload the \`ignition_template.json\` file
 
 2. **Deploy Pod**:
-   - Select Ignition template
-   - Choose GPU (RTX 5090 recommended)
-   - Add network volume if using persistent storage
+   - Select Ignition WAN template
+   - Choose GPU (RTX 5090 or A100 40GB recommended for 14B FP8 models)
+   - Add network volume for persistent model storage
    - Deploy!
 
 ## Access URLs
@@ -392,47 +380,42 @@ Once your pod is running:
   - Username: \`admin\`
   - Password: \`$FILEBROWSER_PASSWORD\`
 
+## WAN 2.2 Model Presets
+
+Set \`HUGGINGFACE_MODELS\` to one of these bundle keys:
+
+| Key | Models Downloaded | VRAM | Use Case |
+|-----|------------------|------|----------|
+| \`wan2.2_t2v_bundle\` | T2V FP8 + text encoder + VAE | ~20GB | Text-to-video |
+| \`wan2.2_i2v_bundle\` | I2V FP8 + text encoder + VAE + CLIP | ~20GB | Image-to-video |
+| \`wan2.2_full_bundle\` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
+| \`wan2.2_t2v_fp16\` + extras | T2V full precision | ~35GB | Max quality T2V |
+
+Individual keys also work: \`wan2.2_t2v_fp8\`, \`wan2.2_i2v_fp8\`, \`umt5_xxl_fp8\`, \`wan_vae\`, \`clip_vision_h\`
+
 ## Environment Variables
 
-### Required for Model Downloads
 | Variable | Description | Example |
 |----------|-------------|---------|
-| \`CIVITAI_MODELS\` | CivitAI model version IDs | \`138977,46846,5616\` |
-| \`HUGGINGFACE_MODELS\` | HuggingFace model keys | \`flux1-dev,clip_l,t5xxl_fp16,ae,flux1-krea-dev\` |
-
-### Optional Authentication  
-| Variable | Description | Get Token From |
-|----------|-------------|----------------|
-| \`CIVITAI_TOKEN\` | CivitAI API token | https://civitai.com/user/account |
-| \`HF_TOKEN\` | HuggingFace token | https://huggingface.co/settings/tokens |
+| \`HUGGINGFACE_MODELS\` | WAN model bundle or comma-separated keys | \`wan2.2_t2v_bundle\` |
+| \`HF_TOKEN\` | HuggingFace API token (optional) | \`hf_xxx\` |
+| \`CIVITAI_MODELS\` | CivitAI checkpoint IDs (optional) | \`138977\` |
+| \`CIVITAI_LORAS\` | CivitAI LoRA IDs (optional) | \`182404\` |
+| \`CIVITAI_TOKEN\` | CivitAI API token (optional) | \`abc123\` |
+| \`FORCE_MODEL_SYNC\` | Re-download all models on start | \`true\` |
 
 ### Storage Configuration
 Storage: $(make_storage_note) (Container: ${CONTAINER_DISK_GB}GB disk, ${VOLUME_GB}GB volume)
 
-## Finding Model IDs
-
-### CivitAI Version IDs
-1. Go to model page on CivitAI
-2. Click the version you want
-3. Copy the \`modelVersionId\` from URL
-4. Example: \`civitai.com/models/4384?modelVersionId=128713\` → use \`128713\`
-
-### HuggingFace Repository IDs  
-1. Go to model repository
-2. Copy the full path from URL
-3. Example: For FLUX workflow use \`flux1-dev,clip_l,t5xxl_fp16,ae,flux1-krea-dev\` (complete set with KREA variant)
-
 ## Startup Process
 
-1. 🔍 System check
-2. 💾 Storage setup  
-3. 📥 Model downloads (parallel)
+1. 🔍 System check + GPU detection
+2. 💾 Storage setup (creates model dirs incl. clip_vision)
+3. 📥 WAN model downloads via HuggingFace (parallel with CivitAI if set)
 4. 📁 File browser start (port 8080)
-5. 🎨 ComfyUI start (port 8188)
+5. 🎬 ComfyUI start with WanVideoWrapper (port 8188)
 
 ## 🔄 Restarting ComfyUI
-
-Ignition includes supervisor architecture for safe restarts:
 
 ### Soft Restart (Models Preserved)
 \`\`\`bash
@@ -441,7 +424,6 @@ Ignition includes supervisor architecture for safe restarts:
 - Restarts ComfyUI in 2 seconds
 - All models and data preserved
 - Container keeps running
-- Use for: applying changes, toggling Manager UI
 
 ### Hard Stop (Triggers Nuke)
 \`\`\`bash
@@ -449,7 +431,6 @@ Ignition includes supervisor architecture for safe restarts:
 \`\`\`
 - Exits container completely
 - Nuclear cleanup deletes all data
-- Use for: complete shutdown, fresh start
 
 | Action | Models | Container | Nuke |
 |--------|--------|-----------|------|
@@ -457,30 +438,21 @@ Ignition includes supervisor architecture for safe restarts:
 | Hard Stop | ❌ Deleted | Exits | ✅ Yes |
 | Crash | ✅ Preserved | Running | ❌ No |
 
-## 🎛️ Manager UI & Performance
-
-ComfyUI-Manager UI is **enabled by default** for better usability:
-
-- Manager UI visible in ComfyUI
-- Network mode set to offline (fast boot, no 5-min delay)
-- Curated performance plugins pre-installed
-
-**To disable**: Set \`ENABLE_MANAGER_UI=false\` env var, then run soft restart
-
 ## Troubleshooting
 
 ### Logs
-- SSH into pod: \`ssh root@[pod-id]-ssh.proxy.runpod.net\`
-- View logs: \`tail -f /tmp/ignition_startup.log\`
+\`\`\`bash
+tail -f /tmp/ignition_startup.log
+\`\`\`
 
 ### Common Issues
-- **No models downloading**: Check model IDs are correct
-- **Out of space**: Use persistent storage or smaller models
-- **Slow downloads**: Add API tokens for authentication
+- **Models not downloading**: Verify \`HUGGINGFACE_MODELS\` key spelling
+- **Out of VRAM**: Use FP8 bundles instead of FP16; ensure 20GB+ VRAM
 - **ComfyUI not responding**: Run \`/workspace/scripts/restart-comfyui.sh\`
+- **Want to re-download models**: Set \`FORCE_MODEL_SYNC=true\` and restart pod
 
 ---
-**🚀 Ready to create amazing AI art with Ignition!**
+**🎬 Ready to generate video with Ignition WAN!**
 EOF
 }
 
@@ -510,13 +482,12 @@ deploy_template() {
   "volumeMountPath": "/workspace",
   "dockerArgs": "",
   "ports": "8188/http,8080/http",
-  "readme": "# $TEMPLATE_NAME\\n\\n$TEMPLATE_DESCRIPTION\\n\\n## Configuration\\n- CivitAI Models: $CIVITAI_MODELS\\n- CivitAI LoRAs: $CIVITAI_LORAS\\n- HuggingFace Models: $HUGGINGFACE_MODELS\\n- Storage: ${STORAGE_NOTE} (${CONTAINER_DISK_GB}GB container disk, ${VOLUME_GB}GB volume)",
+  "readme": "# $TEMPLATE_NAME\\n\\n$TEMPLATE_DESCRIPTION\\n\\n## Configuration\\n- WAN Model Preset: $HUGGINGFACE_MODELS\\n- CivitAI Models: ${CIVITAI_MODELS:-none}\\n- CivitAI LoRAs: ${CIVITAI_LORAS:-none}\\n- Storage: ${STORAGE_NOTE} (${CONTAINER_DISK_GB}GB container disk, ${VOLUME_GB}GB volume)",
   "env": [
+    {"key": "HUGGINGFACE_MODELS", "value": "$HUGGINGFACE_MODELS"},
     {"key": "CIVITAI_MODELS", "value": "$CIVITAI_MODELS"},
     {"key": "CIVITAI_LORAS", "value": "$CIVITAI_LORAS"},
     {"key": "CIVITAI_VAES", "value": "$CIVITAI_VAES"},
-    {"key": "CIVITAI_FLUX", "value": "$CIVITAI_FLUX"},
-    {"key": "HUGGINGFACE_MODELS", "value": "$HUGGINGFACE_MODELS"},
     {"key": "CIVITAI_TOKEN", "value": "{{ RUNPOD_SECRET_civitai.com }}"},
     {"key": "HF_TOKEN", "value": "{{ RUNPOD_SECRET_huggingface.co }}"},
     {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"},
@@ -632,7 +603,7 @@ main() {
     fi
     
     echo ""
-    echo -e "${GREEN}🚀 Happy creating with Ignition!${NC}"
+    echo -e "${GREEN}🎬 Happy generating with Ignition WAN!${NC}"
 }
 
 # Run main function
