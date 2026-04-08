@@ -1,0 +1,126 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v1.0.1, etc.
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ignition-wan
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # Remove tool cache (saves ~15 GB)
+        tool-cache: true
+        # Remove Android SDK (saves ~11 GB)
+        android: true
+        # Remove .NET (saves ~2 GB)
+        dotnet: true
+        # Remove Haskell (saves ~2.7 GB)
+        haskell: true
+        # Keep large packages that might be needed
+        large-packages: false
+        # Remove Docker images (saves space but we need Docker)
+        docker-images: false
+        
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=tag
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        # Optimize for space and speed
+        build-args: |
+          BUILDKIT_INLINE_CACHE=1
+        
+    - name: Image digest
+      run: echo ${{ steps.meta.outputs.digest }}
+      
+    - name: Clean up old Docker images
+      if: success()
+      run: |
+        # Install jq for JSON parsing
+        sudo apt-get update && sudo apt-get install -y jq
+
+        # Get authentication token
+        echo "Authenticating with Docker Hub..."
+        TOKEN=$(curl -s -H "Content-Type: application/json" -X POST \
+          -d '{"username": "${{ secrets.DOCKER_USERNAME }}", "password": "${{ secrets.DOCKER_PASSWORD }}"}' \
+          https://hub.docker.com/v2/users/login/ | jq -r .token)
+
+        if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
+          echo "Failed to authenticate with Docker Hub"
+          exit 1
+        fi
+
+        # Get current tag being built (to protect from deletion)
+        CURRENT_TAG="${GITHUB_REF_NAME}"
+        echo "Current tag: $CURRENT_TAG"
+
+        # Get all version tags (starting with 'v') sorted by last_updated (newest first)
+        # Exclude current tag from the list
+        echo "Fetching tags..."
+        TAGS=$(curl -s -H "Authorization: JWT $TOKEN" \
+          "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-wan/tags/?page_size=100" \
+          | jq -r '.results | sort_by(.last_updated) | reverse | .[].name' \
+          | grep -E '^v[0-9]' \
+          | grep -v "^${CURRENT_TAG}$")
+
+        # Convert to array and keep only latest 3 (excluding current)
+        TAG_ARRAY=($TAGS)
+        TOTAL_TAGS=${#TAG_ARRAY[@]}
+        echo "Found $TOTAL_TAGS version tags (excluding current tag)"
+
+        if [ $TOTAL_TAGS -le 3 ]; then
+          echo "Only $TOTAL_TAGS tags found, no cleanup needed"
+          exit 0
+        fi
+
+        # Delete all but latest 3 (plus current tag which is already excluded)
+        KEEP_COUNT=3
+        DELETE_COUNT=$((TOTAL_TAGS - KEEP_COUNT))
+        TAGS_TO_DELETE=("${TAG_ARRAY[@]:$KEEP_COUNT}")
+
+        echo "Deleting $DELETE_COUNT old tags (keeping latest $KEEP_COUNT + current tag)..."
+        for tag in "${TAGS_TO_DELETE[@]}"; do
+          echo "  Deleting: $tag"
+          RESULT=$(curl -s -X DELETE \
+            -H "Authorization: JWT $TOKEN" \
+            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-wan/tags/$tag/")
+          echo "    Response: $(echo $RESULT | jq -r '.detail // "deleted"')"
+        done
+
+        echo "✅ Cleanup complete! Kept latest $KEEP_COUNT tags + current tag, deleted $DELETE_COUNT old tags"

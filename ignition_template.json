@@ -1,0 +1,78 @@
+{
+  "name": "Ignition WAN v1.0.0",
+  "description": "ComfyUI for WAN 2.2 video generation (T2V and I2V) with safe restart architecture and RTX 5090 support",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.0",
+  "ports": [
+    {
+      "privatePort": 8188,
+      "publicPort": 8188,
+      "type": "http",
+      "description": "ComfyUI Web Interface"
+    },
+    {
+      "privatePort": 8080,
+      "publicPort": 8080,
+      "type": "http",
+      "description": "File Browser"
+    }
+  ],
+  "volumeMounts": [
+    {
+      "containerPath": "/workspace",
+      "name": "workspace"
+    }
+  ],
+  "environmentVariables": [
+    {
+      "key": "HUGGINGFACE_MODELS",
+      "value": "wan2.2_t2v_bundle",
+      "description": "WAN model preset. Options: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle. Or individual keys: wan2.2_t2v_fp8, wan2.2_i2v_fp8, umt5_xxl_fp8, wan_vae, clip_vision_h"
+    },
+    {
+      "key": "HF_TOKEN",
+      "value": "",
+      "description": "HuggingFace API token (optional, for private repos)"
+    },
+    {
+      "key": "CIVITAI_MODELS",
+      "value": "",
+      "description": "Comma-separated CivitAI model version IDs (for extra checkpoints)"
+    },
+    {
+      "key": "CIVITAI_LORAS",
+      "value": "",
+      "description": "Comma-separated CivitAI LoRA version IDs"
+    },
+    {
+      "key": "CIVITAI_VAES",
+      "value": "",
+      "description": "Comma-separated CivitAI VAE version IDs"
+    },
+    {
+      "key": "CIVITAI_TOKEN",
+      "value": "",
+      "description": "CivitAI API token (optional, for faster downloads)"
+    },
+    {
+      "key": "FILEBROWSER_PASSWORD",
+      "value": "runpod",
+      "description": "Password for file browser access"
+    },
+    {
+      "key": "ENABLE_SAGEATTENTION",
+      "value": "false",
+      "description": "Enable SAGE Attention optimization (false = disabled, true = auto-install and enable)"
+    },
+    {
+      "key": "SAGEATTENTION_VERSION",
+      "value": "1.0.6",
+      "description": "SAGE Attention version to install (1.0.6 or 3.0.0 for SA3)"
+    },
+    {
+      "key": "FORCE_MODEL_SYNC",
+      "value": "false",
+      "description": "Set to true to force re-download of all models"
+    }
+  ],
+  "startScript": "bash /workspace/scripts/startup.sh"
+}
