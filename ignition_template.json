@@ -59,16 +59,6 @@
       "description": "Password for file browser access"
     },
     {
-      "key": "ENABLE_SAGEATTENTION",
-      "value": "false",
-      "description": "Enable SAGE Attention optimization (false = disabled, true = auto-install and enable)"
-    },
-    {
-      "key": "SAGEATTENTION_VERSION",
-      "value": "1.0.6",
-      "description": "SAGE Attention version to install (1.0.6 or 3.0.0 for SA3)"
-    },
-    {
       "key": "FORCE_MODEL_SYNC",
       "value": "false",
       "description": "Set to true to force re-download of all models"

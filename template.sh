@@ -188,38 +188,6 @@ get_configuration() {
     esac
     echo ""
 
-    # SageAttention Configuration
-    echo -e "${BLUE}SageAttention Optimization:${NC}"
-    echo "  1) Disabled (default - no performance boost)"
-    echo "  2) Enabled with v1.0.6 (stable, ~15-20% speedup)"
-    echo "  3) Enabled with SA3 (experimental, ~25-30% speedup - requires custom build)"
-    read -p "Select SageAttention option [1]: " sa_preset
-
-    case ${sa_preset:-1} in
-        1)
-            ENABLE_SAGEATTENTION="false"
-            SAGEATTENTION_VERSION="1.0.6"
-            echo "  → SageAttention disabled"
-            ;;
-        2)
-            ENABLE_SAGEATTENTION="true"
-            SAGEATTENTION_VERSION="1.0.6"
-            echo "  → SageAttention v1.0.6 enabled (auto-install at runtime)"
-            ;;
-        3)
-            ENABLE_SAGEATTENTION="true"
-            SAGEATTENTION_VERSION="3.0.0"
-            echo "  → SageAttention3 enabled (requires SA3 wheel in build)"
-            echo "  → Build command: docker build --build-arg SAGEATTENTION_WHEEL_URL=<wheel-url>"
-            ;;
-        *)
-            ENABLE_SAGEATTENTION="false"
-            SAGEATTENTION_VERSION="1.0.6"
-            echo "  → Invalid selection, defaulting to disabled"
-            ;;
-    esac
-    echo ""
-
     # Security settings with default
     echo -e "${BLUE}Security Settings:${NC}"
     read -p "File browser password [runpod]: " input_password
@@ -305,16 +273,6 @@ generate_template() {
       "key": "FILEBROWSER_PASSWORD",
       "value": "$FILEBROWSER_PASSWORD",
       "description": "Password for file browser access"
-    },
-    {
-      "key": "ENABLE_SAGEATTENTION",
-      "value": "$ENABLE_SAGEATTENTION",
-      "description": "Enable SAGE Attention optimization (false = disabled, true = auto-install and enable)"
-    },
-    {
-      "key": "SAGEATTENTION_VERSION",
-      "value": "$SAGEATTENTION_VERSION",
-      "description": "SAGE Attention version to install (1.0.6 or 3.0.0 for SA3)"
     }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
@@ -490,9 +448,7 @@ deploy_template() {
     {"key": "CIVITAI_VAES", "value": "$CIVITAI_VAES"},
     {"key": "CIVITAI_TOKEN", "value": "{{ RUNPOD_SECRET_civitai.com }}"},
     {"key": "HF_TOKEN", "value": "{{ RUNPOD_SECRET_huggingface.co }}"},
-    {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"},
-    {"key": "ENABLE_SAGEATTENTION", "value": "$ENABLE_SAGEATTENTION"},
-    {"key": "SAGEATTENTION_VERSION", "value": "$SAGEATTENTION_VERSION"}
+    {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"}
   ]
 }
 EOF

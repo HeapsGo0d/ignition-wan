@@ -84,17 +84,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         opencv-python \
         psutil
 
-# Optional: Install SageAttention from prebuilt wheel URL
-# Allows building with custom-compiled SageAttention3 for better performance
-# Example: docker build --build-arg SAGEATTENTION_WHEEL_URL=https://github.com/.../sageattn3.whl
-ARG SAGEATTENTION_WHEEL_URL=""
-RUN if [ -n "${SAGEATTENTION_WHEEL_URL}" ]; then \
-      echo "Installing SageAttention from wheel: ${SAGEATTENTION_WHEEL_URL}" && \
-      pip install --no-cache-dir "${SAGEATTENTION_WHEEL_URL}"; \
-    else \
-      echo "No SageAttention wheel URL provided, will use runtime install if enabled"; \
-    fi
-
 FROM base AS final
 
 # Final stage setup
