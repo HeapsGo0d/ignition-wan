@@ -1,16 +1,16 @@
-# 🚀 Ignition RunPod Deployment Guide
+# 🎬 Ignition WAN RunPod Deployment Guide
 
 ## Quick Start
 
-1. **Import Template**:
+1. **Import Template** (or use `./template.sh --deploy` for direct API deployment):
    - Go to RunPod Templates
    - Click "New Template"
    - Upload the `ignition_template.json` file
 
 2. **Deploy Pod**:
-   - Select Ignition template
-   - Choose GPU (RTX 5090 recommended)
-   - Add network volume if using persistent storage
+   - Select Ignition WAN template
+   - Choose GPU (RTX 5090 or A100 40GB recommended for 14B FP8 models)
+   - Add network volume for persistent model storage
    - Deploy!
 
 ## Access URLs
@@ -22,47 +22,42 @@ Once your pod is running:
   - Username: `admin`
   - Password: `runpod`
 
+## WAN 2.2 Model Presets
+
+Set `HUGGINGFACE_MODELS` to one of these bundle keys:
+
+| Key | Models Downloaded | VRAM | Use Case |
+|-----|------------------|------|----------|
+| `wan2.2_t2v_bundle` | T2V FP8 + text encoder + VAE | ~20GB | Text-to-video |
+| `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP | ~20GB | Image-to-video |
+| `wan2.2_full_bundle` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
+| `wan2.2_t2v_fp16` + extras | T2V full precision | ~35GB | Max quality T2V |
+
+Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `wan_vae`, `clip_vision_h`
+
 ## Environment Variables
 
-### Required for Model Downloads
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `CIVITAI_MODELS` | CivitAI model version IDs | `138977,46846,5616` |
-| `HUGGINGFACE_MODELS` | HuggingFace model keys | `flux1-dev,clip_l,t5xxl_fp16,ae,flux1-krea-dev` |
-
-### Optional Authentication  
-| Variable | Description | Get Token From |
-|----------|-------------|----------------|
-| `CIVITAI_TOKEN` | CivitAI API token | https://civitai.com/user/account |
-| `HF_TOKEN` | HuggingFace token | https://huggingface.co/settings/tokens |
+| `HUGGINGFACE_MODELS` | WAN model bundle or comma-separated keys | `wan2.2_t2v_bundle` |
+| `HF_TOKEN` | HuggingFace API token (optional) | `hf_xxx` |
+| `CIVITAI_MODELS` | CivitAI checkpoint IDs (optional) | `138977` |
+| `CIVITAI_LORAS` | CivitAI LoRA IDs (optional) | `182404` |
+| `CIVITAI_TOKEN` | CivitAI API token (optional) | `abc123` |
+| `FORCE_MODEL_SYNC` | Re-download all models on start | `true` |
 
 ### Storage Configuration
 Storage: Ephemeral volume (0GB; models redownload each start) (Container: 200GB disk, 0GB volume)
 
-## Finding Model IDs
-
-### CivitAI Version IDs
-1. Go to model page on CivitAI
-2. Click the version you want
-3. Copy the `modelVersionId` from URL
-4. Example: `civitai.com/models/4384?modelVersionId=128713` → use `128713`
-
-### HuggingFace Repository IDs  
-1. Go to model repository
-2. Copy the full path from URL
-3. Example: For FLUX workflow use `flux1-dev,clip_l,t5xxl_fp16,ae,flux1-krea-dev` (complete set with KREA variant)
-
 ## Startup Process
 
-1. 🔍 System check
-2. 💾 Storage setup  
-3. 📥 Model downloads (parallel)
+1. 🔍 System check + GPU detection
+2. 💾 Storage setup (creates model dirs incl. clip_vision)
+3. 📥 WAN model downloads via HuggingFace (parallel with CivitAI if set)
 4. 📁 File browser start (port 8080)
-5. 🎨 ComfyUI start (port 8188)
+5. 🎬 ComfyUI start with WanVideoWrapper (port 8188)
 
 ## 🔄 Restarting ComfyUI
-
-Ignition includes supervisor architecture for safe restarts:
 
 ### Soft Restart (Models Preserved)
 ```bash
@@ -71,7 +66,6 @@ Ignition includes supervisor architecture for safe restarts:
 - Restarts ComfyUI in 2 seconds
 - All models and data preserved
 - Container keeps running
-- Use for: applying changes, toggling Manager UI
 
 ### Hard Stop (Triggers Nuke)
 ```bash
@@ -79,7 +73,6 @@ Ignition includes supervisor architecture for safe restarts:
 ```
 - Exits container completely
 - Nuclear cleanup deletes all data
-- Use for: complete shutdown, fresh start
 
 | Action | Models | Container | Nuke |
 |--------|--------|-----------|------|
@@ -87,27 +80,18 @@ Ignition includes supervisor architecture for safe restarts:
 | Hard Stop | ❌ Deleted | Exits | ✅ Yes |
 | Crash | ✅ Preserved | Running | ❌ No |
 
-## 🎛️ Manager UI & Performance
-
-ComfyUI-Manager UI is **enabled by default** for better usability:
-
-- Manager UI visible in ComfyUI
-- Network mode set to offline (fast boot, no 5-min delay)
-- Curated performance plugins pre-installed
-
-**To disable**: Set `ENABLE_MANAGER_UI=false` env var, then run soft restart
-
 ## Troubleshooting
 
 ### Logs
-- SSH into pod: `ssh root@[pod-id]-ssh.proxy.runpod.net`
-- View logs: `tail -f /tmp/ignition_startup.log`
+```bash
+tail -f /tmp/ignition_startup.log
+```
 
 ### Common Issues
-- **No models downloading**: Check model IDs are correct
-- **Out of space**: Use persistent storage or smaller models
-- **Slow downloads**: Add API tokens for authentication
+- **Models not downloading**: Verify `HUGGINGFACE_MODELS` key spelling
+- **Out of VRAM**: Use FP8 bundles instead of FP16; ensure 20GB+ VRAM
 - **ComfyUI not responding**: Run `/workspace/scripts/restart-comfyui.sh`
+- **Want to re-download models**: Set `FORCE_MODEL_SYNC=true` and restart pod
 
 ---
-**🚀 Ready to create amazing AI art with Ignition!**
+**🎬 Ready to generate video with Ignition WAN!**

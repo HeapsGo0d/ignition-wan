@@ -226,8 +226,10 @@ PY
 disable_manager_network() {
     log "INFO" "🔧 Disabling ComfyUI-Manager network mode..."
 
-    local MANAGER_DIR="$COMFYUI_ROOT/user/default/ComfyUI-Manager"
-    mkdir -p "$MANAGER_DIR"
+    # Support both old and new ComfyUI-Manager config paths (0.18+ uses __manager)
+    local MANAGER_DIR="$COMFYUI_ROOT/user/__manager"
+    local MANAGER_DIR_LEGACY="$COMFYUI_ROOT/user/default/ComfyUI-Manager"
+    mkdir -p "$MANAGER_DIR" "$MANAGER_DIR_LEGACY"
 
     cat > "$MANAGER_DIR/config.ini" << 'EOF'
 [default]
@@ -239,6 +241,9 @@ channel_url = https://raw.githubusercontent.com/ltdrdata/ComfyUI-Manager/main
 share_option = all
 bypass_ssl = False
 EOF
+
+    # Write to legacy path too to prevent migration notice on every boot
+    cp "$MANAGER_DIR/config.ini" "$MANAGER_DIR_LEGACY/config.ini"
 
     log "INFO" "✅ ComfyUI-Manager network mode disabled"
     log "INFO" ""
@@ -300,7 +305,8 @@ start_comfyui() {
     rm -f /tmp/comfyui.stop
 
     # ---- ignition flags (env-tunable) ----
-    : "${COMFY_FLAGS:=--preview-method auto}"
+    # --enable-cors-header required for RunPod reverse proxy access
+    : "${COMFY_FLAGS:=--preview-method auto --enable-cors-header}"
 
     log "INFO" "  • Startup flags: ${COMFY_FLAGS}"
 

@@ -82,7 +82,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         pillow \
         numpy \
         opencv-python \
-        psutil
+        psutil \
+        onnx \
+        onnxruntime-gpu
 
 FROM base AS final
 
