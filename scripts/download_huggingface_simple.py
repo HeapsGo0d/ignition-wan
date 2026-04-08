@@ -67,16 +67,45 @@ WAN_MODELS = {
         'filename': 'clip_vision_h.safetensors',
         'subdir': 'clip_vision'
     },
+    # --- LightX2V LoRAs: T2V (4-step accelerated generation, v1.1) ---
+    'lightx2v_t2v_low_noise': {
+        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors',
+        'filename': 'wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors',
+        'subdir': 'loras'
+    },
+    'lightx2v_t2v_high_noise': {
+        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors',
+        'filename': 'wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors',
+        'subdir': 'loras'
+    },
+    # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
+    'lightx2v_i2v_low_noise': {
+        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
+        'filename': 'wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
+        'subdir': 'loras'
+    },
+    'lightx2v_i2v_high_noise': {
+        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors',
+        'filename': 'wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors',
+        'subdir': 'loras'
+    },
 }
 
 # Convenience bundle keys that expand to multiple models
 WAN_BUNDLES = {
-    # T2V preset: model + text encoder + VAE
+    # T2V: model + text encoder + VAE
     'wan2.2_t2v_bundle': ['wan2.2_t2v_fp8', 'umt5_xxl_fp8', 'wan_vae'],
-    # I2V preset: model + text encoder + VAE + CLIP vision
+    # T2V + LightX2V LoRAs for 4-step accelerated generation
+    'wan2.2_t2v_lightx2v_bundle': ['wan2.2_t2v_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
+    # I2V: model + text encoder + VAE + CLIP vision
     'wan2.2_i2v_bundle': ['wan2.2_i2v_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # I2V + LightX2V LoRAs for 4-step accelerated generation
+    'wan2.2_i2v_lightx2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
     # Both T2V and I2V (shared text encoder and VAE downloaded once)
     'wan2.2_full_bundle': ['wan2.2_t2v_fp8', 'wan2.2_i2v_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # LightX2V LoRAs only (if models already downloaded)
+    'lightx2v_t2v_bundle': ['lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
+    'lightx2v_i2v_bundle': ['lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
 }
 
 

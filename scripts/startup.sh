@@ -226,10 +226,10 @@ PY
 disable_manager_network() {
     log "INFO" "🔧 Disabling ComfyUI-Manager network mode..."
 
-    # Support both old and new ComfyUI-Manager config paths (0.18+ uses __manager)
+    # Write only to new 0.18+ path; do NOT create legacy dir or Manager will
+    # detect both dirs and run migration on every boot
     local MANAGER_DIR="$COMFYUI_ROOT/user/__manager"
-    local MANAGER_DIR_LEGACY="$COMFYUI_ROOT/user/default/ComfyUI-Manager"
-    mkdir -p "$MANAGER_DIR" "$MANAGER_DIR_LEGACY"
+    mkdir -p "$MANAGER_DIR"
 
     cat > "$MANAGER_DIR/config.ini" << 'EOF'
 [default]
@@ -241,9 +241,6 @@ channel_url = https://raw.githubusercontent.com/ltdrdata/ComfyUI-Manager/main
 share_option = all
 bypass_ssl = False
 EOF
-
-    # Write to legacy path too to prevent migration notice on every boot
-    cp "$MANAGER_DIR/config.ini" "$MANAGER_DIR_LEGACY/config.ini"
 
     log "INFO" "✅ ComfyUI-Manager network mode disabled"
     log "INFO" ""

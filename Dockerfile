@@ -90,8 +90,19 @@ FROM base AS final
 
 # Final stage setup
 
-# Create model directories
-RUN mkdir -p /workspace/ComfyUI/models/{checkpoints,loras,vae,upscale_models,embeddings,controlnet,diffusion_models,text_encoders,clip,clip_vision,unet}
+# Create model directories (explicit paths - /bin/sh doesn't support brace expansion)
+RUN mkdir -p \
+    /workspace/ComfyUI/models/checkpoints \
+    /workspace/ComfyUI/models/loras \
+    /workspace/ComfyUI/models/vae \
+    /workspace/ComfyUI/models/upscale_models \
+    /workspace/ComfyUI/models/embeddings \
+    /workspace/ComfyUI/models/controlnet \
+    /workspace/ComfyUI/models/diffusion_models \
+    /workspace/ComfyUI/models/text_encoders \
+    /workspace/ComfyUI/models/clip \
+    /workspace/ComfyUI/models/clip_vision \
+    /workspace/ComfyUI/models/unet
 
 # Create HuggingFace cache directory
 RUN mkdir -p /workspace/.cache/huggingface
