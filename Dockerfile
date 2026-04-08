@@ -84,7 +84,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         opencv-python \
         psutil \
         onnx \
-        onnxruntime-gpu
+        onnxruntime
 
 FROM base AS final
 
