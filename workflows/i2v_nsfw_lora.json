@@ -262,8 +262,8 @@
         "Node name for S&R": "WanImageToVideo"
       },
       "widgets_values": [
-        832,
-        480,
+        768,
+        512,
         81,
         1
       ]
