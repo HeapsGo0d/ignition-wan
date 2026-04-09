@@ -152,7 +152,11 @@ get_configuration() {
     echo "  3) I2V FP8 (image-to-video, ~22GB + CLIP vision)"
     echo "  4) I2V FP8 + LightX2V LoRAs (4-step fast I2V, ~22GB + LoRAs)"
     echo "  5) Full bundle (T2V + I2V, ~30GB)"
-    echo "  6) Custom (manual entry)"
+    echo "  --- NSFW/Uncensored ---"
+    echo "  6) FX-FeiHou Remix NSFW I2V v2.0 (high + low lighting, ~22GB + CLIP)"
+    echo "  7) Phr00t Rapid AIO NSFW I2V (~23GB + CLIP)"
+    echo "  8) NSFW LoRAs only (NSFW-22-H + NSFW-22-L, ~1.2GB)"
+    echo "  9) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
@@ -177,6 +181,18 @@ get_configuration() {
             echo "  → Selected: Full bundle (T2V + I2V)"
             ;;
         6)
+            HUGGINGFACE_MODELS="remix_nsfw_i2v_bundle"
+            echo "  → Selected: FX-FeiHou Remix NSFW I2V v2.0"
+            ;;
+        7)
+            HUGGINGFACE_MODELS="phr00t_nsfw_i2v_bundle"
+            echo "  → Selected: Phr00t Rapid AIO NSFW I2V"
+            ;;
+        8)
+            HUGGINGFACE_MODELS="nsfw_lora_bundle"
+            echo "  → Selected: NSFW LoRAs only"
+            ;;
+        9)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"

@@ -133,9 +133,13 @@ def validate_huggingface_repo(repo: str) -> bool:
         'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h',
         'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise',
         'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise',
+        'phr00t_i2v_nsfw', 'phr00t_t2v_nsfw',
+        'remix_nsfw_i2v_high', 'remix_nsfw_i2v_low',
+        'nsfw_lora_h', 'nsfw_lora_l',
         'wan2.2_t2v_bundle', 'wan2.2_t2v_lightx2v_bundle',
         'wan2.2_i2v_bundle', 'wan2.2_i2v_lightx2v_bundle',
         'wan2.2_full_bundle', 'lightx2v_t2v_bundle', 'lightx2v_i2v_bundle',
+        'nsfw_lora_bundle', 'remix_nsfw_i2v_bundle', 'phr00t_nsfw_i2v_bundle',
     ]
     if repo in predefined_models:
         return True

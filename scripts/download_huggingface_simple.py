@@ -78,6 +78,40 @@ WAN_MODELS = {
         'filename': 'wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors',
         'subdir': 'loras'
     },
+    # --- NSFW/Uncensored Models ---
+    # Phr00t Rapid All-In-One NSFW (repo deprecated upstream, files still accessible)
+    'phr00t_i2v_nsfw': {
+        'url': 'https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/v10/wan2.2-i2v-rapid-aio-v10-nsfw.safetensors',
+        'filename': 'wan2.2-i2v-rapid-aio-v10-nsfw.safetensors',
+        'subdir': 'diffusion_models'
+    },
+    'phr00t_t2v_nsfw': {
+        'url': 'https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/v10/wan2.2-t2v-rapid-aio-v10-nsfw.safetensors',
+        'filename': 'wan2.2-t2v-rapid-aio-v10-nsfw.safetensors',
+        'subdir': 'diffusion_models'
+    },
+    # FX-FeiHou Remix NSFW v2.0 (age-gate repo - set HF_TOKEN if downloads fail)
+    'remix_nsfw_i2v_high': {
+        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_high_lighting_v2.0.safetensors',
+        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_high_lighting_v2.0.safetensors',
+        'subdir': 'diffusion_models'
+    },
+    'remix_nsfw_i2v_low': {
+        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_low_lighting_v2.0.safetensors',
+        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_low_lighting_v2.0.safetensors',
+        'subdir': 'diffusion_models'
+    },
+    # General NSFW LoRAs (via HuggingFace mirror)
+    'nsfw_lora_h': {
+        'url': 'https://huggingface.co/rahul7star/wan2.2Lora/resolve/main/wan2.2/NSFW-22-H-e8.safetensors',
+        'filename': 'NSFW-22-H-e8.safetensors',
+        'subdir': 'loras'
+    },
+    'nsfw_lora_l': {
+        'url': 'https://huggingface.co/rahul7star/wan2.2Lora/resolve/main/wan2.2/NSFW-22-L-e8.safetensors',
+        'filename': 'NSFW-22-L-e8.safetensors',
+        'subdir': 'loras'
+    },
     # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
     'lightx2v_i2v_low_noise': {
         'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
@@ -106,6 +140,10 @@ WAN_BUNDLES = {
     # LightX2V LoRAs only (if models already downloaded)
     'lightx2v_t2v_bundle': ['lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
     'lightx2v_i2v_bundle': ['lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
+    # NSFW bundles
+    'nsfw_lora_bundle': ['nsfw_lora_h', 'nsfw_lora_l'],
+    'remix_nsfw_i2v_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    'phr00t_nsfw_i2v_bundle': ['phr00t_i2v_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
 }
 
 
