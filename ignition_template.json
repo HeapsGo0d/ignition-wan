@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.1",
+  "name": "Ignition WAN v1.0.10",
   "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.1",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.10",
   "ports": [
     {
       "privatePort": 8188,
@@ -40,7 +40,7 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "wan2.2_t2v_bundle",
+      "value": "phr00t_nsfw_i2v_bundle",
       "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
     },
     {
