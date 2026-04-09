@@ -279,6 +279,11 @@ generate_template() {
       "key": "FILEBROWSER_PASSWORD",
       "value": "$FILEBROWSER_PASSWORD",
       "description": "Password for file browser access"
+    },
+    {
+      "key": "ENABLE_SAGEATTN",
+      "value": "false",
+      "description": "Enable SageAttention2++ for faster attention on RTX 5090 (Blackwell). Use KJNodes patch node in workflow."
     }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
