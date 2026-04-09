@@ -71,6 +71,10 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-KJNodes && \
     pip install --no-cache-dir -r requirements.txt
 
+# Install WanMoeKSampler - auto-switches high/low noise models at correct diffusion timestep
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/stduhpf/ComfyUI-WanMoeKSampler.git
+
 # Install additional dependencies for Ignition
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install \
