@@ -147,59 +147,49 @@ get_configuration() {
 
     # WAN 2.2 Model Preset Selection
     echo -e "${BLUE}WAN 2.2 Video Model Preset:${NC}"
-    echo "  1) T2V FP8 (text-to-video, ~22GB)"
-    echo "  2) T2V FP8 + LightX2V LoRAs (4-step fast T2V, ~22GB + LoRAs)"
-    echo "  3) I2V FP8 (image-to-video, ~22GB + CLIP vision)"
-    echo "  4) I2V FP8 + LightX2V LoRAs (4-step fast I2V, ~22GB + LoRAs)"
-    echo "  5) Full bundle (T2V + I2V, ~30GB)"
+    echo "  1) T2V bundle (text-to-video, both noise variants + LightX2V LoRAs, ~24GB)"
+    echo "  2) I2V bundle (image-to-video, both noise variants + LightX2V LoRAs + CLIP, ~24GB)"
+    echo "  3) Full bundle (T2V + I2V everything, ~45GB)"
     echo "  --- NSFW/Uncensored ---"
-    echo "  6) FX-FeiHou Remix NSFW I2V v2.0 (high + low lighting, ~22GB + CLIP)"
-    echo "  7) Phr00t Rapid AIO NSFW I2V (~23GB + CLIP)"
-    echo "  8) NSFW LoRAs only (NSFW-22-H + NSFW-22-L, ~1.2GB)"
-    echo "  9) Custom (manual entry)"
+    echo "  4) FX-FeiHou Remix NSFW I2V v2.0 (high + low lighting + CLIP, ~24GB)"
+    echo "  5) Phr00t Rapid AIO NSFW I2V (~23GB + CLIP)"
+    echo "  6) NSFW LoRAs only (NSFW-22-H + NSFW-22-L, ~1.2GB)"
+    echo "  7) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
             HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
-            echo "  → Selected: T2V FP8"
+            echo "  → Selected: T2V bundle"
             ;;
         2)
-            HUGGINGFACE_MODELS="wan2.2_t2v_lightx2v_bundle"
-            echo "  → Selected: T2V FP8 + LightX2V LoRAs (4-step)"
+            HUGGINGFACE_MODELS="wan2.2_i2v_bundle"
+            echo "  → Selected: I2V bundle"
             ;;
         3)
-            HUGGINGFACE_MODELS="wan2.2_i2v_bundle"
-            echo "  → Selected: I2V FP8"
-            ;;
-        4)
-            HUGGINGFACE_MODELS="wan2.2_i2v_lightx2v_bundle"
-            echo "  → Selected: I2V FP8 + LightX2V LoRAs (4-step)"
-            ;;
-        5)
             HUGGINGFACE_MODELS="wan2.2_full_bundle"
             echo "  → Selected: Full bundle (T2V + I2V)"
             ;;
-        6)
+        4)
             HUGGINGFACE_MODELS="remix_nsfw_i2v_bundle"
             echo "  → Selected: FX-FeiHou Remix NSFW I2V v2.0"
             ;;
-        7)
+        5)
             HUGGINGFACE_MODELS="phr00t_nsfw_i2v_bundle"
             echo "  → Selected: Phr00t Rapid AIO NSFW I2V"
             ;;
-        8)
+        6)
             HUGGINGFACE_MODELS="nsfw_lora_bundle"
             echo "  → Selected: NSFW LoRAs only"
             ;;
-        9)
+        7)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
             HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
-            echo "  → Invalid selection, defaulting to T2V FP8"
+            echo "  → Invalid selection, defaulting to T2V bundle"
             ;;
     esac
     echo ""
