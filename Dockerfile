@@ -116,7 +116,7 @@ RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh |
 
 # Copy our scripts and workflows
 COPY scripts/ /workspace/scripts/
-COPY workflows/ /workspace/workflows/
+COPY workflows/ /workspace/ComfyUI/user/default/workflows/
 RUN chmod +x /workspace/scripts/*.sh /workspace/scripts/privacy/*.sh && \
     chmod +x /workspace/scripts/restart-comfyui.sh /workspace/scripts/stop-pod.sh
 
