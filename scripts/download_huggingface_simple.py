@@ -127,16 +127,16 @@ WAN_MODELS = {
 
 # Convenience bundle keys that expand to multiple models
 WAN_BUNDLES = {
-    # T2V: model + text encoder + VAE
-    'wan2.2_t2v_bundle': ['wan2.2_t2v_fp8', 'umt5_xxl_fp8', 'wan_vae'],
-    # T2V + LightX2V LoRAs for 4-step accelerated generation (both noise variants required)
+    # T2V: both noise variants + text encoder + VAE + LightX2V LoRAs (complete for all T2V templates)
+    'wan2.2_t2v_bundle': ['wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
+    # T2V alias kept for clarity
     'wan2.2_t2v_lightx2v_bundle': ['wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
-    # I2V: model + text encoder + VAE + CLIP vision
-    'wan2.2_i2v_bundle': ['wan2.2_i2v_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    # I2V + LightX2V LoRAs for 4-step accelerated generation (both noise variants required)
-    'wan2.2_i2v_lightx2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
-    # Both T2V and I2V including high noise variants for LightX2V compatibility
-    'wan2.2_full_bundle': ['wan2.2_t2v_fp8', 'wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # I2V: both noise variants + text encoder + VAE + CLIP + LightX2V LoRAs (complete for all I2V templates)
+    'wan2.2_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
+    # I2V alias kept for clarity
+    'wan2.2_i2v_lightx2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
+    # Full: everything for T2V + I2V including all LightX2V LoRAs
+    'wan2.2_full_bundle': ['wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
     # LightX2V LoRAs only (if models already downloaded)
     'lightx2v_t2v_bundle': ['lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
     'lightx2v_i2v_bundle': ['lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
