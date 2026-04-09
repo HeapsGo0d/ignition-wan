@@ -147,34 +147,34 @@ get_configuration() {
 
     # WAN 2.2 Model Preset Selection
     echo -e "${BLUE}WAN 2.2 Video Model Preset:${NC}"
-    echo "  1) WAN 2.2 T2V FP8 bundle (default - text-to-video, ~15GB, RTX 5090 recommended)"
-    echo "  2) WAN 2.2 I2V FP8 bundle (image-to-video, ~15GB + CLIP vision)"
-    echo "  3) WAN 2.2 Full bundle (both T2V + I2V, ~29GB)"
-    echo "  4) WAN 2.2 T2V FP16 bundle (max quality T2V, ~29GB)"
-    echo "  5) WAN 2.2 I2V FP16 bundle (max quality I2V, ~29GB)"
+    echo "  1) T2V FP8 (text-to-video, ~22GB)"
+    echo "  2) T2V FP8 + LightX2V LoRAs (4-step fast T2V, ~22GB + LoRAs)"
+    echo "  3) I2V FP8 (image-to-video, ~22GB + CLIP vision)"
+    echo "  4) I2V FP8 + LightX2V LoRAs (4-step fast I2V, ~22GB + LoRAs)"
+    echo "  5) Full bundle (T2V + I2V, ~30GB)"
     echo "  6) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
             HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
-            echo "  → Selected: WAN 2.2 T2V FP8 (text-to-video)"
+            echo "  → Selected: T2V FP8"
             ;;
         2)
-            HUGGINGFACE_MODELS="wan2.2_i2v_bundle"
-            echo "  → Selected: WAN 2.2 I2V FP8 (image-to-video)"
+            HUGGINGFACE_MODELS="wan2.2_t2v_lightx2v_bundle"
+            echo "  → Selected: T2V FP8 + LightX2V LoRAs (4-step)"
             ;;
         3)
-            HUGGINGFACE_MODELS="wan2.2_full_bundle"
-            echo "  → Selected: WAN 2.2 Full (T2V + I2V)"
+            HUGGINGFACE_MODELS="wan2.2_i2v_bundle"
+            echo "  → Selected: I2V FP8"
             ;;
         4)
-            HUGGINGFACE_MODELS="wan2.2_t2v_fp16,umt5_xxl_fp8,wan_vae"
-            echo "  → Selected: WAN 2.2 T2V FP16 (max quality)"
+            HUGGINGFACE_MODELS="wan2.2_i2v_lightx2v_bundle"
+            echo "  → Selected: I2V FP8 + LightX2V LoRAs (4-step)"
             ;;
         5)
-            HUGGINGFACE_MODELS="wan2.2_i2v_fp16,umt5_xxl_fp8,wan_vae,clip_vision_h"
-            echo "  → Selected: WAN 2.2 I2V FP16 (max quality)"
+            HUGGINGFACE_MODELS="wan2.2_full_bundle"
+            echo "  → Selected: Full bundle (T2V + I2V)"
             ;;
         6)
             read -p "Enter model keys (comma-separated): " input_hf
@@ -183,7 +183,7 @@ get_configuration() {
             ;;
         *)
             HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
-            echo "  → Invalid selection, defaulting to WAN 2.2 T2V FP8"
+            echo "  → Invalid selection, defaulting to T2V FP8"
             ;;
     esac
     echo ""
@@ -344,12 +344,13 @@ Set \`HUGGINGFACE_MODELS\` to one of these bundle keys:
 
 | Key | Models Downloaded | VRAM | Use Case |
 |-----|------------------|------|----------|
-| \`wan2.2_t2v_bundle\` | T2V FP8 + text encoder + VAE | ~20GB | Text-to-video |
-| \`wan2.2_i2v_bundle\` | I2V FP8 + text encoder + VAE + CLIP | ~20GB | Image-to-video |
+| \`wan2.2_t2v_bundle\` | T2V FP8 + text encoder + VAE | ~22GB | Text-to-video (standard) |
+| \`wan2.2_t2v_lightx2v_bundle\` | Above + LightX2V LoRAs | ~22GB | T2V 4-step (5x faster) |
+| \`wan2.2_i2v_bundle\` | I2V FP8 + text encoder + VAE + CLIP | ~22GB | Image-to-video (standard) |
+| \`wan2.2_i2v_lightx2v_bundle\` | I2V FP8 (both variants) + LightX2V LoRAs | ~22GB | I2V 4-step (5x faster) |
 | \`wan2.2_full_bundle\` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
-| \`wan2.2_t2v_fp16\` + extras | T2V full precision | ~35GB | Max quality T2V |
 
-Individual keys also work: \`wan2.2_t2v_fp8\`, \`wan2.2_i2v_fp8\`, \`umt5_xxl_fp8\`, \`wan_vae\`, \`clip_vision_h\`
+Individual keys also work: \`wan2.2_t2v_fp8\`, \`wan2.2_i2v_fp8\`, \`umt5_xxl_fp8\`, \`wan_vae\`, \`clip_vision_h\`, \`lightx2v_t2v_low_noise\`, \`lightx2v_i2v_low_noise\`
 
 ## Environment Variables
 
