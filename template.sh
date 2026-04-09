@@ -460,7 +460,8 @@ deploy_template() {
     {"key": "CIVITAI_VAES", "value": "$CIVITAI_VAES"},
     {"key": "CIVITAI_TOKEN", "value": "{{ RUNPOD_SECRET_civitai.com }}"},
     {"key": "HF_TOKEN", "value": "{{ RUNPOD_SECRET_huggingface.co }}"},
-    {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"}
+    {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"},
+    {"key": "ENABLE_SAGEATTN", "value": "true"}
   ]
 }
 EOF
