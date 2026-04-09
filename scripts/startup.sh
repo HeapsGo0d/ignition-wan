@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.0             ║"
+    log "INFO" "║       🎬 IGNITION WAN v1.0.12            ║"
     log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
@@ -84,6 +84,7 @@ print_config() {
     log "INFO" "  • Storage: RunPod volume (/workspace)"
     log "INFO" "  • ComfyUI Port: $COMFYUI_PORT"
     log "INFO" "  • File Browser Port: $FILEBROWSER_PORT"
+    log "INFO" "  • SageAttention: ${ENABLE_SAGEATTN:-false}"
     log "INFO" ""
 }
 
