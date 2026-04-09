@@ -282,7 +282,7 @@ generate_template() {
     },
     {
       "key": "ENABLE_SAGEATTN",
-      "value": "false",
+      "value": "true",
       "description": "Enable SageAttention2++ for faster attention on RTX 5090 (Blackwell). Use KJNodes patch node in workflow."
     }
   ],
