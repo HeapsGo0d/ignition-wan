@@ -432,6 +432,21 @@ main() {
         log "INFO" ""
     fi
 
+    # SageAttention: runs every boot (version-checked, idempotent)
+    if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
+        CURRENT_SA=$(python3 -m pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "none")
+        if [[ "$CURRENT_SA" == "2.2.0" ]]; then
+            log "INFO" "⚡ SageAttention 2.2.0 ready"
+        else
+            log "INFO" "⚡ Installing SageAttention2++ (current: $CURRENT_SA)..."
+            PY_VER=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
+            WHEEL_URL="https://github.com/mobcat40/sageattention-blackwell/releases/download/v2.2.0/sageattention-2.2.0+cu128-${PY_VER}-${PY_VER}-linux_x86_64.whl"
+            python3 -m pip install --no-cache-dir "$WHEEL_URL" 2>/dev/null \
+                || python3 -m pip install --no-cache-dir "sageattention>=2.0.0"
+            log "INFO" "✅ SageAttention installed"
+        fi
+    fi
+
     log "INFO" "🚀 All services started successfully"
     log "INFO" "💡 ComfyUI: http://0.0.0.0:$COMFYUI_PORT"
     log "INFO" "📁 File Browser: http://0.0.0.0:$FILEBROWSER_PORT"
