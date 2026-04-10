@@ -1,8 +1,8 @@
 # Ignition WAN - ComfyUI for WAN 2.2 Video Generation
 # Optimized for RTX 5090 and RunPod deployment
-# Using NVIDIA's official PyTorch container with RTX 5090 support
+# Python 3.12 + CUDA 12.8 base for Blackwell support + SA2++ compatibility
 
-FROM pytorch/pytorch:2.5.1-cuda12.4-cudnn9-devel AS base
+FROM pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel AS base
 
 # Consolidated environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -39,8 +39,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --pre --force-reinstall \
     torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
 
-# Verify nightly installation succeeded (build fails if not)
-RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert 'dev' in v, f'Expected nightly, got: {v}'"
+# Verify PyTorch installation succeeded (build fails if not)
+RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.cuda.is_available(), 'CUDA not available'"
 
 # Runtime libraries (triton comes with PyTorch nightly)
 RUN --mount=type=cache,target=/root/.cache/pip \
