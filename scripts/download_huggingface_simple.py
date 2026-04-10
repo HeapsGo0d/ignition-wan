@@ -101,15 +101,10 @@ WAN_MODELS = {
         'filename': 'Wan2.2_Remix_NSFW_i2v_14b_low_lighting_v2.0.safetensors',
         'subdir': 'diffusion_models'
     },
-    # General NSFW LoRAs (via HuggingFace mirror)
+    # General NSFW LoRA — single file works for both high and low noise stages
     'nsfw_lora_h': {
         'url': 'https://huggingface.co/rahul7star/wan2.2Lora/resolve/main/wan2.2/NSFW-22-H-e8.safetensors',
         'filename': 'NSFW-22-H-e8.safetensors',
-        'subdir': 'loras'
-    },
-    'nsfw_lora_l': {
-        'url': 'https://huggingface.co/rahul7star/wan2.2Lora/resolve/main/wan2.2/NSFW-22-L-e8.safetensors',
-        'filename': 'NSFW-22-L-e8.safetensors',
         'subdir': 'loras'
     },
     # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
@@ -141,7 +136,7 @@ WAN_BUNDLES = {
     'lightx2v_t2v_bundle': ['lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
     'lightx2v_i2v_bundle': ['lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
     # NSFW bundles
-    'nsfw_lora_bundle': ['nsfw_lora_h', 'nsfw_lora_l'],
+    'nsfw_lora_bundle': ['nsfw_lora_h'],
     'remix_nsfw_i2v_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     'phr00t_nsfw_i2v_bundle': ['phr00t_i2v_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
 }
