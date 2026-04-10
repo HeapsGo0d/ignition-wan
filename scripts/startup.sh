@@ -432,14 +432,68 @@ main() {
         log "INFO" ""
     fi
 
-    # SageAttention: runs every boot (version-checked, idempotent)
-    # No prebuilt Linux cp312 cu128 wheels available yet — skipped until one appears
+    # SageAttention: build-once-cache strategy
+    # Do NOT add --use-sage-attention to COMFY_FLAGS (Triton backend breaks WAN 2.2 MoE)
+    # Use KJNodes "Apply Sage Attention" patch node with sageattn_qk_int8_pv_fp16_cuda instead
     if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
-        CURRENT_SA=$(python3 -m pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "none")
+        SA_CACHE_DIR="/workspace/.cache/sageattention"
+        mkdir -p "$SA_CACHE_DIR"
+
+        # ABI fingerprint: rebuild wheel only when Python/torch/CUDA versions change
+        SA_PY=$(python3 -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')")
+        SA_TORCH=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/null | tr '+' '-')
+        SA_CUDA=$(python3 -c "import torch; print(torch.version.cuda)" 2>/dev/null || echo "none")
+        SA_ABI="py${SA_PY}-torch${SA_TORCH}-cu${SA_CUDA}"
+        SA_KEY_FILE="${SA_CACHE_DIR}/.abi_key"
+        CACHED_KEY=$(cat "$SA_KEY_FILE" 2>/dev/null || echo "")
+
+        SA_READY=false
+
         if python3 -c "import sageattention" 2>/dev/null; then
-            log "INFO" "⚡ SageAttention ready (${CURRENT_SA})"
+            # Already installed (from a previous background build)
+            SA_VER=$(python3 -m pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "?")
+            log "INFO" "⚡ SageAttention ready (${SA_VER}) — workflow: KJNodes patch node → sageattn_qk_int8_pv_fp16_cuda"
+            SA_READY=true
         else
-            log "INFO" "⚡ SageAttention enabled but no prebuilt Linux wheel available yet — skipping"
+            CACHED_WHEEL=$(ls "${SA_CACHE_DIR}"/sageattention*.whl 2>/dev/null | head -1 || echo "")
+            if [[ -n "$CACHED_WHEEL" ]] && [[ "$CACHED_KEY" == "$SA_ABI" ]]; then
+                log "INFO" "⚡ Installing SageAttention from cache..."
+                if pip install --no-deps "$CACHED_WHEEL" 2>/dev/null && python3 -c "import sageattention" 2>/dev/null; then
+                    log "INFO" "⚡ SageAttention ready — workflow: KJNodes patch node → sageattn_qk_int8_pv_fp16_cuda"
+                    SA_READY=true
+                else
+                    log "WARN" "⚡ SA cache install failed — clearing and rebuilding"
+                    rm -f "$CACHED_WHEEL" "$SA_KEY_FILE"
+                fi
+            fi
+        fi
+
+        if [[ "$SA_READY" != "true" ]]; then
+            log "INFO" "⚡ SageAttention: building from source in background (~5 min)"
+            log "INFO" "  ComfyUI starting now. Run restart-comfyui.sh after build to activate SA."
+            (
+                set +e
+                SA_ARCH=$(python3 -c "import torch; cap=torch.cuda.get_device_capability(0); print(f'sm_{cap[0]}{cap[1]}')" 2>/dev/null || echo "sm_120")
+                cd /tmp && rm -rf sageattention_build && mkdir sageattention_build && cd sageattention_build
+                if git clone --depth 1 https://github.com/thu-ml/SageAttention . >> "$LOG_FILE" 2>&1; then
+                    if MAX_JOBS=32 NVCC_APPEND_FLAGS="--threads 8 -arch=${SA_ARCH}" \
+                       pip wheel --no-deps . -w "$SA_CACHE_DIR" >> "$LOG_FILE" 2>&1; then
+                        echo "$SA_ABI" > "$SA_KEY_FILE"
+                        WHEEL=$(ls "$SA_CACHE_DIR"/sageattention*.whl 2>/dev/null | head -1)
+                        if [[ -n "$WHEEL" ]] && pip install --no-deps "$WHEEL" >> "$LOG_FILE" 2>&1; then
+                            log "INFO" "⚡ SageAttention build complete — run /workspace/scripts/restart-comfyui.sh to activate"
+                        else
+                            log "WARN" "⚡ SageAttention wheel built but install failed"
+                        fi
+                    else
+                        log "WARN" "⚡ SageAttention build failed — see $LOG_FILE for details"
+                    fi
+                else
+                    log "WARN" "⚡ SageAttention: failed to clone thu-ml/SageAttention"
+                fi
+                rm -rf /tmp/sageattention_build
+            ) &
+            disown
         fi
     fi
 
