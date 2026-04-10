@@ -62,8 +62,9 @@ WAN_MODELS = {
         'subdir': 'vae'
     },
     # --- CLIP Vision (required for I2V image conditioning) ---
+    # Note: clip_vision_h is in the WAN 2.1 repackaged repo, not 2.2
     'clip_vision_h': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/clip_vision/clip_vision_h.safetensors',
+        'url': 'https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors',
         'filename': 'clip_vision_h.safetensors',
         'subdir': 'clip_vision'
     },

@@ -433,19 +433,13 @@ main() {
     fi
 
     # SageAttention: runs every boot (version-checked, idempotent)
+    # No prebuilt Linux cp312 cu128 wheels available yet — skipped until one appears
     if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
         CURRENT_SA=$(python3 -m pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "none")
-        if [[ "$CURRENT_SA" == "2.2.0" ]]; then
-            log "INFO" "⚡ SageAttention 2.2.0 ready"
+        if python3 -c "import sageattention" 2>/dev/null; then
+            log "INFO" "⚡ SageAttention ready (${CURRENT_SA})"
         else
-            log "INFO" "⚡ Installing SageAttention2++ (current: $CURRENT_SA)..."
-            PY_VER=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
-            WHEEL_URL="https://github.com/mobcat40/sageattention-blackwell/releases/download/v2.2.0/sageattention-2.2.0+cu128-${PY_VER}-${PY_VER}-linux_x86_64.whl"
-            if python3 -m pip install --no-cache-dir "$WHEEL_URL" 2>/dev/null; then
-                log "INFO" "✅ SageAttention 2.2.0 installed (Blackwell wheel)"
-            else
-                log "WARN" "⚠️  Blackwell wheel not available for $PY_VER, SageAttention skipped"
-            fi
+            log "INFO" "⚡ SageAttention enabled but no prebuilt Linux wheel available yet — skipping"
         fi
     fi
 
