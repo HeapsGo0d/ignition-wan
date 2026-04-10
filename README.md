@@ -99,6 +99,7 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 | Variable | Description | Default |
 |---|---|---|
 | `FILEBROWSER_PASSWORD` | File browser login password | `runpod` |
+| `ENABLE_SAGEATTN` | Build SageAttention2++ from source and cache wheel for faster attention | `true` |
 | `ENABLE_MANAGER_UI` | Show ComfyUI-Manager UI | `true` |
 | `COMFY_FLAGS` | ComfyUI startup flags | `--preview-method auto` |
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `false` |
@@ -115,6 +116,19 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 ├── loras/              # LoRA models (optional)
 └── upscale_models/     # Upscalers (optional)
 ```
+
+## ⚡ SageAttention2++
+
+When `ENABLE_SAGEATTN=true` (default), SageAttention2++ is built from source and cached on the persistent volume for faster attention computation.
+
+**First boot**: ComfyUI starts immediately. SA2++ compiles in the background (~5 min on RTX 5090). When complete, the startup log shows:
+```
+⚡ SageAttention build complete — run /workspace/scripts/restart-comfyui.sh to activate
+```
+
+**Subsequent boots**: Wheel is installed from cache in ~10 seconds — no recompile needed. The ABI fingerprint ensures the wheel is rebuilt automatically if PyTorch or CUDA versions change.
+
+**Activating in workflow**: Do NOT use `--use-sage-attention` in `COMFY_FLAGS` — that uses the Triton backend which causes black frames with WAN 2.2's MoE architecture. Instead, add a **KJNodes "Apply Sage Attention"** patch node to your workflow and set the backend to `sageattn_qk_int8_pv_fp16_cuda`.
 
 ## 🔄 Restarting ComfyUI
 

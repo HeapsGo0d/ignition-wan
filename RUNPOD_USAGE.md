@@ -48,7 +48,23 @@ Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `true` |
 
 ### Storage Configuration
-Storage: Ephemeral volume (0GB; models redownload each start) (Container: 200GB disk, 0GB volume)
+
+| Setup | Container Disk | Volume | Notes |
+|-------|---------------|--------|-------|
+| Ephemeral | 200GB | 0GB | Models redownload each start (~15-30 min) |
+| Persistent (recommended) | 50GB | 100GB+ | Models cached; instant subsequent starts |
+
+## ⚡ SageAttention2++ (Optional Speed Boost)
+
+Set `ENABLE_SAGEATTN=true` (default). On first boot, SA2++ compiles in the background — ComfyUI starts immediately, no wait. When the build finishes (~5 min), run:
+
+```bash
+/workspace/scripts/restart-comfyui.sh
+```
+
+On all subsequent boots, the cached wheel installs in ~10 seconds automatically.
+
+**In your workflow**: Add a KJNodes **"Apply Sage Attention"** patch node, set backend to `sageattn_qk_int8_pv_fp16_cuda`. Do not use `--use-sage-attention` in `COMFY_FLAGS` — it causes black frames with WAN 2.2.
 
 ## Startup Process
 
