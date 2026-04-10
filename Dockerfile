@@ -23,7 +23,7 @@ WORKDIR /workspace
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ffmpeg git aria2 git-lfs wget vim \
     iproute2 net-tools \
-    libgl1-mesa-glx libglib2.0-0 \
+    libgl1 libglib2.0-0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Core Python tooling (PyTorch already included in base image)
