@@ -473,11 +473,11 @@ main() {
             log "INFO" "  ComfyUI starting now. Run restart-comfyui.sh after build to activate SA."
             (
                 set +e
-                SA_ARCH=$(python3 -c "import torch; cap=torch.cuda.get_device_capability(0); print(f'sm_{cap[0]}{cap[1]}')" 2>/dev/null || echo "sm_120")
+                SA_ARCH=$(python3 -c "import torch; cap=torch.cuda.get_device_capability(0); print(f'{cap[0]}.{cap[1]}')" 2>/dev/null || echo "12.0")
                 cd /tmp && rm -rf sageattention_build && mkdir sageattention_build && cd sageattention_build
                 if git clone --depth 1 https://github.com/thu-ml/SageAttention . >> "$LOG_FILE" 2>&1; then
-                    if MAX_JOBS=32 NVCC_APPEND_FLAGS="--threads 8 -arch=${SA_ARCH}" \
-                       pip wheel --no-deps . -w "$SA_CACHE_DIR" >> "$LOG_FILE" 2>&1; then
+                    if MAX_JOBS=32 TORCH_CUDA_ARCH_LIST="${SA_ARCH}" \
+                       pip wheel --no-build-isolation --no-deps . -w "$SA_CACHE_DIR" >> "$LOG_FILE" 2>&1; then
                         echo "$SA_ABI" > "$SA_KEY_FILE"
                         WHEEL=$(ls "$SA_CACHE_DIR"/sageattention*.whl 2>/dev/null | head -1)
                         if [[ -n "$WHEEL" ]] && pip install --no-deps "$WHEEL" >> "$LOG_FILE" 2>&1; then
