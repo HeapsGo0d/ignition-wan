@@ -40,7 +40,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
 
 # Verify PyTorch installation succeeded (build fails if not)
-RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.cuda.is_available(), 'CUDA not available'"
+RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.version.cuda is not None, 'PyTorch not built with CUDA'"
 
 # Runtime libraries (triton comes with PyTorch nightly)
 RUN --mount=type=cache,target=/root/.cache/pip \
