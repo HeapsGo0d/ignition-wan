@@ -441,9 +441,11 @@ main() {
             log "INFO" "⚡ Installing SageAttention2++ (current: $CURRENT_SA)..."
             PY_VER=$(python3 -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
             WHEEL_URL="https://github.com/mobcat40/sageattention-blackwell/releases/download/v2.2.0/sageattention-2.2.0+cu128-${PY_VER}-${PY_VER}-linux_x86_64.whl"
-            python3 -m pip install --no-cache-dir "$WHEEL_URL" 2>/dev/null \
-                || python3 -m pip install --no-cache-dir "sageattention>=2.0.0"
-            log "INFO" "✅ SageAttention installed"
+            if python3 -m pip install --no-cache-dir "$WHEEL_URL" 2>/dev/null; then
+                log "INFO" "✅ SageAttention 2.2.0 installed (Blackwell wheel)"
+            else
+                log "WARN" "⚠️  Blackwell wheel not available for $PY_VER, SageAttention skipped"
+            fi
         fi
     fi
 
