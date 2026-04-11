@@ -435,13 +435,29 @@ main() {
     # SageAttention: pre-compiled into image at build time (TORCH_CUDA_ARCH_LIST=12.0, sm_120)
     # Do NOT add --use-sage-attention to COMFY_FLAGS (Triton backend breaks WAN 2.2 MoE)
     # Use KJNodes "Apply Sage Attention" patch node with sageattn_qk_int8_pv_fp16_cuda instead
+    # Runtime GPU test validates Triton JIT actually works on this device/driver combo —
+    # import success alone is not sufficient (Triton can fail at kernel launch even if SA loads)
     if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
-        if python3 -c "import sageattention; from sageattention import sageattn_qk_int8_pv_fp16_cuda" 2>/dev/null; then
-            SA_VER=$(pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "?")
+        SA_VER=$(pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "?")
+        if python3 - <<'SATEST' 2>/dev/null
+import torch, sys
+try:
+    from sageattention import sageattn_qk_int8_pv_fp16_cuda
+    B,H,N,D = 1,24,256,128
+    q = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
+    k = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
+    v = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
+    sageattn_qk_int8_pv_fp16_cuda(q,k,v,is_causal=False,tensor_layout="HND")
+    sys.exit(0)
+except Exception:
+    sys.exit(1)
+SATEST
+        then
             log "INFO" "⚡ SageAttention ready (${SA_VER}) — workflow: KJNodes patch node → sageattn_qk_int8_pv_fp16_cuda"
         else
-            log "WARN" "⚡ SageAttention health check failed — pre-compiled into image but appears broken"
-            log "WARN" "  Continuing without SA. This may indicate a broken image build."
+            log "WARN" "⚡ SageAttention (${SA_VER}) runtime check FAILED — Triton JIT kernel invalid for this GPU/driver"
+            log "WARN" "  Workflows with SA patch nodes must use backend: disabled"
+            log "WARN" "  Generation works normally without SA — performance only, not correctness"
         fi
     fi
 
