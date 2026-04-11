@@ -76,7 +76,7 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     git -C ComfyUI-Frame-Interpolation checkout 26545cc2dd95bc3d27f056016300673bdeee78f5 && \
     cd ComfyUI-Frame-Interpolation && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements-no-cupy.txt
 
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
