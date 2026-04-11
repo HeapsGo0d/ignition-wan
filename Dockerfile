@@ -77,13 +77,7 @@ RUN TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=8 \
     pip install --no-cache-dir --no-build-isolation sageattention==2.2.0
 
 # Smoke test: verify SA compiled correctly and CUDA backend is callable
-RUN python3 -c "
-import torch
-print(f'✅ PyTorch {torch.__version__} CUDA {torch.version.cuda}')
-import sageattention
-from sageattention import sageattn_qk_int8_pv_fp16_cuda
-print('✅ SageAttention2++ CUDA backend OK')
-"
+RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} CUDA {torch.version.cuda}'); import sageattention; from sageattention import sageattn_qk_int8_pv_fp16_cuda; print('SageAttention2++ CUDA backend OK')"
 
 
 # ── Stage 2: Final (runtime) ──────────────────────────────────────────────────
