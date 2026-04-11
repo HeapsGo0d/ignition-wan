@@ -85,6 +85,8 @@ RUN git clone --depth 1 --branch v2.2.0 https://github.com/thu-ml/SageAttention 
 # Pinned to d1a57a5 (2026-01-17) — last meaningful SA3 change: c03f15f (2025-12-22)
 RUN git clone https://github.com/thu-ml/SageAttention /tmp/sageattention3 && \
     git -C /tmp/sageattention3 checkout d1a57a546c3d395b1ffcbeecc66d81db76f3b4b5 && \
+    sed -i 's/cc_major, cc_minor = torch.cuda.get_device_capability()/cc_major, cc_minor = 12, 0/' \
+        /tmp/sageattention3/sageattention3_blackwell/setup.py && \
     TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=8 \
     pip install --no-cache-dir --no-build-isolation /tmp/sageattention3/sageattention3_blackwell && \
     rm -rf /tmp/sageattention3
