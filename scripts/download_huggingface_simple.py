@@ -139,6 +139,7 @@ WAN_BUNDLES = {
     # NSFW bundles
     'nsfw_lora_bundle': ['nsfw_lora_h'],
     'remix_nsfw_i2v_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    'phr00t_nsfw_t2v_bundle': ['phr00t_t2v_nsfw', 'umt5_xxl_fp8', 'wan_vae'],
     'phr00t_nsfw_i2v_bundle': ['phr00t_i2v_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
 }
 

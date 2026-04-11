@@ -54,17 +54,15 @@ Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `
 | Ephemeral | 200GB | 0GB | Models redownload each start (~15-30 min) |
 | Persistent (recommended) | 50GB | 100GB+ | Models cached; instant subsequent starts |
 
-## ⚡ SageAttention2++ (Optional Speed Boost)
+## ⚡ SageAttention (Optional Speed Boost)
 
-Set `ENABLE_SAGEATTN=true` (default). On first boot, SA2++ compiles in the background — ComfyUI starts immediately, no wait. When the build finishes (~5 min), run:
+SA2++ and SA3 are both **pre-compiled into the image** for RTX 5090 (sm_120). SA3 is the active backend — it uses Blackwell-native CUDA kernels with no Triton JIT at runtime.
 
-```bash
-/workspace/scripts/restart-comfyui.sh
-```
+On boot, the startup script runs a real GPU tensor test and logs the result:
+- `⚡ SageAttention3 Blackwell ready` → SA3 is working, workflows are pre-configured
+- `⚡ SageAttention3 runtime check FAILED` → set KJNodes SA patch node backend to `disabled`
 
-On all subsequent boots, the cached wheel installs in ~10 seconds automatically.
-
-**In your workflow**: Add a KJNodes **"Apply Sage Attention"** patch node, set backend to `sageattn_qk_int8_pv_fp16_cuda`. Do not use `--use-sage-attention` in `COMFY_FLAGS` — it causes black frames with WAN 2.2.
+Do not use `--use-sage-attention` in `COMFY_FLAGS` — it causes black frames with WAN 2.2.
 
 ## Startup Process
 

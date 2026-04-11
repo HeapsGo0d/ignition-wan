@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.23            ║"
+    log "INFO" "║       🎬 IGNITION WAN v1.0.25            ║"
     log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
@@ -432,87 +432,31 @@ main() {
         log "INFO" ""
     fi
 
-    # SageAttention: build-once-cache strategy
+    # SageAttention3: Blackwell-native CUDA kernels compiled at image build time (sm_120)
+    # SA3 avoids SA2++ Triton JIT path which is broken on sm_120 (device kernel image is invalid)
     # Do NOT add --use-sage-attention to COMFY_FLAGS (Triton backend breaks WAN 2.2 MoE)
-    # Use KJNodes "Apply Sage Attention" patch node with sageattn_qk_int8_pv_fp16_cuda instead
+    # Use KJNodes patch node with backend: sageattn3
+    # Runtime GPU tensor test is required — import success alone does not guarantee kernel works
     if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
-        SA_VERSION="v2.2.0"  # pin to known-good release; update intentionally
-        SA_CACHE_DIR="/workspace/.cache/sageattention"
-        SA_BUILD_LOCK="${SA_CACHE_DIR}/.build.lock"
-        mkdir -p "$SA_CACHE_DIR"
-
-        # ABI fingerprint: py + torch + cuda + gpu arch + SA version
-        SA_PY=$(python3 -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')")
-        SA_TORCH=$(python3 -c "import torch; print(torch.__version__)" 2>/dev/null | tr '+' '-')
-        SA_CUDA=$(python3 -c "import torch; print(torch.version.cuda)" 2>/dev/null || echo "none")
-        SA_ARCH=$(python3 -c "import torch; cap=torch.cuda.get_device_capability(0); print(f'{cap[0]}.{cap[1]}')" 2>/dev/null || echo "12.0")
-        SA_ABI="py${SA_PY}-torch${SA_TORCH}-cu${SA_CUDA}-sm${SA_ARCH}-${SA_VERSION}"
-        SA_KEY_FILE="${SA_CACHE_DIR}/.abi_key"
-        CACHED_KEY=$(cat "$SA_KEY_FILE" 2>/dev/null || echo "")
-
-        # Health check: SA installed AND the required CUDA backend is callable
-        sa_healthy() {
-            python3 -c "
-import sageattention
-from sageattention import sageattn_qk_int8_pv_fp16_cuda
-" 2>/dev/null
-        }
-
-        SA_READY=false
-
-        if sa_healthy; then
-            # Already installed and backend verified (from a previous background build)
-            SA_VER=$(python3 -m pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "?")
-            log "INFO" "⚡ SageAttention ready (${SA_VER}) — workflow: KJNodes patch node → sageattn_qk_int8_pv_fp16_cuda"
-            SA_READY=true
+        if python3 - <<'SATEST' 2>/dev/null
+import torch, sys
+try:
+    from sageattn3 import sageattn3_blackwell
+    B,H,N,D = 1,24,256,128
+    q = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
+    k = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
+    v = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
+    sageattn3_blackwell(q,k,v,is_causal=False)
+    sys.exit(0)
+except Exception:
+    sys.exit(1)
+SATEST
+        then
+            log "INFO" "⚡ SageAttention3 Blackwell ready — workflow: KJNodes patch node → sageattn3"
         else
-            CACHED_WHEEL=$(ls "${SA_CACHE_DIR}"/sageattention*.whl 2>/dev/null | head -1 || echo "")
-            if [[ -n "$CACHED_WHEEL" ]] && [[ "$CACHED_KEY" == "$SA_ABI" ]]; then
-                log "INFO" "⚡ Installing SageAttention from cache..."
-                if pip install --no-deps "$CACHED_WHEEL" 2>/dev/null && sa_healthy; then
-                    log "INFO" "⚡ SageAttention ready — workflow: KJNodes patch node → sageattn_qk_int8_pv_fp16_cuda"
-                    SA_READY=true
-                else
-                    log "WARN" "⚡ SA cache install failed — clearing and rebuilding"
-                    rm -f "$CACHED_WHEEL" "$SA_KEY_FILE"
-                fi
-            fi
-        fi
-
-        if [[ "$SA_READY" != "true" ]]; then
-            # Check for a concurrent build already in progress
-            if [[ -f "$SA_BUILD_LOCK" ]] && kill -0 "$(cat "$SA_BUILD_LOCK" 2>/dev/null)" 2>/dev/null; then
-                log "INFO" "⚡ SageAttention build already in progress (PID $(cat "$SA_BUILD_LOCK")) — skipping"
-            else
-                log "INFO" "⚡ SageAttention: building ${SA_VERSION} from source in background (~5 min)"
-                log "INFO" "  ComfyUI starting now. Run restart-comfyui.sh after build to activate SA."
-                (
-                    set +e
-                    echo $$ > "$SA_BUILD_LOCK"
-                    JOBS=$(python3 -c "import os; print(min(os.cpu_count() or 8, 16))")
-                    cd /tmp && rm -rf sageattention_build && mkdir sageattention_build && cd sageattention_build
-                    if git clone --depth 1 --branch "${SA_VERSION}" https://github.com/thu-ml/SageAttention . >> "$LOG_FILE" 2>&1; then
-                        if MAX_JOBS="${JOBS}" TORCH_CUDA_ARCH_LIST="${SA_ARCH}" \
-                           pip wheel --no-build-isolation --no-deps . -w "$SA_CACHE_DIR" >> "$LOG_FILE" 2>&1; then
-                            WHEEL=$(ls "$SA_CACHE_DIR"/sageattention*.whl 2>/dev/null | head -1)
-                            if [[ -n "$WHEEL" ]] && pip install --no-deps "$WHEEL" >> "$LOG_FILE" 2>&1 && sa_healthy; then
-                                echo "$SA_ABI" > "$SA_KEY_FILE"
-                                log "INFO" "⚡ SageAttention build complete — run /workspace/scripts/restart-comfyui.sh to activate"
-                            else
-                                log "WARN" "⚡ SageAttention wheel built but health check failed"
-                                rm -f "$WHEEL"
-                            fi
-                        else
-                            log "WARN" "⚡ SageAttention build failed — see $LOG_FILE for details"
-                        fi
-                    else
-                        log "WARN" "⚡ SageAttention: failed to clone ${SA_VERSION}"
-                    fi
-                    rm -f "$SA_BUILD_LOCK"
-                    rm -rf /tmp/sageattention_build
-                ) &
-                disown
-            fi
+            log "WARN" "⚡ SageAttention3 runtime check FAILED — SA3 kernel invalid for this GPU/driver"
+            log "WARN" "  Set KJNodes SA patch node backend to: disabled"
+            log "WARN" "  Generation works normally without SA — performance only, not correctness"
         fi
     fi
 

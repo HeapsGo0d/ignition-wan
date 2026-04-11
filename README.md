@@ -99,7 +99,7 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 | Variable | Description | Default |
 |---|---|---|
 | `FILEBROWSER_PASSWORD` | File browser login password | `runpod` |
-| `ENABLE_SAGEATTN` | Build SageAttention2++ from source and cache wheel for faster attention | `true` |
+| `ENABLE_SAGEATTN` | Enable SageAttention GPU health check on boot (SA3 Blackwell-native, pre-compiled for sm_120) | `true` |
 | `ENABLE_MANAGER_UI` | Show ComfyUI-Manager UI | `true` |
 | `COMFY_FLAGS` | ComfyUI startup flags | `--preview-method auto` |
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `false` |
@@ -117,18 +117,25 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 └── upscale_models/     # Upscalers (optional)
 ```
 
-## ⚡ SageAttention2++
+## ⚡ SageAttention (Optional Speed Boost)
 
-When `ENABLE_SAGEATTN=true` (default), SageAttention2++ is built from source and cached on the persistent volume for faster attention computation.
+Both SA2++ and SA3 are pre-compiled into the image for RTX 5090 (sm_120). SA3 is the active Blackwell-native backend — it uses native CUDA kernels and avoids the Triton JIT path that is broken on sm_120.
 
-**First boot**: ComfyUI starts immediately. SA2++ compiles in the background (~5 min on RTX 5090). When complete, the startup log shows:
+When `ENABLE_SAGEATTN=true` (default), a real GPU tensor test runs on boot to confirm SA3 works on the detected hardware.
+
+**If startup log shows:**
 ```
-⚡ SageAttention build complete — run /workspace/scripts/restart-comfyui.sh to activate
+⚡ SageAttention3 Blackwell ready — workflow: KJNodes patch node → sageattn3
 ```
+Workflows are pre-configured with `sageattn3` backend — no action needed.
 
-**Subsequent boots**: Wheel is installed from cache in ~10 seconds — no recompile needed. The ABI fingerprint ensures the wheel is rebuilt automatically if PyTorch or CUDA versions change.
+**If startup log shows:**
+```
+⚡ SageAttention3 runtime check FAILED
+```
+Set the KJNodes SA patch node backend to `disabled` in your workflow. Generation works normally without SA — it is a performance optimisation only.
 
-**Activating in workflow**: Do NOT use `--use-sage-attention` in `COMFY_FLAGS` — that uses the Triton backend which causes black frames with WAN 2.2's MoE architecture. Instead, add a **KJNodes "Apply Sage Attention"** patch node to your workflow and set the backend to `sageattn_qk_int8_pv_fp16_cuda`.
+**Important**: Do NOT use `--use-sage-attention` in `COMFY_FLAGS` — that uses the Triton backend which causes black frames with WAN 2.2's MoE architecture.
 
 ## 🔄 Restarting ComfyUI
 

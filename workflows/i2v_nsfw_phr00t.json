@@ -1,6 +1,6 @@
 {
-  "last_node_id": 17,
-  "last_link_id": 22,
+  "last_node_id": 19,
+  "last_link_id": 26,
   "nodes": [
     {
       "id": 1,
@@ -360,7 +360,7 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            9
+            23
           ],
           "slot_index": 0
         }
@@ -399,7 +399,7 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            10
+            25
           ],
           "slot_index": 0
         }
@@ -430,7 +430,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 9
+          "link": 24
         }
       ],
       "outputs": [
@@ -468,7 +468,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 10
+          "link": 26
         }
       ],
       "outputs": [
@@ -721,6 +721,84 @@
         "auto",
         "auto"
       ]
+    },
+    {
+      "id": 18,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        500,
+        870
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 23
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            24
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn3",
+        false
+      ]
+    },
+    {
+      "id": 19,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        500,
+        1000
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 25
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            26
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn3",
+        false
+      ]
     }
   ],
   "links": [
@@ -785,22 +863,6 @@
       8,
       0,
       10,
-      0,
-      "MODEL"
-    ],
-    [
-      9,
-      9,
-      0,
-      11,
-      0,
-      "MODEL"
-    ],
-    [
-      10,
-      10,
-      0,
-      12,
       0,
       "MODEL"
     ],
@@ -899,6 +961,38 @@
       17,
       0,
       "VIDEO"
+    ],
+    [
+      23,
+      9,
+      0,
+      18,
+      0,
+      "MODEL"
+    ],
+    [
+      24,
+      18,
+      0,
+      11,
+      0,
+      "MODEL"
+    ],
+    [
+      25,
+      10,
+      0,
+      19,
+      0,
+      "MODEL"
+    ],
+    [
+      26,
+      19,
+      0,
+      12,
+      0,
+      "MODEL"
     ]
   ],
   "groups": [],

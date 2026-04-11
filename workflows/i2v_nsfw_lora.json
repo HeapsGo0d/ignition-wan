@@ -1,6 +1,6 @@
 {
-  "last_node_id": 17,
-  "last_link_id": 22,
+  "last_node_id": 21,
+  "last_link_id": 30,
   "nodes": [
     {
       "id": 1,
@@ -360,7 +360,7 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            9
+            23
           ],
           "slot_index": 0
         }
@@ -399,7 +399,7 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            10
+            25
           ],
           "slot_index": 0
         }
@@ -413,15 +413,15 @@
       ]
     },
     {
-      "id": 11,
-      "type": "ModelSamplingSD3",
+      "id": 18,
+      "type": "LoraLoaderModelOnly",
       "pos": [
-        850,
+        650,
         870
       ],
       "size": {
         "0": 315,
-        "1": 58
+        "1": 82
       },
       "flags": {},
       "order": 10,
@@ -430,7 +430,85 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 9
+          "link": 23
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            27
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "wan2.2_i2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors",
+        1.0
+      ]
+    },
+    {
+      "id": 19,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        650,
+        1000
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 25
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            29
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+        1.0
+      ]
+    },
+    {
+      "id": 11,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        1000,
+        870
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 28
         }
       ],
       "outputs": [
@@ -454,7 +532,7 @@
       "id": 12,
       "type": "ModelSamplingSD3",
       "pos": [
-        850,
+        1000,
         1000
       ],
       "size": {
@@ -462,13 +540,13 @@
         "1": 58
       },
       "flags": {},
-      "order": 11,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
           "name": "model",
           "type": "MODEL",
-          "link": 10
+          "link": 30
         }
       ],
       "outputs": [
@@ -492,7 +570,7 @@
       "id": 13,
       "type": "KSamplerAdvanced",
       "pos": [
-        1350,
+        1400,
         700
       ],
       "size": {
@@ -500,7 +578,7 @@
         "1": 330
       },
       "flags": {},
-      "order": 12,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -541,12 +619,12 @@
         "enable",
         264244520398999,
         "randomize",
-        20,
-        6.0,
+        4,
+        1.0,
         "euler",
         "simple",
         0,
-        10,
+        2,
         "enable"
       ]
     },
@@ -554,7 +632,7 @@
       "id": 14,
       "type": "KSamplerAdvanced",
       "pos": [
-        1350,
+        1400,
         1100
       ],
       "size": {
@@ -562,7 +640,7 @@
         "1": 330
       },
       "flags": {},
-      "order": 13,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -603,12 +681,12 @@
         "disable",
         0,
         "fixed",
-        20,
-        6.0,
+        4,
+        1.0,
         "euler",
         "simple",
-        10,
-        10000,
+        2,
+        4,
         "disable"
       ]
     },
@@ -616,7 +694,7 @@
       "id": 15,
       "type": "VAEDecode",
       "pos": [
-        1750,
+        1800,
         900
       ],
       "size": {
@@ -624,7 +702,7 @@
         "1": 46
       },
       "flags": {},
-      "order": 14,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -657,7 +735,7 @@
       "id": 16,
       "type": "CreateVideo",
       "pos": [
-        2050,
+        2100,
         900
       ],
       "size": {
@@ -665,7 +743,7 @@
         "1": 58
       },
       "flags": {},
-      "order": 15,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -695,7 +773,7 @@
       "id": 17,
       "type": "SaveVideo",
       "pos": [
-        2350,
+        2400,
         900
       ],
       "size": {
@@ -703,7 +781,7 @@
         "1": 130
       },
       "flags": {},
-      "order": 16,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -717,9 +795,87 @@
         "Node name for S&R": "SaveVideo"
       },
       "widgets_values": [
-        "video/WAN_I2V_NSFW_LoRA",
+        "video/WAN_I2V_NSFW_LightX2V",
         "auto",
         "auto"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        650,
+        870
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            28
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn3",
+        false
+      ]
+    },
+    {
+      "id": 21,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        650,
+        1000
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 29
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            30
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn3",
+        false
       ]
     }
   ],
@@ -785,22 +941,6 @@
       8,
       0,
       10,
-      0,
-      "MODEL"
-    ],
-    [
-      9,
-      9,
-      0,
-      11,
-      0,
-      "MODEL"
-    ],
-    [
-      10,
-      10,
-      0,
-      12,
       0,
       "MODEL"
     ],
@@ -899,6 +1039,54 @@
       17,
       0,
       "VIDEO"
+    ],
+    [
+      23,
+      9,
+      0,
+      18,
+      0,
+      "MODEL"
+    ],
+    [
+      25,
+      10,
+      0,
+      19,
+      0,
+      "MODEL"
+    ],
+    [
+      27,
+      18,
+      0,
+      20,
+      0,
+      "MODEL"
+    ],
+    [
+      28,
+      20,
+      0,
+      11,
+      0,
+      "MODEL"
+    ],
+    [
+      29,
+      19,
+      0,
+      21,
+      0,
+      "MODEL"
+    ],
+    [
+      30,
+      21,
+      0,
+      12,
+      0,
+      "MODEL"
     ]
   ],
   "groups": [],

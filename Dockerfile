@@ -1,54 +1,48 @@
 # Ignition WAN - ComfyUI for WAN 2.2 Video Generation
-# Optimized for RTX 5090 and RunPod deployment
-# Python 3.12 + CUDA 12.8 base for Blackwell support + SA2++ compatibility
+# Two-stage build: devel for compilation, runtime for deployment
+# Eliminates double-torch layer bloat + strips compiler toolchain from final image
+# SageAttention2++ compiled at build time for RTX 5090 (sm_120) — ready on first boot
 
-FROM pytorch/pytorch:2.11.0-cuda12.8-cudnn9-devel AS base
+# ── Stage 1: Builder ──────────────────────────────────────────────────────────
+# Full devel image: needs nvcc to compile SageAttention CUDA kernels
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04 AS builder
 
-# Consolidated environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
-    NVIDIA_VISIBLE_DEVICES=all \
-    NVIDIA_DRIVER_CAPABILITIES=compute,utility \
-    LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH \
-    CUDA_DEVICE_ORDER=PCI_BUS_ID \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_BREAK_SYSTEM_PACKAGES=1 \
-    XDG_CACHE_HOME=/workspace/.cache \
-    HF_HOME=/workspace/.cache/huggingface \
-    HUGGINGFACE_HUB_CACHE=/workspace/.cache/huggingface
+    PATH="/opt/venv/bin:$PATH"
 
-# Set working directory
 WORKDIR /workspace
 
-# Install additional system dependencies including aria2 for downloads
+# System deps (python3-dev needed for SA compilation)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ffmpeg git aria2 git-lfs wget vim \
-    iproute2 net-tools \
+    python3 python3-pip python3-venv python3-dev \
+    curl ffmpeg git aria2 git-lfs wget \
     libgl1 libglib2.0-0 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Core Python tooling (PyTorch already included in base image)
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install packaging setuptools wheel
+# Portable venv: --copies avoids symlinks to system Python, making it safe to
+# COPY between stages without the original Python binary being present
+RUN python3 -m venv --copies /opt/venv
 
-# Remove base image PyTorch to ensure clean nightly installation
-RUN pip uninstall -y torch torchvision torchaudio
+# Core tooling
+RUN pip install --no-cache-dir packaging setuptools wheel
 
-# Install PyTorch nightly with CUDA 12.8 for RTX 5090 Blackwell support
-# Let pip install required CUDA dependencies
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --pre --force-reinstall \
-    torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cu128
+# Install PyTorch nightly with CUDA 12.8 — installed once, no uninstall dance
+RUN pip install --no-cache-dir --pre torch torchvision torchaudio \
+    --index-url https://download.pytorch.org/whl/nightly/cu128
 
-# Verify PyTorch installation succeeded (build fails if not)
-RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.version.cuda is not None, 'PyTorch not built with CUDA'"
+# Verify PyTorch (fail build immediately if broken)
+RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.version.cuda is not None, 'No CUDA'"
 
-# Runtime libraries (triton comes with PyTorch nightly)
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install pyyaml gdown
+# Runtime Python libraries
+RUN pip install --no-cache-dir \
+    pyyaml gdown \
+    requests aiohttp aiofiles \
+    huggingface-hub tqdm \
+    pillow numpy opencv-python \
+    psutil onnx onnxruntime
 
-# Install ComfyUI directly (more reliable than comfy-cli)
-# Filter out torch packages to prevent downgrade from nightly (but keep torchsde)
+# ComfyUI — filter torch packages to prevent nightly downgrade
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI && \
     cd /workspace/ComfyUI && \
     grep -v "^torch$" requirements.txt | \
@@ -56,13 +50,13 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI &
     grep -v "^torchaudio$" | \
     pip install --no-cache-dir -r /dev/stdin
 
-# Install ComfyUI-Manager for custom node management
+# ComfyUI-Manager
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/Comfy-Org/ComfyUI-Manager.git && \
     cd ComfyUI-Manager && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install ComfyUI-WanVideoWrapper and KJNodes for WAN 2.2 video generation
+# ComfyUI-WanVideoWrapper + KJNodes (WAN 2.2 video generation + attention patching)
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/kijai/ComfyUI-WanVideoWrapper.git && \
     cd ComfyUI-WanVideoWrapper && \
@@ -72,30 +66,70 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-KJNodes && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install WanMoeKSampler - auto-switches high/low noise models at correct diffusion timestep
+# WanMoeKSampler — auto-switches high/low noise models at correct diffusion timestep
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/stduhpf/ComfyUI-WanMoeKSampler.git
 
-# Install additional dependencies for Ignition
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install \
-        requests \
-        aiohttp \
-        aiofiles \
-        huggingface-hub \
-        tqdm \
-        pillow \
-        numpy \
-        opencv-python \
-        psutil \
-        onnx \
-        onnxruntime
+# Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
+# AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
+# nvcc is available in this devel stage; will NOT be present in final runtime image
+# v2.x is not on PyPI — install from source tag
+RUN git clone --depth 1 --branch v2.2.0 https://github.com/thu-ml/SageAttention /tmp/sageattention && \
+    TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=8 \
+    pip install --no-cache-dir --no-build-isolation /tmp/sageattention && \
+    rm -rf /tmp/sageattention
 
-FROM base AS final
+# Compile SageAttention3 for RTX 5090 Blackwell (sm_120)
+# SA3 uses native Blackwell CUDA kernels — no Triton JIT at runtime (unlike SA2++)
+# SA3 lives in a subdirectory of main branch, not in any release tag
+# Pinned to d1a57a5 (2026-01-17) — last meaningful SA3 change: c03f15f (2025-12-22)
+RUN git clone https://github.com/thu-ml/SageAttention /tmp/sageattention3 && \
+    git -C /tmp/sageattention3 checkout d1a57a546c3d395b1ffcbeecc66d81db76f3b4b5 && \
+    sed -i 's/cc_major, cc_minor = torch.cuda.get_device_capability()/cc_major, cc_minor = 12, 0/' \
+        /tmp/sageattention3/sageattention3_blackwell/setup.py && \
+    TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=8 \
+    pip install --no-cache-dir --no-build-isolation /tmp/sageattention3/sageattention3_blackwell && \
+    rm -rf /tmp/sageattention3
 
-# Final stage setup
+# Smoke test: verify both SA2++ and SA3 compiled correctly and are importable
+RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} CUDA {torch.version.cuda}'); import sageattention; from sageattention import sageattn_qk_int8_pv_fp16_cuda; print('SA2++ import OK'); from sageattn3 import sageattn3_blackwell; print('SA3 Blackwell import OK')"
 
-# Create model directories (explicit paths - /bin/sh doesn't support brace expansion)
+
+# ── Stage 2: Final (runtime) ──────────────────────────────────────────────────
+# Runtime image: no compiler toolchain — strips nvcc, CUDA headers, static libs
+FROM nvidia/cuda:12.8.1-cudnn-runtime-ubuntu24.04 AS final
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    NVIDIA_VISIBLE_DEVICES=all \
+    NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+    LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH \
+    CUDA_DEVICE_ORDER=PCI_BUS_ID \
+    PATH="/opt/venv/bin:$PATH" \
+    XDG_CACHE_HOME=/workspace/.cache \
+    HF_HOME=/workspace/.cache/huggingface \
+    HUGGINGFACE_HUB_CACHE=/workspace/.cache/huggingface
+
+WORKDIR /workspace
+
+# Runtime system deps
+# git + aria2 kept: install-performance-plugins.sh uses git clone on first boot
+# curl kept: filebrowser install + healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    curl ffmpeg git aria2 git-lfs wget vim \
+    iproute2 net-tools \
+    libgl1 libglib2.0-0 \
+    gcc python3-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy compiled Python environment (torch + SA + all packages)
+COPY --from=builder /opt/venv /opt/venv
+
+# Copy ComfyUI and custom nodes
+COPY --from=builder /workspace/ComfyUI /workspace/ComfyUI
+
+# Create model directories
 RUN mkdir -p \
     /workspace/ComfyUI/models/checkpoints \
     /workspace/ComfyUI/models/loras \
@@ -112,40 +146,34 @@ RUN mkdir -p \
 # Create HuggingFace cache directory
 RUN mkdir -p /workspace/.cache/huggingface
 
-# Install filebrowser for file management
+# Install filebrowser
 RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash
 
-# Copy our scripts and workflows
+# Copy scripts and workflows
 COPY scripts/ /workspace/scripts/
 COPY workflows/ /workspace/ComfyUI/user/default/workflows/
 RUN chmod +x /workspace/scripts/*.sh /workspace/scripts/privacy/*.sh && \
     chmod +x /workspace/scripts/restart-comfyui.sh /workspace/scripts/stop-pod.sh
 
-# Install nuke script for nuclear cleanup
+# Install nuke script
 COPY scripts/nuke /usr/local/bin/nuke
 RUN chmod +x /usr/local/bin/nuke
 
-# Note: Performance plugins are installed at runtime via startup.sh
-# This ensures reliable installation with proper volume context
+# Environment defaults
+ENV CIVITAI_MODELS="" \
+    CIVITAI_LORAS="" \
+    CIVITAI_VAES="" \
+    HUGGINGFACE_MODELS="" \
+    CIVITAI_TOKEN="" \
+    HF_TOKEN="" \
+    FILEBROWSER_PASSWORD="runpod" \
+    ENABLE_SAGEATTN="true" \
+    COMFYUI_PORT="8188" \
+    FILEBROWSER_PORT="8080"
 
-# Set environment defaults (simplified approach)
-ENV CIVITAI_MODELS=""
-ENV CIVITAI_LORAS=""
-ENV CIVITAI_VAES=""
-ENV HUGGINGFACE_MODELS=""
-ENV CIVITAI_TOKEN=""
-ENV HF_TOKEN=""
-ENV FILEBROWSER_PASSWORD="runpod"
-ENV ENABLE_SAGEATTN="true"
-ENV COMFYUI_PORT="8188"
-ENV FILEBROWSER_PORT="8080"
-
-# Expose ports
 EXPOSE 8188 8080
 
-# Add basic healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5m --retries=3 \
   CMD curl -f http://127.0.0.1:8188/ || exit 1
 
-# Set entrypoint
 ENTRYPOINT ["/workspace/scripts/startup.sh"]

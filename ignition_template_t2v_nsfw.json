@@ -1,6 +1,6 @@
 {
-  "name": "Ignition WAN v1.0.25",
-  "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
+  "name": "Ignition WAN v1.0.25 — T2V NSFW (Phr00t)",
+  "description": "ComfyUI for WAN 2.2 text-to-video NSFW generation with Phr00t Rapid AIO model and RTX 5090 support",
   "dockerImage": "heapsgo0d/ignition-wan:v1.0.25",
   "ports": [
     {
@@ -40,8 +40,8 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "remix_nsfw_i2v_bundle",
-      "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
+      "value": "phr00t_nsfw_t2v_bundle",
+      "description": "Downloads Phr00t T2V NSFW AIO model (~19.8GB) + umt5 text encoder + VAE. Also supports individual keys or other bundles."
     },
     {
       "key": "CIVITAI_TOKEN",
