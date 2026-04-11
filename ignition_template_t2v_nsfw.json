@@ -61,7 +61,7 @@
     {
       "key": "ENABLE_SAGEATTN",
       "value": "true",
-      "description": "SageAttention2++ is pre-compiled into the image (sm_120 / RTX 5090). Available immediately on first boot — no background build, no restart needed. In workflow: add KJNodes 'Apply Sage Attention' patch node with sageattn_qk_int8_pv_fp16_cuda backend."
+      "description": "SageAttention3 Blackwell-native backend pre-compiled for RTX 5090 (sm_120). Available immediately on first boot. In workflow: KJNodes 'Apply Sage Attention' patch node with sageattn3 backend. Set to disabled if startup log reports runtime check failed."
     }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
