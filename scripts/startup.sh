@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.25            ║"
+    log "INFO" "║       🎬 IGNITION WAN v1.0.26            ║"
     log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
@@ -144,6 +144,48 @@ download_models() {
         fi
         log "WARN" "⚠️ Some model downloads may have failed, continuing"
     fi
+    log "INFO" ""
+}
+
+prefetch_support_models() {
+    log "INFO" "📦 Prefetching support models (RIFE + upscaler)..."
+
+    local RIFE_DIR="$COMFYUI_ROOT/custom_nodes/ComfyUI-Frame-Interpolation/ckpts"
+    local UPSCALE_DIR="$COMFYUI_ROOT/models/upscale_models"
+
+    mkdir -p "$RIFE_DIR" "$UPSCALE_DIR"
+
+    local rife_status="missing"
+    local upscale_status="missing"
+
+    if [[ ! -f "$RIFE_DIR/rife49.pth" ]]; then
+        log "INFO" "  • Downloading rife49.pth (~27MB)..."
+        aria2c -x4 -q --continue=true \
+            -o "$RIFE_DIR/rife49.pth" \
+            "https://huggingface.co/Fannovel16/ComfyUI-Frame-Interpolation/resolve/main/ckpts/rife49.pth" \
+            && rife_status="ready" \
+            || log "WARN" "  ⚠️  rife49.pth download failed — RIFE workflow will not work"
+    else
+        log "INFO" "  • rife49.pth already cached"
+        rife_status="ready (cached)"
+    fi
+
+    if [[ ! -f "$UPSCALE_DIR/4xLSDIR.pth" ]]; then
+        log "INFO" "  • Downloading 4xLSDIR.pth (~67MB)..."
+        aria2c -x4 -q --continue=true \
+            -o "$UPSCALE_DIR/4xLSDIR.pth" \
+            "https://huggingface.co/Phips/4xLSDIR/resolve/main/4xLSDIR.pth" \
+            && upscale_status="ready" \
+            || log "WARN" "  ⚠️  4xLSDIR.pth download failed — upscale node will not work"
+    else
+        log "INFO" "  • 4xLSDIR.pth already cached"
+        upscale_status="ready (cached)"
+    fi
+
+    log "INFO" "  ┌─ Support model status ──────────────────┐"
+    log "INFO" "  │  RIFE (rife49.pth):    $rife_status"
+    log "INFO" "  │  Upscaler (4xLSDIR):   $upscale_status"
+    log "INFO" "  └────────────────────────────────────────┘"
     log "INFO" ""
 }
 
@@ -414,6 +456,7 @@ main() {
     fi
 
     download_models
+    prefetch_support_models
 
     start_filebrowser
     gpu_preflight

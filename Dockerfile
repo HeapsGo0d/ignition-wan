@@ -70,6 +70,14 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/stduhpf/ComfyUI-WanMoeKSampler.git
 
+# ComfyUI-Frame-Interpolation — RIFE VFI for smooth 60fps output
+# Pinned to 26545cc (2026-04-11)
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    git -C ComfyUI-Frame-Interpolation checkout 26545cc2dd95bc3d27f056016300673bdeee78f5 && \
+    cd ComfyUI-Frame-Interpolation && \
+    pip install --no-cache-dir -r requirements.txt
+
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
 # nvcc is available in this devel stage; will NOT be present in final runtime image
