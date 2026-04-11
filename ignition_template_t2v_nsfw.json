@@ -1,0 +1,68 @@
+{
+  "name": "Ignition WAN v1.0.24 — T2V NSFW (Phr00t)",
+  "description": "ComfyUI for WAN 2.2 text-to-video NSFW generation with Phr00t Rapid AIO model and RTX 5090 support",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.24",
+  "ports": [
+    {
+      "privatePort": 8188,
+      "publicPort": 8188,
+      "type": "http",
+      "description": "ComfyUI Web Interface"
+    },
+    {
+      "privatePort": 8080,
+      "publicPort": 8080,
+      "type": "http",
+      "description": "File Browser"
+    }
+  ],
+  "volumeMounts": [
+    {
+      "containerPath": "/workspace",
+      "name": "workspace"
+    }
+  ],
+  "environmentVariables": [
+    {
+      "key": "CIVITAI_MODELS",
+      "value": "",
+      "description": "Comma-separated CivitAI model version IDs"
+    },
+    {
+      "key": "CIVITAI_LORAS",
+      "value": "",
+      "description": "Comma-separated CivitAI LoRA model version IDs"
+    },
+    {
+      "key": "CIVITAI_VAES",
+      "value": "",
+      "description": "Comma-separated CivitAI VAE model version IDs"
+    },
+    {
+      "key": "HUGGINGFACE_MODELS",
+      "value": "phr00t_nsfw_t2v_bundle",
+      "description": "Downloads Phr00t T2V NSFW AIO model (~19.8GB) + umt5 text encoder + VAE. Also supports individual keys or other bundles."
+    },
+    {
+      "key": "CIVITAI_TOKEN",
+      "value": "",
+      "description": "CivitAI API token (optional, for faster downloads)"
+    },
+    {
+      "key": "HF_TOKEN",
+      "value": "",
+      "description": "HuggingFace API token (optional, for private repos)"
+    },
+    {
+      "key": "FILEBROWSER_PASSWORD",
+      "value": "runpod",
+      "description": "Password for file browser access"
+    },
+    {
+      "key": "ENABLE_SAGEATTN",
+      "value": "true",
+      "description": "SageAttention2++ is pre-compiled into the image (sm_120 / RTX 5090). Available immediately on first boot — no background build, no restart needed. In workflow: add KJNodes 'Apply Sage Attention' patch node with sageattn_qk_int8_pv_fp16_cuda backend."
+    }
+  ],
+  "startScript": "bash /workspace/scripts/startup.sh"
+}
