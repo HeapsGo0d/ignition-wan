@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.24 — T2V NSFW (Phr00t)",
+  "name": "Ignition WAN v1.0.25 — T2V NSFW (Phr00t)",
   "description": "ComfyUI for WAN 2.2 text-to-video NSFW generation with Phr00t Rapid AIO model and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.24",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.25",
   "ports": [
     {
       "privatePort": 8188,
