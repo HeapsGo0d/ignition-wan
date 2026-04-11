@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.23",
+  "name": "Ignition WAN v1.0.24",
   "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.23",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.24",
   "ports": [
     {
       "privatePort": 8188,
@@ -61,7 +61,7 @@
     {
       "key": "ENABLE_SAGEATTN",
       "value": "true",
-      "description": "Build SageAttention2++ from source on first boot (~5 min, cached to /workspace/.cache/sageattention). Fast install on subsequent boots. In workflow: add KJNodes 'Apply Sage Attention' patch node with sageattn_qk_int8_pv_fp16_cuda backend."
+      "description": "SageAttention2++ is pre-compiled into the image (sm_120 / RTX 5090). Available immediately on first boot — no background build, no restart needed. In workflow: add KJNodes 'Apply Sage Attention' patch node with sageattn_qk_int8_pv_fp16_cuda backend."
     }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
