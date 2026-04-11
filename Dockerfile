@@ -73,8 +73,11 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
 # nvcc is available in this devel stage; will NOT be present in final runtime image
-RUN TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=8 \
-    pip install --no-cache-dir --no-build-isolation sageattention==2.2.0
+# v2.x is not on PyPI — install from source tag
+RUN git clone --depth 1 --branch v2.2.0 https://github.com/thu-ml/SageAttention /tmp/sageattention && \
+    TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=8 \
+    pip install --no-cache-dir --no-build-isolation /tmp/sageattention && \
+    rm -rf /tmp/sageattention
 
 # Smoke test: verify SA compiled correctly and CUDA backend is callable
 RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} CUDA {torch.version.cuda}'); import sageattention; from sageattention import sageattn_qk_int8_pv_fp16_cuda; print('SageAttention2++ CUDA backend OK')"
