@@ -108,7 +108,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl ffmpeg git aria2 git-lfs wget vim \
     iproute2 net-tools \
     libgl1 libglib2.0-0 \
-    gcc \
+    gcc python3-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy compiled Python environment (torch + SA + all packages)
