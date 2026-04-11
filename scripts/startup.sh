@@ -432,31 +432,30 @@ main() {
         log "INFO" ""
     fi
 
-    # SageAttention: pre-compiled into image at build time (TORCH_CUDA_ARCH_LIST=12.0, sm_120)
+    # SageAttention3: Blackwell-native CUDA kernels compiled at image build time (sm_120)
+    # SA3 avoids SA2++ Triton JIT path which is broken on sm_120 (device kernel image is invalid)
     # Do NOT add --use-sage-attention to COMFY_FLAGS (Triton backend breaks WAN 2.2 MoE)
-    # Use KJNodes "Apply Sage Attention" patch node with sageattn_qk_int8_pv_fp16_cuda instead
-    # Runtime GPU test validates Triton JIT actually works on this device/driver combo —
-    # import success alone is not sufficient (Triton can fail at kernel launch even if SA loads)
+    # Use KJNodes patch node with backend: sageattn3
+    # Runtime GPU tensor test is required — import success alone does not guarantee kernel works
     if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
-        SA_VER=$(pip show sageattention 2>/dev/null | grep "^Version:" | cut -d' ' -f2 || echo "?")
         if python3 - <<'SATEST' 2>/dev/null
 import torch, sys
 try:
-    from sageattention import sageattn_qk_int8_pv_fp16_cuda
+    from sageattn3 import sageattn3_blackwell
     B,H,N,D = 1,24,256,128
     q = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
     k = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
     v = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
-    sageattn_qk_int8_pv_fp16_cuda(q,k,v,is_causal=False,tensor_layout="HND")
+    sageattn3_blackwell(q,k,v,is_causal=False)
     sys.exit(0)
 except Exception:
     sys.exit(1)
 SATEST
         then
-            log "INFO" "⚡ SageAttention ready (${SA_VER}) — workflow: KJNodes patch node → sageattn_qk_int8_pv_fp16_cuda"
+            log "INFO" "⚡ SageAttention3 Blackwell ready — workflow: KJNodes patch node → sageattn3"
         else
-            log "WARN" "⚡ SageAttention (${SA_VER}) runtime check FAILED — Triton JIT kernel invalid for this GPU/driver"
-            log "WARN" "  Workflows with SA patch nodes must use backend: disabled"
+            log "WARN" "⚡ SageAttention3 runtime check FAILED — SA3 kernel invalid for this GPU/driver"
+            log "WARN" "  Set KJNodes SA patch node backend to: disabled"
             log "WARN" "  Generation works normally without SA — performance only, not correctness"
         fi
     fi

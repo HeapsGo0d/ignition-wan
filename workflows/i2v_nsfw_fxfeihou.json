@@ -757,7 +757,7 @@
         "Node name for S&R": "PathchSageAttentionKJ"
       },
       "widgets_values": [
-        "disabled",
+        "sageattn3",
         false
       ]
     },
@@ -796,7 +796,7 @@
         "Node name for S&R": "PathchSageAttentionKJ"
       },
       "widgets_values": [
-        "disabled",
+        "sageattn3",
         false
       ]
     }
