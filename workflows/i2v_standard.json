@@ -1,6 +1,6 @@
 {
-  "last_node_id": 19,
-  "last_link_id": 24,
+  "last_node_id": 21,
+  "last_link_id": 27,
   "nodes": [
     {
       "id": 1,
@@ -12,8 +12,8 @@
       "mode": 0,
       "inputs": [],
       "outputs": [
-        {"name": "IMAGE", "type": "IMAGE", "links": [1], "slot_index": 0},
-        {"name": "MASK",  "type": "MASK",  "links": [],  "slot_index": 1}
+        {"name": "IMAGE", "type": "IMAGE", "links": [1, 25], "slot_index": 0},
+        {"name": "MASK",  "type": "MASK",  "links": [],      "slot_index": 1}
       ],
       "properties": {"Node name for S&R": "LoadImage"},
       "widgets_values": ["upload_start_image_here.png", "image"]
@@ -34,12 +34,45 @@
       "widgets_values": ["umt5_xxl_fp8_e4m3fn_scaled.safetensors", "wan", "default"]
     },
     {
+      "id": 20,
+      "type": "CLIPVisionLoader",
+      "pos": [50, 450],
+      "size": {"0": 315, "1": 58},
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "CLIP_VISION", "type": "CLIP_VISION", "links": [26], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPVisionLoader"},
+      "widgets_values": ["clip_vision_h.safetensors"]
+    },
+    {
+      "id": 21,
+      "type": "CLIPVisionEncode",
+      "pos": [450, 380],
+      "size": {"0": 315, "1": 82},
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip_vision", "type": "CLIP_VISION", "link": 26},
+        {"name": "image",       "type": "IMAGE",       "link": 25}
+      ],
+      "outputs": [
+        {"name": "CLIP_VISION_OUTPUT", "type": "CLIP_VISION_OUTPUT", "links": [27], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPVisionEncode"},
+      "widgets_values": []
+    },
+    {
       "id": 3,
       "type": "CLIPTextEncode",
       "pos": [450, 550],
       "size": {"0": 425, "1": 180},
       "flags": {},
-      "order": 5,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {"name": "clip", "type": "CLIP", "link": 2}
@@ -56,7 +89,7 @@
       "pos": [450, 760],
       "size": {"0": 425, "1": 180},
       "flags": {},
-      "order": 6,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {"name": "clip", "type": "CLIP", "link": 3}
@@ -73,7 +106,7 @@
       "pos": [50, 750],
       "size": {"0": 315, "1": 58},
       "flags": {},
-      "order": 2,
+      "order": 3,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -88,13 +121,13 @@
       "pos": [950, 300],
       "size": {"0": 315, "1": 230},
       "flags": {},
-      "order": 7,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {"name": "positive",           "type": "CONDITIONING",       "link": 4},
         {"name": "negative",           "type": "CONDITIONING",       "link": 5},
         {"name": "vae",                "type": "VAE",                "link": 6},
-        {"name": "clip_vision_output", "type": "CLIP_VISION_OUTPUT", "link": null},
+        {"name": "clip_vision_output", "type": "CLIP_VISION_OUTPUT", "link": 27},
         {"name": "start_image",        "type": "IMAGE",              "link": 1}
       ],
       "outputs": [
@@ -111,7 +144,7 @@
       "pos": [50, 870],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 3,
+      "order": 4,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -126,7 +159,7 @@
       "pos": [50, 1000],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 4,
+      "order": 5,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -141,7 +174,7 @@
       "pos": [450, 870],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 8,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "MODEL", "link": 7}
@@ -158,7 +191,7 @@
       "pos": [450, 1000],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 9,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "MODEL", "link": 8}
@@ -175,7 +208,7 @@
       "pos": [850, 870],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 10,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "MODEL", "link": 23}
@@ -192,7 +225,7 @@
       "pos": [850, 1000],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 11,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "MODEL", "link": 24}
@@ -209,7 +242,7 @@
       "pos": [1250, 870],
       "size": {"0": 315, "1": 58},
       "flags": {},
-      "order": 12,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "MODEL", "link": 9}
@@ -226,7 +259,7 @@
       "pos": [1250, 1000],
       "size": {"0": 315, "1": 58},
       "flags": {},
-      "order": 13,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {"name": "model", "type": "MODEL", "link": 10}
@@ -243,7 +276,7 @@
       "pos": [1650, 700],
       "size": {"0": 315, "1": 330},
       "flags": {},
-      "order": 14,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {"name": "model",        "type": "MODEL",        "link": 11},
@@ -267,7 +300,7 @@
       "pos": [1650, 1100],
       "size": {"0": 315, "1": 330},
       "flags": {},
-      "order": 15,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {"name": "model",        "type": "MODEL",        "link": 15},
@@ -291,7 +324,7 @@
       "pos": [2050, 900],
       "size": {"0": 210, "1": 46},
       "flags": {},
-      "order": 16,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {"name": "samples", "type": "LATENT", "link": 19},
@@ -309,7 +342,7 @@
       "pos": [2350, 900],
       "size": {"0": 210, "1": 58},
       "flags": {},
-      "order": 17,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {"name": "images", "type": "IMAGE", "link": 21}
@@ -326,7 +359,7 @@
       "pos": [2650, 900],
       "size": {"0": 315, "1": 130},
       "flags": {},
-      "order": 18,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {"name": "video", "type": "VIDEO", "link": 22}
@@ -360,7 +393,10 @@
     [21, 15, 0, 16, 0, "IMAGE"],
     [22, 16, 0, 17, 0, "VIDEO"],
     [23, 18, 0, 9,  0, "MODEL"],
-    [24, 19, 0, 10, 0, "MODEL"]
+    [24, 19, 0, 10, 0, "MODEL"],
+    [25, 1,  0, 21, 1, "IMAGE"],
+    [26, 20, 0, 21, 0, "CLIP_VISION"],
+    [27, 21, 0, 6,  3, "CLIP_VISION_OUTPUT"]
   ],
   "groups": [],
   "config": {},
