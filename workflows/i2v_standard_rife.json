@@ -369,7 +369,7 @@
         {"name": "IMAGE", "type": "IMAGE", "links": [28], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "RIFE VFI"},
-      "widgets_values": ["rife49.pth", 5, 3, false, true, 1]
+      "widgets_values": ["rife49.pth", 10, 5, true, true, 1.0, "float32", false, 1]
     },
     {
       "id": 16,

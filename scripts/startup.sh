@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.26            ║"
+    log "INFO" "║       🎬 IGNITION WAN v1.0.26.2          ║"
     log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
@@ -158,13 +158,14 @@ prefetch_support_models() {
     local rife_status="missing"
     local upscale_status="missing"
 
+    # aria2c requires -d (directory) + -o (filename) — absolute paths in -o are not supported
     if [[ ! -f "$RIFE_DIR/rife49.pth" ]]; then
         log "INFO" "  • Downloading rife49.pth (~27MB)..."
         aria2c -x4 -q --continue=true \
-            -o "$RIFE_DIR/rife49.pth" \
-            "https://huggingface.co/Fannovel16/ComfyUI-Frame-Interpolation/resolve/main/ckpts/rife49.pth" \
+            -d "$RIFE_DIR" -o "rife49.pth" \
+            "https://huggingface.co/marduk191/rife/resolve/main/rife49.pth" \
             && rife_status="ready" \
-            || log "WARN" "  ⚠️  rife49.pth download failed — RIFE workflow will not work"
+            || log "WARN" "  ⚠️  rife49.pth download failed — RIFE node will auto-download on first use"
     else
         log "INFO" "  • rife49.pth already cached"
         rife_status="ready (cached)"
@@ -173,7 +174,7 @@ prefetch_support_models() {
     if [[ ! -f "$UPSCALE_DIR/4xLSDIR.pth" ]]; then
         log "INFO" "  • Downloading 4xLSDIR.pth (~67MB)..."
         aria2c -x4 -q --continue=true \
-            -o "$UPSCALE_DIR/4xLSDIR.pth" \
+            -d "$UPSCALE_DIR" -o "4xLSDIR.pth" \
             "https://huggingface.co/Phips/4xLSDIR/resolve/main/4xLSDIR.pth" \
             && upscale_status="ready" \
             || log "WARN" "  ⚠️  4xLSDIR.pth download failed — upscale node will not work"
@@ -358,8 +359,9 @@ start_comfyui() {
         COMFYUI_PID=$!
 
         # Wait for first successful start
+        # 120s budget: Manager prestartup (~6s) + device init (~5s) + custom node imports (~30s) + server bind
         if [[ "$COMFYUI_STARTED" != "true" ]]; then
-            for i in {1..30}; do
+            for i in {1..120}; do
                 if curl -sf http://127.0.0.1:$COMFYUI_PORT/ >/dev/null 2>&1; then
                     COMFYUI_STARTED=true
                     log "INFO" "✅ ComfyUI responding on port $COMFYUI_PORT"
