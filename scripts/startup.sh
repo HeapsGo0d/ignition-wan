@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.26.2          ║"
+    log "INFO" "║       🎬 IGNITION WAN v1.0.26.3          ║"
     log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
@@ -175,7 +175,7 @@ prefetch_support_models() {
         log "INFO" "  • Downloading 4xLSDIR.pth (~67MB)..."
         aria2c -x4 -q --continue=true \
             -d "$UPSCALE_DIR" -o "4xLSDIR.pth" \
-            "https://huggingface.co/Phips/4xLSDIR/resolve/main/4xLSDIR.pth" \
+            "https://huggingface.co/LS110824/upscale/resolve/main/4xLSDIR.pth" \
             && upscale_status="ready" \
             || log "WARN" "  ⚠️  4xLSDIR.pth download failed — upscale node will not work"
     else
