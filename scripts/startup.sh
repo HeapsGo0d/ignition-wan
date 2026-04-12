@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.26.3          ║"
+    log "INFO" "║       🎬 IGNITION WAN v1.0.26.4          ║"
     log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
@@ -150,7 +150,8 @@ download_models() {
 prefetch_support_models() {
     log "INFO" "📦 Prefetching support models (RIFE + upscaler)..."
 
-    local RIFE_DIR="$COMFYUI_ROOT/custom_nodes/ComfyUI-Frame-Interpolation/ckpts"
+    # Node looks for ckpts/rife/rife49.pth — the rife/ subdirectory is required
+    local RIFE_DIR="$COMFYUI_ROOT/custom_nodes/ComfyUI-Frame-Interpolation/ckpts/rife"
     local UPSCALE_DIR="$COMFYUI_ROOT/models/upscale_models"
 
     mkdir -p "$RIFE_DIR" "$UPSCALE_DIR"
