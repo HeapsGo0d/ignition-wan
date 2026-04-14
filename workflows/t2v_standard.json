@@ -23,7 +23,7 @@
       "pos": [450, 150],
       "size": {"0": 425, "1": 180},
       "flags": {},
-      "order": 2,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {"name": "clip", "type": "CLIP", "link": 1}
@@ -40,7 +40,7 @@
       "pos": [450, 360],
       "size": {"0": 425, "1": 180},
       "flags": {},
-      "order": 3,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {"name": "clip", "type": "CLIP", "link": 2}
@@ -61,24 +61,32 @@
       "mode": 0,
       "inputs": [],
       "outputs": [
-        {"name": "VAE", "type": "VAE", "links": [5], "slot_index": 0}
+        {"name": "VAE", "type": "VAE", "links": [5, 6], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "VAELoader"},
       "widgets_values": ["wan_2.1_vae.safetensors"]
     },
     {
       "id": 5,
-      "type": "EmptyLatentVideo",
+      "type": "WanImageToVideo",
       "pos": [950, 200],
-      "size": {"0": 315, "1": 130},
+      "size": {"0": 315, "1": 230},
       "flags": {},
-      "order": 4,
+      "order": 6,
       "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {"name": "LATENT", "type": "LATENT", "links": [6], "slot_index": 0}
+      "inputs": [
+        {"name": "positive",           "type": "CONDITIONING",       "link": 3},
+        {"name": "negative",           "type": "CONDITIONING",       "link": 4},
+        {"name": "vae",                "type": "VAE",                "link": 5},
+        {"name": "clip_vision_output", "type": "CLIP_VISION_OUTPUT", "link": null},
+        {"name": "start_image",        "type": "IMAGE",              "link": null}
       ],
-      "properties": {"Node name for S&R": "EmptyLatentVideo"},
+      "outputs": [
+        {"name": "positive", "type": "CONDITIONING", "links": [9, 14],  "slot_index": 0},
+        {"name": "negative", "type": "CONDITIONING", "links": [10, 15], "slot_index": 1},
+        {"name": "latent",   "type": "LATENT",       "links": [17],     "slot_index": 2}
+      ],
+      "properties": {"Node name for S&R": "WanImageToVideo"},
       "widgets_values": [832, 480, 81, 1]
     },
     {
@@ -87,7 +95,7 @@
       "pos": [50, 500],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 5,
+      "order": 2,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -102,7 +110,7 @@
       "pos": [50, 630],
       "size": {"0": 315, "1": 82},
       "flags": {},
-      "order": 6,
+      "order": 3,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -223,9 +231,9 @@
       "mode": 0,
       "inputs": [
         {"name": "model",        "type": "MODEL",        "link": 11},
-        {"name": "positive",     "type": "CONDITIONING", "link": 3},
-        {"name": "negative",     "type": "CONDITIONING", "link": 4},
-        {"name": "latent_image", "type": "LATENT",       "link": 6}
+        {"name": "positive",     "type": "CONDITIONING", "link": 9},
+        {"name": "negative",     "type": "CONDITIONING", "link": 10},
+        {"name": "latent_image", "type": "LATENT",       "link": 17}
       ],
       "outputs": [
         {"name": "LATENT", "type": "LATENT", "links": [12], "slot_index": 0}
@@ -271,7 +279,7 @@
       "mode": 0,
       "inputs": [
         {"name": "samples", "type": "LATENT", "link": 16},
-        {"name": "vae",     "type": "VAE",    "link": 5}
+        {"name": "vae",     "type": "VAE",    "link": 6}
       ],
       "outputs": [
         {"name": "IMAGE", "type": "IMAGE", "links": [18], "slot_index": 0}
@@ -315,18 +323,21 @@
   "links": [
     [1,  1,  0, 2,  0, "CLIP"],
     [2,  1,  0, 3,  0, "CLIP"],
-    [3,  2,  0, 12, 1, "CONDITIONING"],
-    [4,  3,  0, 12, 2, "CONDITIONING"],
-    [5,  4,  0, 14, 1, "VAE"],
-    [6,  5,  0, 12, 3, "LATENT"],
+    [3,  2,  0, 5,  0, "CONDITIONING"],
+    [4,  3,  0, 5,  1, "CONDITIONING"],
+    [5,  4,  0, 5,  2, "VAE"],
+    [6,  4,  0, 14, 1, "VAE"],
     [7,  6,  0, 8,  0, "MODEL"],
     [8,  7,  0, 9,  0, "MODEL"],
+    [9,  5,  0, 12, 1, "CONDITIONING"],
+    [10, 5,  1, 12, 2, "CONDITIONING"],
     [11, 10, 0, 12, 0, "MODEL"],
     [12, 12, 0, 13, 3, "LATENT"],
     [13, 11, 0, 13, 0, "MODEL"],
-    [14, 2,  0, 13, 1, "CONDITIONING"],
-    [15, 3,  0, 13, 2, "CONDITIONING"],
+    [14, 5,  0, 13, 1, "CONDITIONING"],
+    [15, 5,  1, 13, 2, "CONDITIONING"],
     [16, 13, 0, 14, 0, "LATENT"],
+    [17, 5,  2, 12, 3, "LATENT"],
     [18, 14, 0, 15, 0, "IMAGE"],
     [19, 15, 0, 16, 0, "VIDEO"],
     [21, 8,  0, 17, 0, "MODEL"],
@@ -337,10 +348,7 @@
   "groups": [],
   "config": {},
   "extra": {
-    "ds": {
-      "scale": 0.7,
-      "offset": [0, 0]
-    }
+    "ds": {"scale": 0.7, "offset": [0, 0]}
   },
   "version": 0.4
 }

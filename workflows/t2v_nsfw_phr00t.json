@@ -63,8 +63,7 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            3,
-            14
+            3
           ],
           "slot_index": 0
         }
@@ -102,8 +101,7 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            4,
-            15
+            4
           ],
           "slot_index": 0
         }
@@ -135,7 +133,8 @@
           "name": "VAE",
           "type": "VAE",
           "links": [
-            5
+            5,
+            6
           ],
           "slot_index": 0
         }
@@ -149,38 +148,26 @@
     },
     {
       "id": 5,
-      "type": "EmptyLatentVideo",
-      "pos": [
-        950,
-        200
-      ],
-      "size": {
-        "0": 315,
-        "1": 130
-      },
+      "type": "WanImageToVideo",
+      "pos": [950, 200],
+      "size": {"0": 315, "1": 230},
       "flags": {},
-      "order": 4,
+      "order": 6,
       "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": [
-            6
-          ],
-          "slot_index": 0
-        }
+      "inputs": [
+        {"name": "positive",           "type": "CONDITIONING",       "link": 3},
+        {"name": "negative",           "type": "CONDITIONING",       "link": 4},
+        {"name": "vae",                "type": "VAE",                "link": 5},
+        {"name": "clip_vision_output", "type": "CLIP_VISION_OUTPUT", "link": null},
+        {"name": "start_image",        "type": "IMAGE",              "link": null}
       ],
-      "properties": {
-        "Node name for S&R": "EmptyLatentVideo"
-      },
-      "widgets_values": [
-        832,
-        480,
-        81,
-        1
-      ]
+      "outputs": [
+        {"name": "positive", "type": "CONDITIONING", "links": [9, 14],  "slot_index": 0},
+        {"name": "negative", "type": "CONDITIONING", "links": [10, 15], "slot_index": 1},
+        {"name": "latent",   "type": "LATENT",       "links": [17],     "slot_index": 2}
+      ],
+      "properties": {"Node name for S&R": "WanImageToVideo"},
+      "widgets_values": [832, 480, 81, 1]
     },
     {
       "id": 6,
@@ -716,166 +703,29 @@
     }
   ],
   "links": [
-    [
-      1,
-      1,
-      0,
-      2,
-      0,
-      "CLIP"
-    ],
-    [
-      2,
-      1,
-      0,
-      3,
-      0,
-      "CLIP"
-    ],
-    [
-      3,
-      2,
-      0,
-      12,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      4,
-      3,
-      0,
-      12,
-      2,
-      "CONDITIONING"
-    ],
-    [
-      5,
-      4,
-      0,
-      14,
-      1,
-      "VAE"
-    ],
-    [
-      6,
-      5,
-      0,
-      12,
-      3,
-      "LATENT"
-    ],
-    [
-      7,
-      6,
-      0,
-      8,
-      0,
-      "MODEL"
-    ],
-    [
-      8,
-      7,
-      0,
-      9,
-      0,
-      "MODEL"
-    ],
-    [
-      11,
-      10,
-      0,
-      12,
-      0,
-      "MODEL"
-    ],
-    [
-      12,
-      12,
-      0,
-      13,
-      3,
-      "LATENT"
-    ],
-    [
-      13,
-      11,
-      0,
-      13,
-      0,
-      "MODEL"
-    ],
-    [
-      14,
-      2,
-      0,
-      13,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      15,
-      3,
-      0,
-      13,
-      2,
-      "CONDITIONING"
-    ],
-    [
-      16,
-      13,
-      0,
-      14,
-      0,
-      "LATENT"
-    ],
-    [
-      18,
-      14,
-      0,
-      15,
-      0,
-      "IMAGE"
-    ],
-    [
-      19,
-      15,
-      0,
-      16,
-      0,
-      "VIDEO"
-    ],
-    [
-      21,
-      8,
-      0,
-      17,
-      0,
-      "MODEL"
-    ],
-    [
-      22,
-      17,
-      0,
-      10,
-      0,
-      "MODEL"
-    ],
-    [
-      23,
-      9,
-      0,
-      18,
-      0,
-      "MODEL"
-    ],
-    [
-      24,
-      18,
-      0,
-      11,
-      0,
-      "MODEL"
-    ]
+    [1,  1,  0, 2,  0, "CLIP"],
+    [2,  1,  0, 3,  0, "CLIP"],
+    [3,  2,  0, 5,  0, "CONDITIONING"],
+    [4,  3,  0, 5,  1, "CONDITIONING"],
+    [5,  4,  0, 5,  2, "VAE"],
+    [6,  4,  0, 14, 1, "VAE"],
+    [7,  6,  0, 8,  0, "MODEL"],
+    [8,  7,  0, 9,  0, "MODEL"],
+    [9,  5,  0, 12, 1, "CONDITIONING"],
+    [10, 5,  1, 12, 2, "CONDITIONING"],
+    [11, 10, 0, 12, 0, "MODEL"],
+    [12, 12, 0, 13, 3, "LATENT"],
+    [13, 11, 0, 13, 0, "MODEL"],
+    [14, 5,  0, 13, 1, "CONDITIONING"],
+    [15, 5,  1, 13, 2, "CONDITIONING"],
+    [16, 13, 0, 14, 0, "LATENT"],
+    [17, 5,  2, 12, 3, "LATENT"],
+    [18, 14, 0, 15, 0, "IMAGE"],
+    [19, 15, 0, 16, 0, "VIDEO"],
+    [21, 8,  0, 17, 0, "MODEL"],
+    [22, 17, 0, 10, 0, "MODEL"],
+    [23, 9,  0, 18, 0, "MODEL"],
+    [24, 18, 0, 11, 0, "MODEL"]
   ],
   "groups": [],
   "config": {},
