@@ -91,15 +91,23 @@ WAN_MODELS = {
         'filename': 'wan2.2-t2v-rapid-aio-v10-nsfw.safetensors',
         'subdir': 'diffusion_models'
     },
-    # FX-FeiHou Remix NSFW v2.0 (age-gate repo - set HF_TOKEN if downloads fail)
+    # FX-FeiHou Remix NSFW v3.0 (age-gate repo - set HF_TOKEN if downloads fail)
+    # fp8_e4m3fn native — improved anatomy, motion, scene consistency over v2.0
     'remix_nsfw_i2v_high': {
-        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_high_lighting_v2.0.safetensors',
-        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_high_lighting_v2.0.safetensors',
+        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_high_lighting_fp8_e4m3fn_v3.0.safetensors',
+        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_high_lighting_fp8_e4m3fn_v3.0.safetensors',
         'subdir': 'diffusion_models'
     },
     'remix_nsfw_i2v_low': {
-        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_low_lighting_v2.0.safetensors',
-        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_low_lighting_v2.0.safetensors',
+        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_low_lighting_fp8_e4m3fn_v3.0.safetensors',
+        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_low_lighting_fp8_e4m3fn_v3.0.safetensors',
+        'subdir': 'diffusion_models'
+    },
+    # Phr00t MEGA v12.2 — single unified file (I2V+T2V), bf16 Fun/VACE base, rCM+LightX2V baked in
+    # Load same file in both UNETLoader nodes. Best sampler: dpmpp_sde / beta.
+    'phr00t_mega_nsfw': {
+        'url': 'https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/Mega-v12/wan2.2-rapid-mega-aio-nsfw-v12.2.safetensors',
+        'filename': 'wan2.2-rapid-mega-aio-nsfw-v12.2.safetensors',
         'subdir': 'diffusion_models'
     },
     # General NSFW LoRA — single file works for both high and low noise stages
@@ -141,6 +149,7 @@ WAN_BUNDLES = {
     'remix_nsfw_i2v_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     'phr00t_nsfw_t2v_bundle': ['phr00t_t2v_nsfw', 'umt5_xxl_fp8', 'wan_vae'],
     'phr00t_nsfw_i2v_bundle': ['phr00t_i2v_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
 }
 
 

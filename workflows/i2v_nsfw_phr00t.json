@@ -1,6 +1,6 @@
 {
-  "last_node_id": 19,
-  "last_link_id": 26,
+  "last_node_id": 21,
+  "last_link_id": 29,
   "nodes": [
     {
       "id": 1,
@@ -22,7 +22,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            1
+            1,
+            27
           ],
           "slot_index": 0
         },
@@ -222,7 +223,7 @@
         {
           "name": "clip_vision_output",
           "type": "CLIP_VISION_OUTPUT",
-          "link": null
+          "link": 29
         },
         {
           "name": "start_image",
@@ -723,6 +724,39 @@
       ]
     },
     {
+      "id": 20,
+      "type": "CLIPVisionLoader",
+      "pos": [50, 450],
+      "size": {"0": 315, "1": 58},
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "CLIP_VISION", "type": "CLIP_VISION", "links": [28], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPVisionLoader"},
+      "widgets_values": ["clip_vision_h.safetensors"]
+    },
+    {
+      "id": 21,
+      "type": "CLIPVisionEncode",
+      "pos": [450, 380],
+      "size": {"0": 315, "1": 82},
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip_vision", "type": "CLIP_VISION", "link": 28},
+        {"name": "image",       "type": "IMAGE",       "link": 27}
+      ],
+      "outputs": [
+        {"name": "CLIP_VISION_OUTPUT", "type": "CLIP_VISION_OUTPUT", "links": [29], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPVisionEncode"},
+      "widgets_values": []
+    },
+    {
       "id": 18,
       "type": "PathchSageAttentionKJ",
       "pos": [
@@ -993,7 +1027,10 @@
       12,
       0,
       "MODEL"
-    ]
+    ],
+    [27, 1,  0, 21, 1, "IMAGE"],
+    [28, 20, 0, 21, 0, "CLIP_VISION"],
+    [29, 21, 0, 6,  3, "CLIP_VISION_OUTPUT"]
   ],
   "groups": [],
   "config": {},
@@ -1004,7 +1041,8 @@
         0,
         0
       ]
-    }
+    },
+    "_note": "MEGA v12.2 is a single unified file — load same file in both UNETLoader nodes. Use i2v_nsfw_lora.json to stack extra LoRAs on top."
   },
   "version": 0.4
 }
