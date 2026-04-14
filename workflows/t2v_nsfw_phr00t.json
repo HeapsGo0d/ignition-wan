@@ -236,84 +236,6 @@
       ]
     },
     {
-      "id": 8,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        450,
-        500
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            21
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "NSFW-22-H-e8.safetensors",
-        0.8
-      ]
-    },
-    {
-      "id": 9,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        450,
-        630
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 8
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            23
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "NSFW-22-H-e8.safetensors",
-        0.8
-      ]
-    },
-    {
       "id": 10,
       "type": "ModelSamplingSD3",
       "pos": [
@@ -412,17 +334,17 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 3
+          "link": 9
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 4
+          "link": 10
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 6
+          "link": 17
         }
       ],
       "outputs": [
@@ -536,7 +458,7 @@
         {
           "name": "vae",
           "type": "VAE",
-          "link": 5
+          "link": 6
         }
       ],
       "outputs": [
@@ -589,7 +511,7 @@
         "Node name for S&R": "CreateVideo"
       },
       "widgets_values": [
-        16
+        24
       ]
     },
     {
@@ -641,7 +563,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 21
+          "link": 7
         }
       ],
       "outputs": [
@@ -680,7 +602,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 23
+          "link": 8
         }
       ],
       "outputs": [
@@ -709,8 +631,8 @@
     [4,  3,  0, 5,  1, "CONDITIONING"],
     [5,  4,  0, 5,  2, "VAE"],
     [6,  4,  0, 14, 1, "VAE"],
-    [7,  6,  0, 8,  0, "MODEL"],
-    [8,  7,  0, 9,  0, "MODEL"],
+    [7,  6,  0, 17, 0, "MODEL"],
+    [8,  7,  0, 18, 0, "MODEL"],
     [9,  5,  0, 12, 1, "CONDITIONING"],
     [10, 5,  1, 12, 2, "CONDITIONING"],
     [11, 10, 0, 12, 0, "MODEL"],
@@ -722,9 +644,7 @@
     [17, 5,  2, 12, 3, "LATENT"],
     [18, 14, 0, 15, 0, "IMAGE"],
     [19, 15, 0, 16, 0, "VIDEO"],
-    [21, 8,  0, 17, 0, "MODEL"],
     [22, 17, 0, 10, 0, "MODEL"],
-    [23, 9,  0, 18, 0, "MODEL"],
     [24, 18, 0, 11, 0, "MODEL"]
   ],
   "groups": [],

@@ -40,7 +40,7 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "wan2.2_i2v_bundle",
+      "value": "wan2.2_t2v_bundle",
       "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
     },
     {

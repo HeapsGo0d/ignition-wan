@@ -336,84 +336,6 @@
       ]
     },
     {
-      "id": 9,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        450,
-        870
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 7
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            23
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "NSFW-22-e8.safetensors",
-        0.8
-      ]
-    },
-    {
-      "id": 10,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        450,
-        1000
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 8
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            25
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "NSFW-22-e8.safetensors",
-        0.8
-      ]
-    },
-    {
       "id": 11,
       "type": "ModelSamplingSD3",
       "pos": [
@@ -689,7 +611,7 @@
         "Node name for S&R": "CreateVideo"
       },
       "widgets_values": [
-        16
+        24
       ]
     },
     {
@@ -774,7 +696,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 23
+          "link": 7
         }
       ],
       "outputs": [
@@ -813,7 +735,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 25
+          "link": 8
         }
       ],
       "outputs": [
@@ -884,22 +806,8 @@
       2,
       "VAE"
     ],
-    [
-      7,
-      7,
-      0,
-      9,
-      0,
-      "MODEL"
-    ],
-    [
-      8,
-      8,
-      0,
-      10,
-      0,
-      "MODEL"
-    ],
+    [7, 7, 0, 18, 0, "MODEL"],
+    [8, 8, 0, 19, 0, "MODEL"],
     [
       11,
       11,
@@ -997,26 +905,10 @@
       "VIDEO"
     ],
     [
-      23,
-      9,
-      0,
-      18,
-      0,
-      "MODEL"
-    ],
-    [
       24,
       18,
       0,
       11,
-      0,
-      "MODEL"
-    ],
-    [
-      25,
-      10,
-      0,
-      19,
       0,
       "MODEL"
     ],
