@@ -116,6 +116,19 @@ WAN_MODELS = {
         'filename': 'wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors',
         'subdir': 'loras'
     },
+    # --- SVI 2.0 Pro LoRAs: Wan 2.2 I2V (error-recycling for long video continuity) ---
+    # Kijai's fp16 variants — both MoE experts MUST be loaded (high+low) for SVI to be active.
+    # DO NOT combine with LightX2V LoRAs — step-distillation interferes with error-recycling.
+    'svi_wan22_high_lora': {
+        'url': 'https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors',
+        'filename': 'SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors',
+        'subdir': 'loras'
+    },
+    'svi_wan22_low_lora': {
+        'url': 'https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors',
+        'filename': 'SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors',
+        'subdir': 'loras'
+    },
 }
 
 # Convenience bundle keys that expand to multiple models
@@ -139,6 +152,11 @@ WAN_BUNDLES = {
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # SVI 2.0 Pro bundles — NO LightX2V (step-distillation conflicts with SVI error-recycling)
+    # Use HUGGINGFACE_MODELS=svi_i2v_bundle for i2v_svi_standard.json
+    'svi_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora'],
+    # Use HUGGINGFACE_MODELS=svi_nsfw_i2v_bundle for i2v_svi_nsfw_lora.json
+    'svi_nsfw_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora', 'nsfw_lora_h'],
 }
 
 
