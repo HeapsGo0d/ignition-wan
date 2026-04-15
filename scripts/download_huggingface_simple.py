@@ -120,13 +120,13 @@ WAN_MODELS = {
     # Kijai's fp16 variants — both MoE experts MUST be loaded (high+low) for SVI to be active.
     # DO NOT combine with LightX2V LoRAs — step-distillation interferes with error-recycling.
     'svi_wan22_high_lora': {
-        'url': 'https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors',
-        'filename': 'SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors',
+        'url': 'https://huggingface.co/vita-video-gen/svi-model/resolve/main/version-2.0/SVI_Wan2.2-I2V-A14B_high_noise_lora_v2.0_pro.safetensors',
+        'filename': 'SVI_Wan2.2-I2V-A14B_high_noise_lora_v2.0_pro.safetensors',
         'subdir': 'loras'
     },
     'svi_wan22_low_lora': {
-        'url': 'https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors',
-        'filename': 'SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors',
+        'url': 'https://huggingface.co/vita-video-gen/svi-model/resolve/main/version-2.0/SVI_Wan2.2-I2V-A14B_low_noise_lora_v2.0_pro.safetensors',
+        'filename': 'SVI_Wan2.2-I2V-A14B_low_noise_lora_v2.0_pro.safetensors',
         'subdir': 'loras'
     },
 }

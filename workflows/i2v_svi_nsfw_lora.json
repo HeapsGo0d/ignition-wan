@@ -221,7 +221,7 @@
         {"name": "MODEL", "type": "MODEL", "links": [21], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "LoraLoaderModelOnly"},
-      "widgets_values": ["SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors", 1.0]
+      "widgets_values": ["SVI_Wan2.2-I2V-A14B_high_noise_lora_v2.0_pro.safetensors", 1.0]
     },
     {
       "id": 10,
@@ -238,7 +238,7 @@
         {"name": "MODEL", "type": "MODEL", "links": [22], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "LoraLoaderModelOnly"},
-      "widgets_values": ["SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors", 1.0]
+      "widgets_values": ["SVI_Wan2.2-I2V-A14B_low_noise_lora_v2.0_pro.safetensors", 1.0]
     },
     {
       "id": 20,
