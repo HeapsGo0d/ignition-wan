@@ -194,12 +194,12 @@ get_configuration() {
         8)
             HUGGINGFACE_MODELS="svi_i2v_bundle"
             echo "  → Selected: SVI I2V (~30GB — official Wan 2.2 + SVI 2.0 Pro LoRAs, no LightX2V)"
-            echo "     Use workflow: i2v_svi_standard.json"
+            echo "     Use workflow: i2v_svi_4chunk.json (~20s video)"
             ;;
         9)
             HUGGINGFACE_MODELS="svi_nsfw_i2v_bundle"
             echo "  → Selected: SVI NSFW I2V (~32GB — official Wan 2.2 + SVI LoRAs + NSFW LoRA)"
-            echo "     Use workflow: i2v_svi_nsfw_lora.json"
+            echo "     Use workflow: i2v_svi_nsfw_4chunk.json (~20s video)"
             ;;
         10)
             read -p "Enter model keys (comma-separated): " input_hf
