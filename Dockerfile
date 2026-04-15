@@ -84,9 +84,7 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
 
 # comfyUI-LongLook — FreeLong per-chunk spectral blending + WanContinuationConditioning
 RUN cd /workspace/ComfyUI/custom_nodes && \
-    git clone https://github.com/shootthesound/comfyUI-LongLook.git && \
-    cd comfyUI-LongLook && \
-    pip install --no-cache-dir -r requirements.txt
+    git clone https://github.com/shootthesound/comfyUI-LongLook.git
 
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
