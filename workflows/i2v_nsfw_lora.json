@@ -1,6 +1,6 @@
 {
-  "last_node_id": 21,
-  "last_link_id": 30,
+  "last_node_id": 23,
+  "last_link_id": 33,
   "nodes": [
     {
       "id": 1,
@@ -22,7 +22,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            1
+            1,
+            31
           ],
           "slot_index": 0
         },
@@ -222,7 +223,7 @@
         {
           "name": "clip_vision_output",
           "type": "CLIP_VISION_OUTPUT",
-          "link": null
+          "link": 33
         },
         {
           "name": "start_image",
@@ -801,6 +802,39 @@
       ]
     },
     {
+      "id": 22,
+      "type": "CLIPVisionLoader",
+      "pos": [50, 450],
+      "size": {"0": 315, "1": 58},
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "CLIP_VISION", "type": "CLIP_VISION", "links": [32], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPVisionLoader"},
+      "widgets_values": ["clip_vision_h.safetensors"]
+    },
+    {
+      "id": 23,
+      "type": "CLIPVisionEncode",
+      "pos": [450, 380],
+      "size": {"0": 315, "1": 82},
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip_vision", "type": "CLIP_VISION", "link": 32},
+        {"name": "image",       "type": "IMAGE",       "link": 31}
+      ],
+      "outputs": [
+        {"name": "CLIP_VISION_OUTPUT", "type": "CLIP_VISION_OUTPUT", "links": [33], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPVisionEncode"},
+      "widgets_values": []
+    },
+    {
       "id": 20,
       "type": "PathchSageAttentionKJ",
       "pos": [
@@ -1087,7 +1121,10 @@
       12,
       0,
       "MODEL"
-    ]
+    ],
+    [31, 1,  0, 23, 1, "IMAGE"],
+    [32, 22, 0, 23, 0, "CLIP_VISION"],
+    [33, 23, 0, 6,  3, "CLIP_VISION_OUTPUT"]
   ],
   "groups": [],
   "config": {},

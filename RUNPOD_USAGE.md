@@ -48,21 +48,7 @@ Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `true` |
 
 ### Storage Configuration
-
-| Setup | Container Disk | Volume | Notes |
-|-------|---------------|--------|-------|
-| Ephemeral | 200GB | 0GB | Models redownload each start (~15-30 min) |
-| Persistent (recommended) | 50GB | 100GB+ | Models cached; instant subsequent starts |
-
-## ⚡ SageAttention (Optional Speed Boost)
-
-SA2++ and SA3 are both **pre-compiled into the image** for RTX 5090 (sm_120). SA3 is the active backend — it uses Blackwell-native CUDA kernels with no Triton JIT at runtime.
-
-On boot, the startup script runs a real GPU tensor test and logs the result:
-- `⚡ SageAttention3 Blackwell ready` → SA3 is working, workflows are pre-configured
-- `⚡ SageAttention3 runtime check FAILED` → set KJNodes SA patch node backend to `disabled`
-
-Do not use `--use-sage-attention` in `COMFY_FLAGS` — it causes black frames with WAN 2.2.
+Storage: Ephemeral volume (0GB; models redownload each start) (Container: 200GB disk, 0GB volume)
 
 ## Startup Process
 

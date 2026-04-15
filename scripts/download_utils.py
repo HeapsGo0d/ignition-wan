@@ -126,22 +126,9 @@ def validate_huggingface_repo(repo: str) -> bool:
 
     repo = repo.strip()
 
-    # Check for predefined models (single words or underscored keys)
-    predefined_models = [
-        'wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'wan2.2_t2v_fp16',
-        'wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp16',
-        'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h',
-        'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise',
-        'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise',
-        'phr00t_i2v_nsfw', 'phr00t_t2v_nsfw',
-        'remix_nsfw_i2v_high', 'remix_nsfw_i2v_low',
-        'nsfw_lora_h', 'nsfw_lora_l',
-        'wan2.2_t2v_bundle', 'wan2.2_t2v_lightx2v_bundle',
-        'wan2.2_i2v_bundle', 'wan2.2_i2v_lightx2v_bundle',
-        'wan2.2_full_bundle', 'lightx2v_t2v_bundle', 'lightx2v_i2v_bundle',
-        'nsfw_lora_bundle', 'remix_nsfw_i2v_bundle', 'phr00t_nsfw_i2v_bundle',
-    ]
-    if repo in predefined_models:
+    # Accept predefined model/bundle keys: alphanumeric with dots, underscores, hyphens — no slashes or colons.
+    # Unknown keys are caught downstream in download_wan_model with a helpful error.
+    if re.match(r'^[a-zA-Z0-9][a-zA-Z0-9._-]*$', repo):
         return True
 
     # Check generic repo format: repo:filename:subdir[:branch] or user/repo format

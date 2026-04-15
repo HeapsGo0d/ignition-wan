@@ -256,7 +256,7 @@
       "properties": {"Node name for S&R": "KSamplerAdvanced"},
       "widgets_values": [
         "enable", 264244520398999, "randomize",
-        20, 3.5, "euler", "simple",
+        20, 6.0, "euler", "simple",
         0, 10, "enable"
       ]
     },
@@ -280,7 +280,7 @@
       "properties": {"Node name for S&R": "KSamplerAdvanced"},
       "widgets_values": [
         "disable", 0, "fixed",
-        20, 3.5, "euler", "simple",
+        20, 6.0, "euler", "simple",
         10, 10000, "disable"
       ]
     },
