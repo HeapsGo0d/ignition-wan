@@ -153,8 +153,8 @@ get_configuration() {
     echo "  4) Full + NSFW LoRAs (T2V + I2V + NSFW-22-H/L LoRAs, ~46GB)"
     echo "  --- NSFW/Uncensored models ---"
     echo "  5) FX-FeiHou Remix NSFW I2V v3.0 (high + low + CLIP, ~24GB)"
-    echo "  6) Phr00t Rapid AIO NSFW I2V v10 (~23GB + CLIP)"
-    echo "  7) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
+    echo "  6) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
+    echo "  7) NSFW I2V Full (all 3 NSFW I2V workflows, ~70GB)"
     echo "  8) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
@@ -180,13 +180,13 @@ get_configuration() {
             echo "  → Selected: FX-FeiHou Remix NSFW I2V v3.0"
             ;;
         6)
-            HUGGINGFACE_MODELS="phr00t_nsfw_i2v_bundle"
-            echo "  → Selected: Phr00t Rapid AIO NSFW I2V"
-            ;;
-        7)
             HUGGINGFACE_MODELS="phr00t_mega_nsfw_bundle"
             echo "  → Selected: Phr00t MEGA NSFW v12.2"
             echo "     Sampler tip: dpmpp_sde / beta for best motion on MEGA v12.2"
+            ;;
+        7)
+            HUGGINGFACE_MODELS="nsfw_i2v_full_bundle"
+            echo "  → Selected: NSFW I2V Full (~70GB — Remix v3.0 + MEGA + official SFW base + LoRAs)"
             ;;
         8)
             read -p "Enter model keys (comma-separated): " input_hf

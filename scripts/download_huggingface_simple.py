@@ -80,17 +80,6 @@ WAN_MODELS = {
         'subdir': 'loras'
     },
     # --- NSFW/Uncensored Models ---
-    # Phr00t Rapid All-In-One NSFW (repo deprecated upstream, files still accessible)
-    'phr00t_i2v_nsfw': {
-        'url': 'https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/v10/wan2.2-i2v-rapid-aio-v10-nsfw.safetensors',
-        'filename': 'wan2.2-i2v-rapid-aio-v10-nsfw.safetensors',
-        'subdir': 'diffusion_models'
-    },
-    'phr00t_t2v_nsfw': {
-        'url': 'https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/v10/wan2.2-t2v-rapid-aio-v10-nsfw.safetensors',
-        'filename': 'wan2.2-t2v-rapid-aio-v10-nsfw.safetensors',
-        'subdir': 'diffusion_models'
-    },
     # FX-FeiHou Remix NSFW v3.0 (age-gate repo - set HF_TOKEN if downloads fail)
     # fp8_e4m3fn native — improved anatomy, motion, scene consistency over v2.0
     'remix_nsfw_i2v_high': {
@@ -147,9 +136,9 @@ WAN_BUNDLES = {
     # NSFW bundles
     'nsfw_lora_bundle': ['nsfw_lora_h'],
     'remix_nsfw_i2v_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    'phr00t_nsfw_t2v_bundle': ['phr00t_t2v_nsfw', 'umt5_xxl_fp8', 'wan_vae'],
-    'phr00t_nsfw_i2v_bundle': ['phr00t_i2v_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
+    'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
 }
 
 
