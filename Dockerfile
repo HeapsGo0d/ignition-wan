@@ -82,9 +82,21 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/Well-Made/ComfyUI-Wan-SVI2Pro-FLF.git
 
+# ComfyUI-Wan22FMLF — native WanSVIProAdvancedI2V / WanAdvancedI2V nodes (cnr_id: wan22fmlf)
+# Provides improved SVI Pro conditioning with separate positive_high/positive_low outputs
+# and built-in prev_latent chaining. No pip deps required.
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/wallen0322/ComfyUI-Wan22FMLF.git
+
 # comfyUI-LongLook — FreeLong per-chunk spectral blending + WanContinuationConditioning
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/shootthesound/comfyUI-LongLook.git
+
+# ComfyUI-VideoHelperSuite (VHS) — VHS_VideoCombine, VHS_LoadVideo, VHS_GetImageCount
+# Used by SVI long-video workflows and general video I/O. ffmpeg already in image.
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    pip install --no-cache-dir -r ComfyUI-VideoHelperSuite/requirements.txt
 
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
