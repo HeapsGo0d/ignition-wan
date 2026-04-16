@@ -109,8 +109,8 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "high quality photo, sharp details, 8k resolution, detailed skin texture, professional lighting, photorealistic, anatomically correct",
-        "bad quality, blurry, messy, artifacts, noise, compression artifacts, watermark, low resolution, deformed anatomy, extra limbs"
+        "high quality photo, sharp details, 8k resolution, detailed texture, professional photography, photorealistic",
+        "bad quality, blurry, messy, artifacts, noise, compression artifacts, watermark, low resolution"
       ]
     },
     {
@@ -133,10 +133,10 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        30,
-        2.5, 2.5,
-        3,
-        1.001,
+        45,
+        4.0, 4.0,
+        5,
+        1.003,
         1.0,
         1.0, 1.0,
         -1.0,
@@ -176,7 +176,7 @@
       ],
       "outputs": [],
       "properties": {"Node name for S&R": "SaveImage"},
-      "widgets_values": ["SUPIR_NSFW"]
+      "widgets_values": ["SUPIR_SFW_detail"]
     }
   ],
   "links": [
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — BALANCED preset (steps=30, cfg=2.5, reduced artifacts). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR SFW upscale — DETAIL preset (steps=45, cfg=4.0, aggressive hallucination — max detail restoration, higher artifact risk). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

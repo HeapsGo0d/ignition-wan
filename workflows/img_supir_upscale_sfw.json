@@ -88,7 +88,7 @@
         {"name": "latent", "type": "LATENT", "links": [10, 15], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "SUPIR_encode"},
-      "widgets_values": [true, 512, "auto"]
+      "widgets_values": [true, 1024, "auto"]
     },
     {
       "id": 6,
@@ -133,16 +133,16 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        45,
-        4.0, 4.0,
-        5,
-        1.003,
+        30,
+        2.5, 2.5,
+        3,
+        1.001,
         1.0,
         1.0, 1.0,
         -1.0,
         false,
         "RestoreEDMSampler",
-        1024, 512
+        1024, 1024
       ]
     },
     {
@@ -161,7 +161,7 @@
         {"name": "image", "type": "IMAGE", "links": [14], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "SUPIR_decode"},
-      "widgets_values": [true, 512]
+      "widgets_values": [true, 1024]
     },
     {
       "id": 9,
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR SFW upscale. Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR SFW upscale — BALANCED preset (steps=30, cfg=2.5, reduced artifacts). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

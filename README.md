@@ -137,6 +137,22 @@ Set the KJNodes SA patch node backend to `disabled` in your workflow. Generation
 
 **Important**: Do NOT use `--use-sage-attention` in `COMFY_FLAGS` — that uses the Triton backend which causes black frames with WAN 2.2's MoE architecture.
 
+## 📦 Download SUPIR Workflow Pack
+
+Package all SUPIR workflows into a zip for easy download via the file browser:
+
+```bash
+/workspace/scripts/package-supir-workflows.sh
+```
+
+Creates `supir-workflows.zip` in `/workspace`. To specify a custom output path:
+
+```bash
+/workspace/scripts/package-supir-workflows.sh /workspace/ComfyUI/output/supir-workflows.zip
+```
+
+Includes: `img_supir_upscale_sfw.json`, `img_supir_upscale_nsfw.json`, and the `_clean` / `_detail` variants for both.
+
 ## 🔄 Restarting ComfyUI
 
 ### Soft Restart (Models Preserved)
