@@ -2057,7 +2057,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "images",
+          "name": "image",
           "type": "IMAGE",
           "link": 86,
           "slot_index": 0
@@ -2098,7 +2098,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "images",
+          "name": "image",
           "type": "IMAGE",
           "link": 88,
           "slot_index": 0
@@ -2139,7 +2139,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "images",
+          "name": "image",
           "type": "IMAGE",
           "link": 90,
           "slot_index": 0
