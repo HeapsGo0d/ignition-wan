@@ -1,6 +1,6 @@
 {
-  "last_node_id": 70,
-  "last_link_id": 85,
+  "last_node_id": 73,
+  "last_link_id": 91,
   "nodes": [
     {
       "id": 1,
@@ -22,10 +22,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            9,
-            10,
-            11,
-            12
+            9
           ],
           "slot_index": 0
         },
@@ -780,7 +777,8 @@
           "type": "IMAGE",
           "links": [
             64,
-            77
+            77,
+            86
           ],
           "slot_index": 0
         }
@@ -826,7 +824,7 @@
         {
           "name": "start_image",
           "type": "IMAGE",
-          "link": 10,
+          "link": 87,
           "slot_index": 3
         },
         {
@@ -1069,7 +1067,8 @@
           "type": "IMAGE",
           "links": [
             65,
-            80
+            80,
+            88
           ],
           "slot_index": 0
         }
@@ -1115,7 +1114,7 @@
         {
           "name": "start_image",
           "type": "IMAGE",
-          "link": 11,
+          "link": 89,
           "slot_index": 3
         },
         {
@@ -1358,7 +1357,8 @@
           "type": "IMAGE",
           "links": [
             67,
-            83
+            83,
+            90
           ],
           "slot_index": 0
         }
@@ -1404,7 +1404,7 @@
         {
           "name": "start_image",
           "type": "IMAGE",
-          "link": 12,
+          "link": 91,
           "slot_index": 3
         },
         {
@@ -1962,6 +1962,129 @@
         "Node name for S&R": "VAEEncode"
       },
       "widgets_values": []
+    },
+    {
+      "id": 71,
+      "type": "VHS_SelectImages",
+      "pos": [
+        2600,
+        620
+      ],
+      "size": {
+        "0": 210,
+        "1": 82
+      },
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 86,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            87
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectImages"
+      },
+      "widgets_values": [
+        "-1",
+        true,
+        true
+      ]
+    },
+    {
+      "id": 72,
+      "type": "VHS_SelectImages",
+      "pos": [
+        2600,
+        1220
+      ],
+      "size": {
+        "0": 210,
+        "1": 82
+      },
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 88,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            89
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectImages"
+      },
+      "widgets_values": [
+        "-1",
+        true,
+        true
+      ]
+    },
+    {
+      "id": 73,
+      "type": "VHS_SelectImages",
+      "pos": [
+        2600,
+        1820
+      ],
+      "size": {
+        "0": 210,
+        "1": 82
+      },
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 90,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            91
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectImages"
+      },
+      "widgets_values": [
+        "-1",
+        true,
+        true
+      ]
     }
   ],
   "links": [
@@ -2036,46 +2159,6 @@
       20,
       3,
       "IMAGE"
-    ],
-    [
-      10,
-      1,
-      0,
-      30,
-      3,
-      "IMAGE"
-    ],
-    [
-      11,
-      1,
-      0,
-      40,
-      3,
-      "IMAGE"
-    ],
-    [
-      12,
-      1,
-      0,
-      50,
-      3,
-      "IMAGE"
-    ],
-    [
-      13,
-      3,
-      0,
-      20,
-      0,
-      "CONDITIONING"
-    ],
-    [
-      14,
-      3,
-      0,
-      30,
-      0,
-      "CONDITIONING"
     ],
     [
       15,
@@ -2603,6 +2686,70 @@
       1,
       52,
       1,
+      "CONDITIONING"
+    ],
+    [
+      86,
+      23,
+      0,
+      71,
+      0,
+      "IMAGE"
+    ],
+    [
+      87,
+      71,
+      0,
+      30,
+      3,
+      "IMAGE"
+    ],
+    [
+      88,
+      33,
+      0,
+      72,
+      0,
+      "IMAGE"
+    ],
+    [
+      89,
+      72,
+      0,
+      40,
+      3,
+      "IMAGE"
+    ],
+    [
+      90,
+      43,
+      0,
+      73,
+      0,
+      "IMAGE"
+    ],
+    [
+      91,
+      73,
+      0,
+      50,
+      3,
+      "IMAGE"
+    ],
+    [
+      13,
+      3,
+      0,
+      20,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      14,
+      3,
+      0,
+      30,
+      0,
       "CONDITIONING"
     ]
   ],

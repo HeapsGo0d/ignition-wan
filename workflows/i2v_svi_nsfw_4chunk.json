@@ -1,6 +1,6 @@
 {
-  "last_node_id": 70,
-  "last_link_id": 85,
+  "last_node_id": 73,
+  "last_link_id": 91,
   "nodes": [
     {
       "id": 1,
@@ -22,10 +22,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            11,
-            12,
-            13,
-            14
+            11
           ],
           "slot_index": 0
         },
@@ -858,7 +855,8 @@
           "type": "IMAGE",
           "links": [
             70,
-            77
+            77,
+            86
           ],
           "slot_index": 0
         }
@@ -904,7 +902,7 @@
         {
           "name": "start_image",
           "type": "IMAGE",
-          "link": 12,
+          "link": 87,
           "slot_index": 3
         },
         {
@@ -1147,7 +1145,8 @@
           "type": "IMAGE",
           "links": [
             71,
-            80
+            80,
+            88
           ],
           "slot_index": 0
         }
@@ -1193,7 +1192,7 @@
         {
           "name": "start_image",
           "type": "IMAGE",
-          "link": 13,
+          "link": 89,
           "slot_index": 3
         },
         {
@@ -1436,7 +1435,8 @@
           "type": "IMAGE",
           "links": [
             73,
-            83
+            83,
+            90
           ],
           "slot_index": 0
         }
@@ -1482,7 +1482,7 @@
         {
           "name": "start_image",
           "type": "IMAGE",
-          "link": 14,
+          "link": 91,
           "slot_index": 3
         },
         {
@@ -2040,6 +2040,129 @@
         "Node name for S&R": "VAEEncode"
       },
       "widgets_values": []
+    },
+    {
+      "id": 71,
+      "type": "VHS_SelectImages",
+      "pos": [
+        2980,
+        620
+      ],
+      "size": {
+        "0": 210,
+        "1": 82
+      },
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 86,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            87
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectImages"
+      },
+      "widgets_values": [
+        "-1",
+        true,
+        true
+      ]
+    },
+    {
+      "id": 72,
+      "type": "VHS_SelectImages",
+      "pos": [
+        2980,
+        1220
+      ],
+      "size": {
+        "0": 210,
+        "1": 82
+      },
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 88,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            89
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectImages"
+      },
+      "widgets_values": [
+        "-1",
+        true,
+        true
+      ]
+    },
+    {
+      "id": 73,
+      "type": "VHS_SelectImages",
+      "pos": [
+        2980,
+        1820
+      ],
+      "size": {
+        "0": 210,
+        "1": 82
+      },
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 90,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            91
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_SelectImages"
+      },
+      "widgets_values": [
+        "-1",
+        true,
+        true
+      ]
     }
   ],
   "links": [
@@ -2128,30 +2251,6 @@
       1,
       0,
       20,
-      3,
-      "IMAGE"
-    ],
-    [
-      12,
-      1,
-      0,
-      30,
-      3,
-      "IMAGE"
-    ],
-    [
-      13,
-      1,
-      0,
-      40,
-      3,
-      "IMAGE"
-    ],
-    [
-      14,
-      1,
-      0,
-      50,
       3,
       "IMAGE"
     ],
@@ -2698,6 +2797,54 @@
       50,
       9,
       "LATENT"
+    ],
+    [
+      86,
+      23,
+      0,
+      71,
+      0,
+      "IMAGE"
+    ],
+    [
+      87,
+      71,
+      0,
+      30,
+      3,
+      "IMAGE"
+    ],
+    [
+      88,
+      33,
+      0,
+      72,
+      0,
+      "IMAGE"
+    ],
+    [
+      89,
+      72,
+      0,
+      40,
+      3,
+      "IMAGE"
+    ],
+    [
+      90,
+      43,
+      0,
+      73,
+      0,
+      "IMAGE"
+    ],
+    [
+      91,
+      73,
+      0,
+      50,
+      3,
+      "IMAGE"
     ]
   ],
   "groups": [],
