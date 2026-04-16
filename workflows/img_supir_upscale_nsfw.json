@@ -1,6 +1,6 @@
 {
   "last_node_id": 9,
-  "last_link_id": 14,
+  "last_link_id": 15,
   "nodes": [
     {
       "id": 1,
@@ -85,7 +85,7 @@
         {"name": "image",     "type": "IMAGE",    "link": 2}
       ],
       "outputs": [
-        {"name": "latent", "type": "LATENT", "links": [10], "slot_index": 0}
+        {"name": "latent", "type": "LATENT", "links": [10, 15], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "SUPIR_encode"},
       "widgets_values": [true, 512, "auto"]
@@ -100,6 +100,7 @@
       "mode": 0,
       "inputs": [
         {"name": "SUPIR_model", "type": "SUPIRMODEL", "link": 6},
+        {"name": "latents",     "type": "LATENT",     "link": 15},
         {"name": "captions",    "type": "STRING",     "link": null}
       ],
       "outputs": [
@@ -189,6 +190,7 @@
     [8,  4, 1, 5, 0, "SUPIRVAE"],
     [9,  4, 1, 8, 0, "SUPIRVAE"],
     [10, 5, 0, 7, 1, "LATENT"],
+    [15, 5, 0, 6, 1, "LATENT"],
     [11, 6, 0, 7, 2, "SUPIR_cond_pos"],
     [12, 6, 1, 7, 3, "SUPIR_cond_neg"],
     [13, 7, 0, 8, 1, "LATENT"],
