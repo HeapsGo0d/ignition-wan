@@ -114,6 +114,12 @@ WAN_MODELS = {
         'filename': 'SUPIR-v0Q.ckpt',
         'subdir': 'checkpoints'
     },
+    # F variant — fidelity-preserving, less hallucination on lightly degraded images (~5.3GB)
+    'supir_v0f': {
+        'url': 'https://huggingface.co/camenduru/SUPIR/resolve/main/SUPIR-v0F.ckpt',
+        'filename': 'SUPIR-v0F.ckpt',
+        'subdir': 'checkpoints'
+    },
     # SDXL base checkpoint required by SUPIR (~6.9GB) — CLIP is embedded, no separate CLIP files needed
     # Public from camenduru mirror; includes improved 0.9 VAE
     'sdxl_base': {

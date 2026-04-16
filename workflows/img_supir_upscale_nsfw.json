@@ -70,7 +70,7 @@
         {"name": "SUPIR_VAE",   "type": "SUPIRVAE",   "links": [8, 9], "slot_index": 1}
       ],
       "properties": {"Node name for S&R": "SUPIR_model_loader_v2"},
-      "widgets_values": ["SUPIR-v0Q.ckpt", false, "auto", false]
+      "widgets_values": ["SUPIR-v0F.ckpt", false, "auto", false]
     },
     {
       "id": 5,
@@ -109,8 +109,8 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "high quality photo, natural detail, realistic texture, clean image, photorealistic",
-        "blurry, artifacts, noise, compression artifacts, oversharpening, grain, speckles, dirty texture, deformed anatomy, extra limbs"
+        "high quality photo, natural detail, clean image, realistic texture",
+        "noise, grain, oversharpening, artifacts, dirty texture, compression artifacts, speckles, deformed anatomy, extra limbs"
       ]
     },
     {
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — CLEAN preset (steps=36, cfg=2.0, churn=0, s_noise=1.0, restore_cfg=0, no pre-upscale). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — v0F fidelity model, steps=36, cfg=2.0, churn=0, s_noise=1.0, restore_cfg=0, no pre-upscale. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download: HUGGINGFACE_MODELS=supir_v0f,sdxl_base. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }
