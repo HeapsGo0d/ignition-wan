@@ -459,6 +459,15 @@ main() {
     fi
 
     download_models
+
+    # Warn when SUPIR is active — non-commercial license upstream
+    if [[ "${HUGGINGFACE_MODELS:-}" == *"supir"* ]]; then
+        log "WARN" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        log "WARN" "  SUPIR LICENSE NOTICE: SUPIR is for non-commercial use only."
+        log "WARN" "  See: https://github.com/Fanghua-Yu/SUPIR"
+        log "WARN" "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    fi
+
     prefetch_support_models
 
     start_filebrowser

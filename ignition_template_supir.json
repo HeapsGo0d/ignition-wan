@@ -1,0 +1,69 @@
+{
+  "name": "Ignition WAN — SUPIR Image Upscaler (non-commercial)",
+  "description": "ComfyUI with SUPIR diffusion-based image super-resolution. Upscales and restores detail in SFW and NSFW images. LICENSE: SUPIR is non-commercial use only — see https://github.com/Fanghua-Yu/SUPIR",
+  "dockerImage": "heapsgo0d/ignition-wan:latest",
+  "ports": [
+    {
+      "privatePort": 8188,
+      "publicPort": 8188,
+      "type": "http",
+      "description": "ComfyUI Web Interface"
+    },
+    {
+      "privatePort": 8080,
+      "publicPort": 8080,
+      "type": "http",
+      "description": "File Browser"
+    }
+  ],
+  "volumeMounts": [
+    {
+      "containerPath": "/workspace",
+      "name": "workspace"
+    }
+  ],
+  "containerDiskInGb": 50,
+  "environmentVariables": [
+    {
+      "key": "CIVITAI_MODELS",
+      "value": "",
+      "description": "Comma-separated CivitAI model version IDs"
+    },
+    {
+      "key": "CIVITAI_LORAS",
+      "value": "",
+      "description": "Comma-separated CivitAI LoRA model version IDs"
+    },
+    {
+      "key": "CIVITAI_VAES",
+      "value": "",
+      "description": "Comma-separated CivitAI VAE model version IDs"
+    },
+    {
+      "key": "HUGGINGFACE_MODELS",
+      "value": "supir_bundle",
+      "description": "supir_bundle = SUPIR-v0Q + SDXL base (~12GB). Use supir_core_only if you already have an SDXL checkpoint."
+    },
+    {
+      "key": "CIVITAI_TOKEN",
+      "value": "",
+      "description": "CivitAI API token (optional, for faster downloads)"
+    },
+    {
+      "key": "HF_TOKEN",
+      "value": "",
+      "description": "HuggingFace API token (optional, for private repos)"
+    },
+    {
+      "key": "FILEBROWSER_PASSWORD",
+      "value": "runpod",
+      "description": "Password for file browser access"
+    },
+    {
+      "key": "ENABLE_SAGEATTN",
+      "value": "true",
+      "description": "Enable SageAttention2++ for faster attention on RTX 5090 (Blackwell)."
+    }
+  ],
+  "startScript": "bash /workspace/scripts/startup.sh"
+}

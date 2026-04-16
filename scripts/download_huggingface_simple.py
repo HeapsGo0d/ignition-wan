@@ -105,6 +105,22 @@ WAN_MODELS = {
         'filename': 'NSFW-22-H-e8.safetensors',
         'subdir': 'loras'
     },
+    # --- SUPIR: diffusion image super-resolution ---
+    # Pruned Q variant — best quality/VRAM tradeoff (~5.3GB, .ckpt format)
+    # Public mirror from camenduru/SUPIR (no HF_TOKEN required)
+    # kijai/SUPIR has pruned safetensors but requires HF_TOKEN — use that repo if preferred
+    'supir_v0q': {
+        'url': 'https://huggingface.co/camenduru/SUPIR/resolve/main/SUPIR-v0Q.ckpt',
+        'filename': 'SUPIR-v0Q.ckpt',
+        'subdir': 'checkpoints'
+    },
+    # SDXL base checkpoint required by SUPIR (~6.9GB) — CLIP is embedded, no separate CLIP files needed
+    # Public from camenduru mirror; includes improved 0.9 VAE
+    'sdxl_base': {
+        'url': 'https://huggingface.co/camenduru/SUPIR/resolve/main/sd_xl_base_1.0_0.9vae.safetensors',
+        'filename': 'sd_xl_base_1.0_0.9vae.safetensors',
+        'subdir': 'checkpoints'
+    },
     # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
     'lightx2v_i2v_low_noise': {
         'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
@@ -139,6 +155,10 @@ WAN_BUNDLES = {
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # SUPIR image upscaling: SUPIR-v0Q + SDXL base (~12GB total) — non-commercial license
+    'supir_bundle': ['supir_v0q', 'sdxl_base'],
+    # SUPIR model only — for instances that already have an SDXL checkpoint
+    'supir_core_only': ['supir_v0q'],
 }
 
 

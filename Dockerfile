@@ -78,6 +78,14 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-Frame-Interpolation && \
     pip install --no-cache-dir -r requirements-no-cupy.txt
 
+# ComfyUI-SUPIR — diffusion-based image super-resolution (kijai/ComfyUI-SUPIR)
+# Pinned to fe0d660f (2026-04-16) — non-commercial license upstream, see SUPIR repo
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/kijai/ComfyUI-SUPIR.git && \
+    git -C ComfyUI-SUPIR checkout fe0d660f && \
+    cd ComfyUI-SUPIR && \
+    pip install --no-cache-dir -r requirements.txt
+
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
 # nvcc is available in this devel stage; will NOT be present in final runtime image
