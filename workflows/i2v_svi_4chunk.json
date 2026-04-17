@@ -1965,7 +1965,7 @@
     },
     {
       "id": 71,
-      "type": "VHS_SelectImages",
+      "type": "GetImageRangeFromBatch",
       "pos": [
         2600,
         620
@@ -1979,7 +1979,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "image",
+          "name": "images",
           "type": "IMAGE",
           "link": 86,
           "slot_index": 0
@@ -1993,20 +1993,25 @@
             87
           ],
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
         }
       ],
       "properties": {
-        "Node name for S&R": "VHS_SelectImages"
+        "Node name for S&R": "GetImageRangeFromBatch"
       },
       "widgets_values": [
-        "-1",
-        true,
-        true
+        -1,
+        1
       ]
     },
     {
       "id": 72,
-      "type": "VHS_SelectImages",
+      "type": "GetImageRangeFromBatch",
       "pos": [
         2600,
         1220
@@ -2020,7 +2025,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "image",
+          "name": "images",
           "type": "IMAGE",
           "link": 88,
           "slot_index": 0
@@ -2034,20 +2039,25 @@
             89
           ],
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
         }
       ],
       "properties": {
-        "Node name for S&R": "VHS_SelectImages"
+        "Node name for S&R": "GetImageRangeFromBatch"
       },
       "widgets_values": [
-        "-1",
-        true,
-        true
+        -1,
+        1
       ]
     },
     {
       "id": 73,
-      "type": "VHS_SelectImages",
+      "type": "GetImageRangeFromBatch",
       "pos": [
         2600,
         1820
@@ -2061,7 +2071,7 @@
       "mode": 0,
       "inputs": [
         {
-          "name": "image",
+          "name": "images",
           "type": "IMAGE",
           "link": 90,
           "slot_index": 0
@@ -2075,15 +2085,20 @@
             91
           ],
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "slot_index": 1
         }
       ],
       "properties": {
-        "Node name for S&R": "VHS_SelectImages"
+        "Node name for S&R": "GetImageRangeFromBatch"
       },
       "widgets_values": [
-        "-1",
-        true,
-        true
+        -1,
+        1
       ]
     }
   ],
