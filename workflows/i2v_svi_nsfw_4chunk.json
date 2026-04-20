@@ -1,6 +1,6 @@
 {
   "last_node_id": 78,
-  "last_link_id": 103,
+  "last_link_id": 112,
   "nodes": [
     {
       "id": 1,
@@ -22,8 +22,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            11,
-            96
+            104
           ],
           "slot_index": 0
         },
@@ -179,14 +178,11 @@
           "name": "VAE",
           "type": "VAE",
           "links": [
-            3,
-            4,
-            5,
-            6,
             7,
             8,
             9,
-            10
+            10,
+            105
           ],
           "slot_index": 0
         }
@@ -582,14 +578,14 @@
     },
     {
       "id": 20,
-      "type": "WanImageToVideo",
+      "type": "WanImageToVideoSVIPro",
       "pos": [
         1920,
         500
       ],
       "size": {
         "0": 315,
-        "1": 230
+        "1": 130
       },
       "flags": {},
       "order": 16,
@@ -608,22 +604,10 @@
           "slot_index": 1
         },
         {
-          "name": "vae",
-          "type": "VAE",
-          "link": 3,
+          "name": "anchor_samples",
+          "type": "LATENT",
+          "link": 106,
           "slot_index": 2
-        },
-        {
-          "name": "clip_vision_output",
-          "type": "CLIP_VISION_OUTPUT",
-          "link": 100,
-          "slot_index": 3
-        },
-        {
-          "name": "start_image",
-          "type": "IMAGE",
-          "link": 11,
-          "slot_index": 4
         }
       ],
       "outputs": [
@@ -655,11 +639,9 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "WanImageToVideo"
+        "Node name for S&R": "WanImageToVideoSVIPro"
       },
       "widgets_values": [
-        832,
-        480,
         81,
         1
       ]
@@ -716,9 +698,9 @@
       "widgets_values": [
         "enable",
         264244520398999,
-        "fixed",
+        "randomize",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         0,
@@ -767,7 +749,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            45
+            45,
+            110
           ],
           "slot_index": 0
         }
@@ -780,7 +763,7 @@
         0,
         "fixed",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         12,
@@ -819,8 +802,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            70,
-            86
+            70
           ],
           "slot_index": 0
         }
@@ -832,14 +814,14 @@
     },
     {
       "id": 30,
-      "type": "WanImageToVideo",
+      "type": "WanImageToVideoSVIPro",
       "pos": [
         1920,
         1100
       ],
       "size": {
         "0": 315,
-        "1": 230
+        "1": 130
       },
       "flags": {},
       "order": 20,
@@ -858,22 +840,16 @@
           "slot_index": 1
         },
         {
-          "name": "vae",
-          "type": "VAE",
-          "link": 4,
+          "name": "anchor_samples",
+          "type": "LATENT",
+          "link": 107,
           "slot_index": 2
         },
         {
-          "name": "clip_vision_output",
-          "type": "CLIP_VISION_OUTPUT",
-          "link": 101,
+          "name": "prev_samples",
+          "type": "LATENT",
+          "link": 110,
           "slot_index": 3
-        },
-        {
-          "name": "start_image",
-          "type": "IMAGE",
-          "link": 87,
-          "slot_index": 4
         }
       ],
       "outputs": [
@@ -905,11 +881,9 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "WanImageToVideo"
+        "Node name for S&R": "WanImageToVideoSVIPro"
       },
       "widgets_values": [
-        832,
-        480,
         81,
         1
       ]
@@ -966,9 +940,9 @@
       "widgets_values": [
         "enable",
         264244520398999,
-        "fixed",
+        "randomize",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         0,
@@ -1017,7 +991,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            53
+            53,
+            111
           ],
           "slot_index": 0
         }
@@ -1030,7 +1005,7 @@
         0,
         "fixed",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         12,
@@ -1069,8 +1044,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            71,
-            88
+            71
           ],
           "slot_index": 0
         }
@@ -1082,14 +1056,14 @@
     },
     {
       "id": 40,
-      "type": "WanImageToVideo",
+      "type": "WanImageToVideoSVIPro",
       "pos": [
         1920,
         1700
       ],
       "size": {
         "0": 315,
-        "1": 230
+        "1": 130
       },
       "flags": {},
       "order": 24,
@@ -1108,22 +1082,16 @@
           "slot_index": 1
         },
         {
-          "name": "vae",
-          "type": "VAE",
-          "link": 5,
+          "name": "anchor_samples",
+          "type": "LATENT",
+          "link": 108,
           "slot_index": 2
         },
         {
-          "name": "clip_vision_output",
-          "type": "CLIP_VISION_OUTPUT",
-          "link": 102,
+          "name": "prev_samples",
+          "type": "LATENT",
+          "link": 111,
           "slot_index": 3
-        },
-        {
-          "name": "start_image",
-          "type": "IMAGE",
-          "link": 89,
-          "slot_index": 4
         }
       ],
       "outputs": [
@@ -1155,11 +1123,9 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "WanImageToVideo"
+        "Node name for S&R": "WanImageToVideoSVIPro"
       },
       "widgets_values": [
-        832,
-        480,
         81,
         1
       ]
@@ -1216,9 +1182,9 @@
       "widgets_values": [
         "enable",
         264244520398999,
-        "fixed",
+        "randomize",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         0,
@@ -1267,7 +1233,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            61
+            61,
+            112
           ],
           "slot_index": 0
         }
@@ -1280,7 +1247,7 @@
         0,
         "fixed",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         12,
@@ -1319,8 +1286,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            73,
-            90
+            73
           ],
           "slot_index": 0
         }
@@ -1332,14 +1298,14 @@
     },
     {
       "id": 50,
-      "type": "WanImageToVideo",
+      "type": "WanImageToVideoSVIPro",
       "pos": [
         1920,
         2300
       ],
       "size": {
         "0": 315,
-        "1": 230
+        "1": 130
       },
       "flags": {},
       "order": 28,
@@ -1358,22 +1324,16 @@
           "slot_index": 1
         },
         {
-          "name": "vae",
-          "type": "VAE",
-          "link": 6,
+          "name": "anchor_samples",
+          "type": "LATENT",
+          "link": 109,
           "slot_index": 2
         },
         {
-          "name": "clip_vision_output",
-          "type": "CLIP_VISION_OUTPUT",
-          "link": 103,
+          "name": "prev_samples",
+          "type": "LATENT",
+          "link": 112,
           "slot_index": 3
-        },
-        {
-          "name": "start_image",
-          "type": "IMAGE",
-          "link": 91,
-          "slot_index": 4
         }
       ],
       "outputs": [
@@ -1405,11 +1365,9 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "WanImageToVideo"
+        "Node name for S&R": "WanImageToVideoSVIPro"
       },
       "widgets_values": [
-        832,
-        480,
         81,
         1
       ]
@@ -1466,9 +1424,9 @@
       "widgets_values": [
         "enable",
         264244520398999,
-        "fixed",
+        "randomize",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         0,
@@ -1530,7 +1488,7 @@
         0,
         "fixed",
         25,
-        1.2,
+        4.0,
         "euler",
         "simple",
         12,
@@ -1758,342 +1716,48 @@
       ]
     },
     {
-      "id": 71,
-      "type": "GetImageRangeFromBatch",
-      "pos": [
-        2980,
-        620
-      ],
-      "size": {
-        "0": 210,
-        "1": 82
-      },
-      "flags": {},
-      "order": 20,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 86,
-          "slot_index": 0
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            87,
-            97
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "GetImageRangeFromBatch"
-      },
-      "widgets_values": [
-        -1,
-        1
-      ]
-    },
-    {
-      "id": 72,
-      "type": "GetImageRangeFromBatch",
-      "pos": [
-        2980,
-        1220
-      ],
-      "size": {
-        "0": 210,
-        "1": 82
-      },
-      "flags": {},
-      "order": 24,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 88,
-          "slot_index": 0
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            89,
-            98
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "GetImageRangeFromBatch"
-      },
-      "widgets_values": [
-        -1,
-        1
-      ]
-    },
-    {
-      "id": 73,
-      "type": "GetImageRangeFromBatch",
-      "pos": [
-        2980,
-        1820
-      ],
-      "size": {
-        "0": 210,
-        "1": 82
-      },
-      "flags": {},
-      "order": 28,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 90,
-          "slot_index": 0
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            91,
-            99
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "GetImageRangeFromBatch"
-      },
-      "widgets_values": [
-        -1,
-        1
-      ]
-    },
-    {
       "id": 74,
-      "type": "CLIPVisionLoader",
-      "pos": [
-        50,
-        1100
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "CLIP_VISION",
-          "type": "CLIP_VISION",
-          "links": [
-            92,
-            93,
-            94,
-            95
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPVisionLoader"
-      },
-      "widgets_values": [
-        "clip_vision_h.safetensors"
-      ]
-    },
-    {
-      "id": 75,
-      "type": "CLIPVisionEncode",
+      "type": "VAEEncode",
       "pos": [
         430,
-        350
+        200
       ],
       "size": {
-        "0": 315,
-        "1": 82
+        "0": 210,
+        "1": 46
       },
       "flags": {},
-      "order": 6,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
-          "name": "clip_vision",
-          "type": "CLIP_VISION",
-          "link": 92
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 104,
+          "slot_index": 0
         },
         {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 96
+          "name": "vae",
+          "type": "VAE",
+          "link": 105,
+          "slot_index": 1
         }
       ],
       "outputs": [
         {
-          "name": "CLIP_VISION_OUTPUT",
-          "type": "CLIP_VISION_OUTPUT",
+          "name": "LATENT",
+          "type": "LATENT",
           "links": [
-            100
+            106,
+            107,
+            108,
+            109
           ],
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "CLIPVisionEncode"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 76,
-      "type": "CLIPVisionEncode",
-      "pos": [
-        3300,
-        640
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip_vision",
-          "type": "CLIP_VISION",
-          "link": 93
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 97
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CLIP_VISION_OUTPUT",
-          "type": "CLIP_VISION_OUTPUT",
-          "links": [
-            101
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPVisionEncode"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 77,
-      "type": "CLIPVisionEncode",
-      "pos": [
-        3300,
-        1240
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 26,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip_vision",
-          "type": "CLIP_VISION",
-          "link": 94
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 98
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CLIP_VISION_OUTPUT",
-          "type": "CLIP_VISION_OUTPUT",
-          "links": [
-            102
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPVisionEncode"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 78,
-      "type": "CLIPVisionEncode",
-      "pos": [
-        3300,
-        1840
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 30,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip_vision",
-          "type": "CLIP_VISION",
-          "link": 95
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 99
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CLIP_VISION_OUTPUT",
-          "type": "CLIP_VISION_OUTPUT",
-          "links": [
-            103
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPVisionEncode"
+        "Node name for S&R": "VAEEncode"
       },
       "widgets_values": []
     }
@@ -2114,38 +1778,6 @@
       4,
       0,
       "CLIP"
-    ],
-    [
-      3,
-      5,
-      0,
-      20,
-      2,
-      "VAE"
-    ],
-    [
-      4,
-      5,
-      0,
-      30,
-      2,
-      "VAE"
-    ],
-    [
-      5,
-      5,
-      0,
-      40,
-      2,
-      "VAE"
-    ],
-    [
-      6,
-      5,
-      0,
-      50,
-      2,
-      "VAE"
     ],
     [
       7,
@@ -2178,14 +1810,6 @@
       53,
       1,
       "VAE"
-    ],
-    [
-      11,
-      1,
-      0,
-      20,
-      4,
-      "IMAGE"
     ],
     [
       15,
@@ -2660,148 +2284,76 @@
       "IMAGE"
     ],
     [
-      86,
-      23,
+      104,
+      1,
       0,
-      71,
-      0,
-      "IMAGE"
-    ],
-    [
-      87,
-      71,
-      0,
-      30,
-      4,
-      "IMAGE"
-    ],
-    [
-      88,
-      33,
-      0,
-      72,
-      0,
-      "IMAGE"
-    ],
-    [
-      89,
-      72,
-      0,
-      40,
-      4,
-      "IMAGE"
-    ],
-    [
-      90,
-      43,
-      0,
-      73,
-      0,
-      "IMAGE"
-    ],
-    [
-      91,
-      73,
-      0,
-      50,
-      4,
-      "IMAGE"
-    ],
-    [
-      92,
       74,
       0,
-      75,
-      0,
-      "CLIP_VISION"
+      "IMAGE"
     ],
     [
-      93,
+      105,
+      5,
+      0,
       74,
-      0,
-      76,
-      0,
-      "CLIP_VISION"
+      1,
+      "VAE"
     ],
     [
-      94,
+      106,
       74,
-      0,
-      77,
-      0,
-      "CLIP_VISION"
-    ],
-    [
-      95,
-      74,
-      0,
-      78,
-      0,
-      "CLIP_VISION"
-    ],
-    [
-      96,
-      1,
-      0,
-      75,
-      1,
-      "IMAGE"
-    ],
-    [
-      97,
-      71,
-      0,
-      76,
-      1,
-      "IMAGE"
-    ],
-    [
-      98,
-      72,
-      0,
-      77,
-      1,
-      "IMAGE"
-    ],
-    [
-      99,
-      73,
-      0,
-      78,
-      1,
-      "IMAGE"
-    ],
-    [
-      100,
-      75,
       0,
       20,
-      3,
-      "CLIP_VISION_OUTPUT"
+      2,
+      "LATENT"
     ],
     [
-      101,
-      76,
+      107,
+      74,
+      0,
+      30,
+      2,
+      "LATENT"
+    ],
+    [
+      108,
+      74,
+      0,
+      40,
+      2,
+      "LATENT"
+    ],
+    [
+      109,
+      74,
+      0,
+      50,
+      2,
+      "LATENT"
+    ],
+    [
+      110,
+      22,
       0,
       30,
       3,
-      "CLIP_VISION_OUTPUT"
+      "LATENT"
     ],
     [
-      102,
-      77,
+      111,
+      32,
       0,
       40,
       3,
-      "CLIP_VISION_OUTPUT"
+      "LATENT"
     ],
     [
-      103,
-      78,
+      112,
+      42,
       0,
       50,
       3,
-      "CLIP_VISION_OUTPUT"
+      "LATENT"
     ]
   ],
   "groups": [],
