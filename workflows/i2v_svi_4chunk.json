@@ -22,7 +22,6 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            9,
             104
           ],
           "slot_index": 0
@@ -517,13 +516,13 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 15,
+          "link": 13,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 19,
+          "link": 17,
           "slot_index": 1
         },
         {
@@ -753,13 +752,13 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 16,
+          "link": 14,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 20,
+          "link": 18,
           "slot_index": 1
         },
         {
@@ -995,13 +994,13 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 17,
+          "link": 15,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 21,
+          "link": 19,
           "slot_index": 1
         },
         {
@@ -1237,13 +1236,13 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 18,
+          "link": 16,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 22,
+          "link": 20,
           "slot_index": 1
         },
         {
@@ -1717,14 +1716,6 @@
       33,
       1,
       "VAE"
-    ],
-    [
-      9,
-      1,
-      0,
-      20,
-      3,
-      "IMAGE"
     ],
     [
       15,
