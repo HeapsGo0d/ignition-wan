@@ -1,6 +1,6 @@
 {
   "last_node_id": 74,
-  "last_link_id": 70,
+  "last_link_id": 72,
   "nodes": [
     {
       "id": 1,
@@ -22,7 +22,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            7
+            9
           ],
           "slot_index": 0
         },
@@ -104,10 +104,10 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            9,
-            22,
-            35,
-            48
+            11,
+            24,
+            37,
+            50
           ],
           "slot_index": 0
         }
@@ -146,10 +146,10 @@
           "name": "CONDITIONING",
           "type": "CONDITIONING",
           "links": [
-            10,
-            23,
-            36,
-            49
+            12,
+            25,
+            38,
+            51
           ],
           "slot_index": 0
         }
@@ -182,11 +182,11 @@
           "name": "VAE",
           "type": "VAE",
           "links": [
-            8,
-            21,
-            34,
-            47,
-            60
+            10,
+            23,
+            36,
+            49,
+            62
           ],
           "slot_index": 0
         }
@@ -348,6 +348,86 @@
       "title": "LoRA  \u2014  SVI Pro low  v2.0"
     },
     {
+      "id": 12,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        800,
+        820
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn3",
+        false
+      ],
+      "title": "Sage attention patch (high)  \u2014  sageattn3"
+    },
+    {
+      "id": 16,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        800,
+        950
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn3",
+        false
+      ],
+      "title": "Sage attention patch (low)   \u2014  sageattn3"
+    },
+    {
       "id": 13,
       "type": "ModelSamplingSD3",
       "pos": [
@@ -365,7 +445,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 5
+          "link": 7
         }
       ],
       "outputs": [
@@ -373,10 +453,10 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            12,
-            25,
-            38,
-            51
+            14,
+            27,
+            40,
+            53
           ],
           "slot_index": 0
         }
@@ -407,7 +487,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 6
+          "link": 8
         }
       ],
       "outputs": [
@@ -415,10 +495,10 @@
           "name": "MODEL",
           "type": "MODEL",
           "links": [
-            13,
-            26,
-            39,
-            52
+            15,
+            28,
+            41,
+            54
           ],
           "slot_index": 0
         }
@@ -449,13 +529,13 @@
         {
           "name": "pixels",
           "type": "IMAGE",
-          "link": 7,
+          "link": 9,
           "slot_index": 0
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 8,
+          "link": 10,
           "slot_index": 1
         }
       ],
@@ -464,10 +544,10 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            11,
-            24,
-            37,
-            50
+            13,
+            26,
+            39,
+            52
           ],
           "slot_index": 0
         }
@@ -496,19 +576,19 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 9,
+          "link": 11,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 10,
+          "link": 12,
           "slot_index": 1
         },
         {
           "name": "anchor_samples",
           "type": "LATENT",
-          "link": 11,
+          "link": 13,
           "slot_index": 2
         }
       ],
@@ -517,8 +597,8 @@
           "name": "positive",
           "type": "CONDITIONING",
           "links": [
-            14,
-            15
+            16,
+            17
           ],
           "slot_index": 0
         },
@@ -526,8 +606,8 @@
           "name": "negative",
           "type": "CONDITIONING",
           "links": [
-            16,
-            17
+            18,
+            19
           ],
           "slot_index": 1
         },
@@ -535,7 +615,7 @@
           "name": "latent",
           "type": "LATENT",
           "links": [
-            18
+            20
           ],
           "slot_index": 2
         }
@@ -567,22 +647,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 12
+          "link": 14
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 14
+          "link": 16
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 16
+          "link": 18
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 18
+          "link": 20
         }
       ],
       "outputs": [
@@ -590,7 +670,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            19
+            21
           ],
           "slot_index": 0
         }
@@ -630,22 +710,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 13
+          "link": 15
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 15
+          "link": 17
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 17
+          "link": 19
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 19
+          "link": 21
         }
       ],
       "outputs": [
@@ -653,8 +733,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            20,
-            61
+            22,
+            63
           ],
           "slot_index": 0
         }
@@ -694,12 +774,12 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 20
+          "link": 22
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 21
+          "link": 23
         }
       ],
       "outputs": [
@@ -707,7 +787,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            64
+            66
           ],
           "slot_index": 0
         }
@@ -736,25 +816,25 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 22,
+          "link": 24,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 23,
+          "link": 25,
           "slot_index": 1
         },
         {
           "name": "anchor_samples",
           "type": "LATENT",
-          "link": 24,
+          "link": 26,
           "slot_index": 2
         },
         {
           "name": "prev_samples",
           "type": "LATENT",
-          "link": 61,
+          "link": 63,
           "slot_index": 3
         }
       ],
@@ -763,8 +843,8 @@
           "name": "positive",
           "type": "CONDITIONING",
           "links": [
-            27,
-            28
+            29,
+            30
           ],
           "slot_index": 0
         },
@@ -772,8 +852,8 @@
           "name": "negative",
           "type": "CONDITIONING",
           "links": [
-            29,
-            30
+            31,
+            32
           ],
           "slot_index": 1
         },
@@ -781,7 +861,7 @@
           "name": "latent",
           "type": "LATENT",
           "links": [
-            31
+            33
           ],
           "slot_index": 2
         }
@@ -813,22 +893,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 25
+          "link": 27
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 27
+          "link": 29
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 29
+          "link": 31
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 31
+          "link": 33
         }
       ],
       "outputs": [
@@ -836,7 +916,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            32
+            34
           ],
           "slot_index": 0
         }
@@ -876,22 +956,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 26
+          "link": 28
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 28
+          "link": 30
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 30
+          "link": 32
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 32
+          "link": 34
         }
       ],
       "outputs": [
@@ -899,8 +979,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            33,
-            62
+            35,
+            64
           ],
           "slot_index": 0
         }
@@ -940,12 +1020,12 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 33
+          "link": 35
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 34
+          "link": 36
         }
       ],
       "outputs": [
@@ -953,7 +1033,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            65
+            67
           ],
           "slot_index": 0
         }
@@ -982,25 +1062,25 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 35,
+          "link": 37,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 36,
+          "link": 38,
           "slot_index": 1
         },
         {
           "name": "anchor_samples",
           "type": "LATENT",
-          "link": 37,
+          "link": 39,
           "slot_index": 2
         },
         {
           "name": "prev_samples",
           "type": "LATENT",
-          "link": 62,
+          "link": 64,
           "slot_index": 3
         }
       ],
@@ -1009,8 +1089,8 @@
           "name": "positive",
           "type": "CONDITIONING",
           "links": [
-            40,
-            41
+            42,
+            43
           ],
           "slot_index": 0
         },
@@ -1018,8 +1098,8 @@
           "name": "negative",
           "type": "CONDITIONING",
           "links": [
-            42,
-            43
+            44,
+            45
           ],
           "slot_index": 1
         },
@@ -1027,7 +1107,7 @@
           "name": "latent",
           "type": "LATENT",
           "links": [
-            44
+            46
           ],
           "slot_index": 2
         }
@@ -1059,22 +1139,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 38
+          "link": 40
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 40
+          "link": 42
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 42
+          "link": 44
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 44
+          "link": 46
         }
       ],
       "outputs": [
@@ -1082,7 +1162,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            45
+            47
           ],
           "slot_index": 0
         }
@@ -1122,22 +1202,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 39
+          "link": 41
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 41
+          "link": 43
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 43
+          "link": 45
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 45
+          "link": 47
         }
       ],
       "outputs": [
@@ -1145,8 +1225,8 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            46,
-            63
+            48,
+            65
           ],
           "slot_index": 0
         }
@@ -1186,12 +1266,12 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 46
+          "link": 48
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 47
+          "link": 49
         }
       ],
       "outputs": [
@@ -1199,7 +1279,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            67
+            69
           ],
           "slot_index": 0
         }
@@ -1228,25 +1308,25 @@
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 48,
+          "link": 50,
           "slot_index": 0
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 49,
+          "link": 51,
           "slot_index": 1
         },
         {
           "name": "anchor_samples",
           "type": "LATENT",
-          "link": 50,
+          "link": 52,
           "slot_index": 2
         },
         {
           "name": "prev_samples",
           "type": "LATENT",
-          "link": 63,
+          "link": 65,
           "slot_index": 3
         }
       ],
@@ -1255,8 +1335,8 @@
           "name": "positive",
           "type": "CONDITIONING",
           "links": [
-            53,
-            54
+            55,
+            56
           ],
           "slot_index": 0
         },
@@ -1264,8 +1344,8 @@
           "name": "negative",
           "type": "CONDITIONING",
           "links": [
-            55,
-            56
+            57,
+            58
           ],
           "slot_index": 1
         },
@@ -1273,7 +1353,7 @@
           "name": "latent",
           "type": "LATENT",
           "links": [
-            57
+            59
           ],
           "slot_index": 2
         }
@@ -1305,22 +1385,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 51
+          "link": 53
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 53
+          "link": 55
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 55
+          "link": 57
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 57
+          "link": 59
         }
       ],
       "outputs": [
@@ -1328,7 +1408,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            58
+            60
           ],
           "slot_index": 0
         }
@@ -1368,22 +1448,22 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 52
+          "link": 54
         },
         {
           "name": "positive",
           "type": "CONDITIONING",
-          "link": 54
+          "link": 56
         },
         {
           "name": "negative",
           "type": "CONDITIONING",
-          "link": 56
+          "link": 58
         },
         {
           "name": "latent_image",
           "type": "LATENT",
-          "link": 58
+          "link": 60
         }
       ],
       "outputs": [
@@ -1391,7 +1471,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            59
+            61
           ],
           "slot_index": 0
         }
@@ -1431,12 +1511,12 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 59
+          "link": 61
         },
         {
           "name": "vae",
           "type": "VAE",
-          "link": 60
+          "link": 62
         }
       ],
       "outputs": [
@@ -1444,7 +1524,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            69
+            71
           ],
           "slot_index": 0
         }
@@ -1468,64 +1548,6 @@
       },
       "flags": {},
       "order": 32,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "source_images",
-          "type": "IMAGE",
-          "link": 64
-        },
-        {
-          "name": "new_images",
-          "type": "IMAGE",
-          "link": 65
-        }
-      ],
-      "outputs": [
-        {
-          "name": "source_images",
-          "type": "IMAGE",
-          "links": [],
-          "slot_index": 0
-        },
-        {
-          "name": "start_images",
-          "type": "IMAGE",
-          "links": [],
-          "slot_index": 1
-        },
-        {
-          "name": "extended_images",
-          "type": "IMAGE",
-          "links": [
-            66
-          ],
-          "slot_index": 2
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ImageBatchExtendWithOverlap"
-      },
-      "widgets_values": [
-        4,
-        "new_images",
-        "linear_blend"
-      ],
-      "title": "Seam C1->C2  (overlap=4, linear_blend)"
-    },
-    {
-      "id": 61,
-      "type": "ImageBatchExtendWithOverlap",
-      "pos": [
-        2980,
-        1460
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -1569,21 +1591,21 @@
         "new_images",
         "linear_blend"
       ],
-      "title": "Seam ->C3   (overlap=4, linear_blend)"
+      "title": "Seam C1->C2  (overlap=4, linear_blend)"
     },
     {
-      "id": 62,
+      "id": 61,
       "type": "ImageBatchExtendWithOverlap",
       "pos": [
         2980,
-        2060
+        1460
       ],
       "size": {
         "0": 210,
         "1": 46
       },
       "flags": {},
-      "order": 34,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -1627,6 +1649,64 @@
         "new_images",
         "linear_blend"
       ],
+      "title": "Seam ->C3   (overlap=4, linear_blend)"
+    },
+    {
+      "id": 62,
+      "type": "ImageBatchExtendWithOverlap",
+      "pos": [
+        2980,
+        2060
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "source_images",
+          "type": "IMAGE",
+          "link": 70
+        },
+        {
+          "name": "new_images",
+          "type": "IMAGE",
+          "link": 71
+        }
+      ],
+      "outputs": [
+        {
+          "name": "source_images",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 0
+        },
+        {
+          "name": "start_images",
+          "type": "IMAGE",
+          "links": [],
+          "slot_index": 1
+        },
+        {
+          "name": "extended_images",
+          "type": "IMAGE",
+          "links": [
+            72
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageBatchExtendWithOverlap"
+      },
+      "widgets_values": [
+        4,
+        "new_images",
+        "linear_blend"
+      ],
       "title": "Seam ->C4   (overlap=4, linear_blend)"
     },
     {
@@ -1647,7 +1727,7 @@
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 70
+          "link": 72
         }
       ],
       "outputs": [
@@ -1723,7 +1803,7 @@
       5,
       11,
       0,
-      13,
+      12,
       0,
       "MODEL"
     ],
@@ -1731,12 +1811,28 @@
       6,
       15,
       0,
-      17,
+      16,
       0,
       "MODEL"
     ],
     [
       7,
+      12,
+      0,
+      13,
+      0,
+      "MODEL"
+    ],
+    [
+      8,
+      16,
+      0,
+      17,
+      0,
+      "MODEL"
+    ],
+    [
+      9,
       1,
       0,
       74,
@@ -1744,7 +1840,7 @@
       "IMAGE"
     ],
     [
-      8,
+      10,
       5,
       0,
       74,
@@ -1752,7 +1848,7 @@
       "VAE"
     ],
     [
-      9,
+      11,
       3,
       0,
       20,
@@ -1760,7 +1856,7 @@
       "CONDITIONING"
     ],
     [
-      10,
+      12,
       4,
       0,
       20,
@@ -1768,7 +1864,7 @@
       "CONDITIONING"
     ],
     [
-      11,
+      13,
       74,
       0,
       20,
@@ -1776,7 +1872,7 @@
       "LATENT"
     ],
     [
-      12,
+      14,
       13,
       0,
       21,
@@ -1784,55 +1880,55 @@
       "MODEL"
     ],
     [
-      13,
+      15,
       17,
       0,
       22,
       0,
       "MODEL"
-    ],
-    [
-      14,
-      20,
-      0,
-      21,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      15,
-      20,
-      0,
-      22,
-      1,
-      "CONDITIONING"
     ],
     [
       16,
       20,
-      1,
+      0,
       21,
-      2,
+      1,
       "CONDITIONING"
     ],
     [
       17,
       20,
-      1,
+      0,
       22,
-      2,
+      1,
       "CONDITIONING"
     ],
     [
       18,
       20,
+      1,
+      21,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      19,
+      20,
+      1,
+      22,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      20,
+      20,
       2,
       21,
       3,
       "LATENT"
     ],
     [
-      19,
+      21,
       21,
       0,
       22,
@@ -1840,7 +1936,7 @@
       "LATENT"
     ],
     [
-      20,
+      22,
       22,
       0,
       23,
@@ -1848,7 +1944,7 @@
       "LATENT"
     ],
     [
-      21,
+      23,
       5,
       0,
       23,
@@ -1856,7 +1952,7 @@
       "VAE"
     ],
     [
-      22,
+      24,
       3,
       0,
       30,
@@ -1864,7 +1960,7 @@
       "CONDITIONING"
     ],
     [
-      23,
+      25,
       4,
       0,
       30,
@@ -1872,7 +1968,7 @@
       "CONDITIONING"
     ],
     [
-      24,
+      26,
       74,
       0,
       30,
@@ -1880,7 +1976,7 @@
       "LATENT"
     ],
     [
-      25,
+      27,
       13,
       0,
       31,
@@ -1888,39 +1984,39 @@
       "MODEL"
     ],
     [
-      26,
+      28,
       17,
       0,
       32,
       0,
       "MODEL"
-    ],
-    [
-      27,
-      30,
-      0,
-      31,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      28,
-      30,
-      0,
-      32,
-      1,
-      "CONDITIONING"
     ],
     [
       29,
       30,
+      0,
+      31,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      30,
+      30,
+      0,
+      32,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      31,
+      30,
       1,
       31,
       2,
       "CONDITIONING"
     ],
     [
-      30,
+      32,
       30,
       1,
       32,
@@ -1928,31 +2024,31 @@
       "CONDITIONING"
     ],
     [
-      31,
+      33,
       30,
       2,
       31,
       3,
-      "LATENT"
-    ],
-    [
-      32,
-      31,
-      0,
-      32,
-      3,
-      "LATENT"
-    ],
-    [
-      33,
-      32,
-      0,
-      33,
-      0,
       "LATENT"
     ],
     [
       34,
+      31,
+      0,
+      32,
+      3,
+      "LATENT"
+    ],
+    [
+      35,
+      32,
+      0,
+      33,
+      0,
+      "LATENT"
+    ],
+    [
+      36,
       5,
       0,
       33,
@@ -1960,7 +2056,7 @@
       "VAE"
     ],
     [
-      35,
+      37,
       3,
       0,
       40,
@@ -1968,7 +2064,7 @@
       "CONDITIONING"
     ],
     [
-      36,
+      38,
       4,
       0,
       40,
@@ -1976,7 +2072,7 @@
       "CONDITIONING"
     ],
     [
-      37,
+      39,
       74,
       0,
       40,
@@ -1984,7 +2080,7 @@
       "LATENT"
     ],
     [
-      38,
+      40,
       13,
       0,
       41,
@@ -1992,7 +2088,7 @@
       "MODEL"
     ],
     [
-      39,
+      41,
       17,
       0,
       42,
@@ -2000,47 +2096,47 @@
       "MODEL"
     ],
     [
-      40,
+      42,
       40,
       0,
       41,
       1,
-      "CONDITIONING"
-    ],
-    [
-      41,
-      40,
-      0,
-      42,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      42,
-      40,
-      1,
-      41,
-      2,
       "CONDITIONING"
     ],
     [
       43,
       40,
-      1,
+      0,
       42,
-      2,
+      1,
       "CONDITIONING"
     ],
     [
       44,
       40,
+      1,
+      41,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      45,
+      40,
+      1,
+      42,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      46,
+      40,
       2,
       41,
       3,
       "LATENT"
     ],
     [
-      45,
+      47,
       41,
       0,
       42,
@@ -2048,7 +2144,7 @@
       "LATENT"
     ],
     [
-      46,
+      48,
       42,
       0,
       43,
@@ -2056,7 +2152,7 @@
       "LATENT"
     ],
     [
-      47,
+      49,
       5,
       0,
       43,
@@ -2064,7 +2160,7 @@
       "VAE"
     ],
     [
-      48,
+      50,
       3,
       0,
       50,
@@ -2072,7 +2168,7 @@
       "CONDITIONING"
     ],
     [
-      49,
+      51,
       4,
       0,
       50,
@@ -2080,7 +2176,7 @@
       "CONDITIONING"
     ],
     [
-      50,
+      52,
       74,
       0,
       50,
@@ -2088,7 +2184,7 @@
       "LATENT"
     ],
     [
-      51,
+      53,
       13,
       0,
       51,
@@ -2096,7 +2192,7 @@
       "MODEL"
     ],
     [
-      52,
+      54,
       17,
       0,
       52,
@@ -2104,39 +2200,39 @@
       "MODEL"
     ],
     [
-      53,
-      50,
-      0,
-      51,
-      1,
-      "CONDITIONING"
-    ],
-    [
-      54,
-      50,
-      0,
-      52,
-      1,
-      "CONDITIONING"
-    ],
-    [
       55,
       50,
-      1,
+      0,
       51,
-      2,
+      1,
       "CONDITIONING"
     ],
     [
       56,
       50,
+      0,
+      52,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      57,
+      50,
+      1,
+      51,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      58,
+      50,
       1,
       52,
       2,
       "CONDITIONING"
     ],
     [
-      57,
+      59,
       50,
       2,
       51,
@@ -2144,7 +2240,7 @@
       "LATENT"
     ],
     [
-      58,
+      60,
       51,
       0,
       52,
@@ -2152,7 +2248,7 @@
       "LATENT"
     ],
     [
-      59,
+      61,
       52,
       0,
       53,
@@ -2160,7 +2256,7 @@
       "LATENT"
     ],
     [
-      60,
+      62,
       5,
       0,
       53,
@@ -2168,7 +2264,7 @@
       "VAE"
     ],
     [
-      61,
+      63,
       22,
       0,
       30,
@@ -2176,7 +2272,7 @@
       "LATENT"
     ],
     [
-      62,
+      64,
       32,
       0,
       40,
@@ -2184,7 +2280,7 @@
       "LATENT"
     ],
     [
-      63,
+      65,
       42,
       0,
       50,
@@ -2192,7 +2288,7 @@
       "LATENT"
     ],
     [
-      64,
+      66,
       23,
       0,
       60,
@@ -2200,7 +2296,7 @@
       "IMAGE"
     ],
     [
-      65,
+      67,
       33,
       0,
       60,
@@ -2208,7 +2304,7 @@
       "IMAGE"
     ],
     [
-      66,
+      68,
       60,
       2,
       61,
@@ -2216,7 +2312,7 @@
       "IMAGE"
     ],
     [
-      67,
+      69,
       43,
       0,
       61,
@@ -2224,7 +2320,7 @@
       "IMAGE"
     ],
     [
-      68,
+      70,
       61,
       2,
       62,
@@ -2232,7 +2328,7 @@
       "IMAGE"
     ],
     [
-      69,
+      71,
       53,
       0,
       62,
@@ -2240,7 +2336,7 @@
       "IMAGE"
     ],
     [
-      70,
+      72,
       62,
       2,
       70,

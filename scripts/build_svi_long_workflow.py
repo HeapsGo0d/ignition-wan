@@ -4,9 +4,10 @@
 Source template: workflows/i2v_svi_4chunk.json (known-good 4-chunk WAN 2.2 SVI Pro graph).
 
 Transformations applied to template:
-  1. Drop PathchSageAttentionKJ nodes (12, 16). Reroute LoRA -> ModelSamplingSD3 directly.
+  1. (Sage patch nodes 12/16 are kept. An earlier revision removed them which caused
+     white noise + 4.5x slowdown; see build() comment.)
   2. Replace ImageBatch nodes (60, 61, 62) with ImageBatchExtendWithOverlap
-     (overlap=4, overlap_side=new, overlap_mode=linear_blend) for crossfade seams.
+     (overlap=4, overlap_side=new_images, overlap_mode=linear_blend) for crossfade seams.
   3. High-noise KSamplers (21, 31, 41, 51) get fixed seeds 1001/1002/1003/1004.
   4. Node titles added to every chunk block + key knobs for self-documentation.
   5. Link IDs renumbered sequentially; integrity verified.
@@ -36,6 +37,8 @@ NODE_TITLES = {
     14: "UNet  —  low noise",
     11: "LoRA  —  SVI Pro high  v2.0",
     15: "LoRA  —  SVI Pro low  v2.0",
+    12: "Sage attention patch (high)  —  sageattn3",
+    16: "Sage attention patch (low)   —  sageattn3",
     13: "ModelSamplingSD3 high  —  SHIFT (3-8, default 5)",
     17: "ModelSamplingSD3 low   —  SHIFT (3-8, default 5)",
     74: "VAEEncode  ->  anchor_samples (shared to all chunks)",
@@ -67,22 +70,12 @@ def build(template_path: Path, output_path: Path) -> dict:
     nodes = wf["nodes"]
     links = wf["links"]
 
-    # --- 1. Drop PathchSageAttentionKJ nodes (bypass them in the MODEL chain) ---
-    # Template wiring: LoRA_high(11) --link5--> Sage(12) --link7--> ModelSamplingSD3(13)
-    #                  LoRA_low(15)  --link6--> Sage(16) --link8--> ModelSamplingSD3(17)
-    # Rewrite link 7 to originate from node 11; link 8 from node 15. Drop links 5/6.
-    for lk in links:
-        if lk[0] == 7:
-            lk[1], lk[2] = 11, 0
-        elif lk[0] == 8:
-            lk[1], lk[2] = 15, 0
-    links[:] = [lk for lk in links if lk[0] not in (5, 6)]
-    nodes[:] = [n for n in nodes if n["id"] not in SAGE_NODES]
-    for n in nodes:
-        if n["id"] == 11:
-            n["outputs"][0]["links"] = [7]
-        elif n["id"] == 15:
-            n["outputs"][0]["links"] = [8]
+    # --- 1. (Sage patches kept.) ---
+    # Earlier revision dropped PathchSageAttentionKJ nodes 12/16 on the assumption that
+    # the second widget 'false' meant 'disabled'. It doesn't — widgets_values
+    # ["sageattn3", false] means "patch model to use sageattn3, compile=false". Removing
+    # the nodes dropped the model to torch SDPA, causing ~4.5x slowdown AND white-noise
+    # output on WAN 2.2 SVI Pro. Sage patch nodes must stay.
 
     # --- 2. ImageBatch -> ImageBatchExtendWithOverlap ---
     for n in nodes:
