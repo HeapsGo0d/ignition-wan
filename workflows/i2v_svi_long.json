@@ -1508,7 +1508,7 @@
       },
       "widgets_values": [
         4,
-        "new",
+        "new_images",
         "linear_blend"
       ],
       "title": "Seam C1->C2  (overlap=4, linear_blend)"
@@ -1566,7 +1566,7 @@
       },
       "widgets_values": [
         4,
-        "new",
+        "new_images",
         "linear_blend"
       ],
       "title": "Seam ->C3   (overlap=4, linear_blend)"
@@ -1624,7 +1624,7 @@
       },
       "widgets_values": [
         4,
-        "new",
+        "new_images",
         "linear_blend"
       ],
       "title": "Seam ->C4   (overlap=4, linear_blend)"

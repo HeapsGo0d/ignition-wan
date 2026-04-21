@@ -89,7 +89,7 @@ def build(template_path: Path, output_path: Path) -> dict:
         if n["id"] in IMAGEBATCH_NODES and n["type"] == "ImageBatch":
             n["type"] = "ImageBatchExtendWithOverlap"
             n["properties"]["Node name for S&R"] = "ImageBatchExtendWithOverlap"
-            n["widgets_values"] = [4, "new", "linear_blend"]
+            n["widgets_values"] = [4, "new_images", "linear_blend"]
             for inp in n["inputs"]:
                 if inp["name"] == "image1":
                     inp["name"] = "source_images"
