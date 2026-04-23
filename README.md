@@ -1,12 +1,13 @@
 # 🎬 Ignition WAN - ComfyUI Video Generation for RunPod
 
-**WAN 2.2 · Text-to-Video · Image-to-Video · RTX 5090 Ready**
+**WAN 2.2 · Text-to-Video · Image-to-Video · SVI Pro Long Video · RTX 5090 Ready**
 
 Ignition WAN is a RunPod-optimized Docker container for WAN 2.2 video generation via ComfyUI. Built on the same robust infrastructure as Ignition (image generation), it adds WanVideoWrapper and KJNodes at build time and downloads WAN models automatically at startup.
 
 ## ✨ Features
 
 - **🎬 WAN 2.2 Video Generation**: Text-to-video and image-to-video via ComfyUI-WanVideoWrapper
+- **🔁 SVI Pro Long Video**: Multi-chunk I2V with error-recycling continuity (up to ~40s+)
 - **⚡ Parallel Downloads**: Efficient concurrent downloading from HuggingFace and CivitAI
 - **🔒 Atomic File Operations**: Download → verify → move → cleanup prevents corruption
 - **🔄 Safe Restart Architecture**: Supervisor loop enables in-place restarts without data loss
@@ -29,8 +30,8 @@ export RUNPOD_API_KEY="your_runpod_api_key"
 ```
 
 **Interactive prompts:**
-1. **Version**: Enter tag (e.g. `v1.0.1`) or `latest`
-2. **WAN Preset**: Choose from 5 presets (see below)
+1. **Version**: Enter tag (e.g. `v1.0.44-svi`) or `latest`
+2. **WAN Preset**: Choose from presets (see below)
 3. **Storage**: Container disk and volume sizes
 4. **Password**: File browser password
 
@@ -48,43 +49,81 @@ docker run -d \
 
 ## 🎬 WAN 2.2 Model Presets
 
-Set `HUGGINGFACE_MODELS` to one of these bundle keys. All models sourced from `Comfy-Org/Wan_2.2_ComfyUI_Repackaged`.
+Set `HUGGINGFACE_MODELS` to one of these bundle keys. All standard models sourced from `Comfy-Org/Wan_2.2_ComfyUI_Repackaged`; SVI LoRAs from `Kijai/WanVideo_comfy`.
 
-| Preset Key | Downloads | Size | VRAM | Use Case |
-|---|---|---|---|---|
-| `wan2.2_t2v_bundle` | T2V FP8 + text encoder + VAE | ~15GB | ~20GB | Text-to-video (recommended start) |
-| `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP vision | ~15GB | ~20GB | Image-to-video |
-| `wan2.2_full_bundle` | Both T2V + I2V + shared encoders | ~29GB | ~20GB | Both modes |
-| `wan2.2_t2v_fp16` + extras | T2V full precision + text encoder + VAE | ~29GB | ~35GB | Max quality T2V |
-| `wan2.2_i2v_fp16` + extras | I2V full precision + text encoder + VAE + CLIP | ~29GB | ~35GB | Max quality I2V |
+### Standard bundles
 
-### Individual Model Keys
+| Preset Key | Downloads | Size | Use Case |
+|---|---|---|---|
+| `wan2.2_t2v_bundle` | T2V FP8 + text encoder + VAE + LightX2V LoRAs | ~15GB | Text-to-video (LightX2V 4-step) |
+| `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP + LightX2V LoRAs | ~15GB | Image-to-video (LightX2V 4-step) |
+| `wan2.2_full_bundle` | Both T2V + I2V + all shared encoders | ~29GB | Both modes |
 
-You can also compose your own set:
+### SVI Pro bundles
+
+| Preset Key | Downloads | Size | Use Case |
+|---|---|---|---|
+| `svi_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP + SVI Pro LoRAs | ~30GB | SVI long video (4-chunk, ~40s) |
+| `svi_nsfw_i2v_bundle` | Above + NSFW LoRA | ~32GB | SVI long video, uncensored |
+
+> **Note:** Do not combine SVI LoRAs with LightX2V LoRAs — step-distillation conflicts with SVI's error-recycling mechanism.
+
+### NSFW bundles
+
+| Preset Key | Downloads | Size | Use Case |
+|---|---|---|---|
+| `remix_nsfw_i2v_bundle` | FX-FeiHou Remix NSFW v3.0 + CLIP | ~24GB | NSFW I2V — Remix v3.0 |
+| `phr00t_mega_nsfw_bundle` | Phr00t MEGA v12.2 + CLIP | ~15GB | NSFW I2V+T2V unified |
+| `nsfw_i2v_full_bundle` | All NSFW I2V models + SFW base + LoRAs | ~70GB | Full NSFW suite |
+
+### Individual model keys
 
 | Key | File | Directory |
 |---|---|---|
 | `wan2.2_t2v_fp8` | wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors | diffusion_models/ |
 | `wan2.2_t2v_high_noise_fp8` | wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors | diffusion_models/ |
-| `wan2.2_t2v_fp16` | wan2.2_t2v_low_noise_14B_fp16.safetensors | diffusion_models/ |
 | `wan2.2_i2v_fp8` | wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors | diffusion_models/ |
 | `wan2.2_i2v_high_noise_fp8` | wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors | diffusion_models/ |
-| `wan2.2_i2v_fp16` | wan2.2_i2v_low_noise_14B_fp16.safetensors | diffusion_models/ |
 | `umt5_xxl_fp8` | umt5_xxl_fp8_e4m3fn_scaled.safetensors | text_encoders/ |
 | `wan_vae` | wan_2.1_vae.safetensors | vae/ |
 | `clip_vision_h` | clip_vision_h.safetensors | clip_vision/ |
+| `svi_wan22_high_lora` | SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors | loras/ |
+| `svi_wan22_low_lora` | SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors | loras/ |
+| `lightx2v_i2v_low_noise` | wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors | loras/ |
+| `lightx2v_i2v_high_noise` | wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors | loras/ |
 
-**Example — T2V + I2V with shared encoders (manual):**
-```
-HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_vision_h"
-```
+## 📽️ Workflows
+
+| Workflow | Bundle | Output | Description |
+|---|---|---|---|
+| `t2v_standard.json` | `wan2.2_t2v_bundle` | ~5s | Text-to-video, LightX2V 4-step |
+| `i2v_standard.json` | `wan2.2_i2v_bundle` | ~5s | Image-to-video, LightX2V 4-step |
+| `i2v_quality.json` | `wan2.2_i2v_bundle` | ~5s | I2V, higher quality settings |
+| `i2v_standard_rife.json` | `wan2.2_i2v_bundle` | ~5s | I2V + RIFE frame interpolation |
+| `i2v_svi_single.json` | `svi_i2v_bundle` | ~5s | SVI Pro single chunk (81 frames) |
+| `i2v_svi_4chunk.json` | `svi_i2v_bundle` | ~40s | SVI Pro 4-chunk long video |
+| `i2v_svi_long.json` | `svi_i2v_bundle` | ~40s | SVI Pro 4-chunk + seam blending |
+| `i2v_svi_nsfw_4chunk.json` | `svi_nsfw_i2v_bundle` | ~40s | SVI Pro 4-chunk, uncensored |
+| `i2v_nsfw_fxfeihou.json` | `remix_nsfw_i2v_bundle` | ~5s | NSFW I2V — FX-FeiHou Remix v3.0 |
+| `i2v_nsfw_lora.json` | `wan2.2_i2v_bundle` + NSFW LoRA | ~5s | NSFW I2V via LoRA |
+| `i2v_nsfw_phr00t.json` | `phr00t_mega_nsfw_bundle` | ~5s | NSFW I2V — Phr00t MEGA |
+| `t2v_nsfw_phr00t.json` | `phr00t_mega_nsfw_bundle` | ~5s | NSFW T2V — Phr00t MEGA |
+| `upscale_image.json` | — | — | Image upscaling utility |
+
+### SVI Pro architecture notes
+
+SVI Pro uses `WanImageToVideoSVIPro` (not `WanImageToVideo`) with:
+- Dual high/low noise UNet pair, each with its own SVI Pro LoRA
+- `VAEEncode` for `anchor_samples` (start image → latent, shared across all chunks)
+- `prev_samples` chaining: each chunk's low-noise KSampler output feeds the next chunk's SVIPro node
+- CFG=4.0, 25 steps, euler/simple — **do not use LightX2V LoRAs with this setup**
 
 ## 📋 Environment Variables
 
 ### Model Sources
 | Variable | Description | Example |
 |---|---|---|
-| `HUGGINGFACE_MODELS` | WAN bundle key or comma-separated individual keys | `wan2.2_t2v_bundle` |
+| `HUGGINGFACE_MODELS` | WAN bundle key or comma-separated individual keys | `svi_i2v_bundle` |
 | `CIVITAI_MODELS` | CivitAI checkpoint version IDs (optional) | `"123456"` |
 | `CIVITAI_LORAS` | CivitAI LoRA version IDs (optional) | `"345678"` |
 | `CIVITAI_VAES` | CivitAI VAE version IDs (optional) | `"567890"` |
@@ -99,7 +138,7 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 | Variable | Description | Default |
 |---|---|---|
 | `FILEBROWSER_PASSWORD` | File browser login password | `runpod` |
-| `ENABLE_SAGEATTN` | Enable SageAttention GPU health check on boot (SA3 Blackwell-native, pre-compiled for sm_120) | `true` |
+| `ENABLE_SAGEATTN` | Enable SageAttention GPU health check on boot | `true` |
 | `ENABLE_MANAGER_UI` | Show ComfyUI-Manager UI | `true` |
 | `COMFY_FLAGS` | ComfyUI startup flags | `--preview-method auto` |
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `false` |
@@ -112,8 +151,8 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 ├── text_encoders/      # UMT5-XXL text encoder
 ├── vae/                # WAN VAE
 ├── clip_vision/        # CLIP vision encoder (I2V)
+├── loras/              # LoRA models (SVI Pro, LightX2V, NSFW)
 ├── checkpoints/        # CivitAI checkpoints (optional)
-├── loras/              # LoRA models (optional)
 └── upscale_models/     # Upscalers (optional)
 ```
 
@@ -188,8 +227,7 @@ tail -f /tmp/ignition_startup.log
 
 # List downloaded models
 ls -lh /workspace/ComfyUI/models/diffusion_models/
-ls -lh /workspace/ComfyUI/models/text_encoders/
-ls -lh /workspace/ComfyUI/models/clip_vision/
+ls -lh /workspace/ComfyUI/models/loras/
 ```
 
 ## 🐛 Troubleshooting
@@ -201,6 +239,7 @@ ls -lh /workspace/ComfyUI/models/clip_vision/
 | ComfyUI not responding | Run `restart-comfyui.sh` |
 | Want to re-download | Set `FORCE_MODEL_SYNC=true` and restart pod |
 | Check what downloaded | `tail -f /tmp/ignition_startup.log` |
+| SVI white noise | Confirm SVI LoRAs loaded (no "lora key not loaded" in console) |
 
 ## 🏗️ Building Locally
 
