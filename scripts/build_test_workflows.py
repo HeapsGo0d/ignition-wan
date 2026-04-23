@@ -246,6 +246,79 @@ def verify(path: Path) -> bool:
 
 
 # ---------------------------------------------------------------------------
+# Step 3: SVIPro 2-chunk
+# ---------------------------------------------------------------------------
+
+def build_svi_2chunk(src: Path, out: Path) -> None:
+    """Extract chunks 1+2 from i2v_svi_4chunk.json as a 2-chunk workflow.
+
+    Keeps: shared infrastructure (1,2,3,4,5,10,11,12,13,14,15,16,17,74)
+           + chunk 1 (20,21,22,23) + chunk 2 (30,31,32,33)
+           + ImageBatch(60) + output (70)
+    Drops: chunks 3-4 (40-43, 50-53) and extra ImageBatch nodes (61,62)
+    Wires: ImageBatch(60) → VHS_VideoCombine(70)
+
+    prev_samples chain (KSamplerLow_C1(22) → SVIPro_C2(30)) already present in source.
+    SVIPro lengths set to 81 frames (full chunk).
+    """
+    wf = json.loads(src.read_text())
+    nodes = wf["nodes"]
+    links = wf["links"]
+
+    KEEP = {1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 74,
+            20, 21, 22, 23, 30, 31, 32, 33, 60, 70}
+    drop = {n["id"] for n in nodes if n["id"] not in KEEP}
+    _drop_nodes_and_links(nodes, links, drop)
+
+    # Wire ImageBatch(60) output slot 0 → VHS_VideoCombine(70) input slot 0 ("images")
+    _add_link(nodes, links, 60, 0, 70, 0, "IMAGE")
+
+    # Set both SVIPro lengths to 81 frames
+    for n in nodes:
+        if n["type"] == "WanImageToVideoSVIPro":
+            n["widgets_values"][0] = 81
+
+    # Update VHS filename
+    for n in nodes:
+        if n["id"] == 70 and n["type"] == "VHS_VideoCombine":
+            n["widgets_values"][2] = "video/WAN_SVI_2chunk"
+
+    TITLES = {
+        1: "Start image",
+        2: "CLIP — umt5_xxl",
+        3: "Positive prompt",
+        4: "Negative prompt",
+        5: "VAE — wan_2.1",
+        10: "UNet — high noise",
+        11: "LoRA — SVI_v2_PRO HIGH fp16 (Kijai)",
+        12: "Sage patch (high) — sageattn3",
+        13: "ModelSamplingSD3 high — shift=5.0",
+        14: "UNet — low noise",
+        15: "LoRA — SVI_v2_PRO LOW fp16 (Kijai)",
+        16: "Sage patch (low) — sageattn3",
+        17: "ModelSamplingSD3 low — shift=5.0",
+        74: "VAEEncode — anchor_samples",
+        20: "C1 SVIPro — length=81, mlc=1",
+        21: "C1 KSampler high — CFG 4.0 — steps 0→12",
+        22: "C1 KSampler low  — CFG 4.0 — steps 12→25",
+        23: "C1 VAEDecode",
+        30: "C2 SVIPro — length=81, mlc=1",
+        31: "C2 KSampler high — CFG 4.0 — steps 0→12",
+        32: "C2 KSampler low  — CFG 4.0 — steps 12→25",
+        33: "C2 VAEDecode",
+        60: "ImageBatch C1+C2",
+        70: "VHS output — 16 fps",
+    }
+    for n in nodes:
+        if n["id"] in TITLES:
+            n["title"] = TITLES[n["id"]]
+
+    links[:] = _renumber_links(nodes, links)
+    _save(wf, nodes, links, out)
+    print(f"Wrote {out}  ({len(nodes)} nodes, {len(links)} links)")
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -257,12 +330,14 @@ def main() -> None:
     root = Path(__file__).resolve().parent.parent
     baseline = root / "workflows" / "i2v_wan_baseline.json"
     svi_single = root / "workflows" / "i2v_svi_single.json"
+    svi_2chunk = root / "workflows" / "i2v_svi_2chunk.json"
 
     if not args.verify:
         build_wan_baseline(root / "workflows" / "i2v_standard.json", baseline)
         build_svi_single(root / "workflows" / "i2v_svi_4chunk.json", svi_single)
+        build_svi_2chunk(root / "workflows" / "i2v_svi_4chunk.json", svi_2chunk)
 
-    ok = verify(baseline) & verify(svi_single)
+    ok = verify(baseline) & verify(svi_single) & verify(svi_2chunk)
     sys.exit(0 if ok else 1)
 
 
