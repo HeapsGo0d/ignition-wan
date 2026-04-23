@@ -302,7 +302,7 @@
         "Node name for S&R": "LoraLoaderModelOnly"
       },
       "widgets_values": [
-        "SVI_Wan2.2-I2V-A14B_high_noise_lora_v2.0_pro.safetensors",
+        "SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors",
         1.0
       ],
       "title": "LoRA  \u2014  SVI Pro high  v2.0"
@@ -342,7 +342,7 @@
         "Node name for S&R": "LoraLoaderModelOnly"
       },
       "widgets_values": [
-        "SVI_Wan2.2-I2V-A14B_low_noise_lora_v2.0_pro.safetensors",
+        "SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors",
         1.0
       ],
       "title": "LoRA  \u2014  SVI Pro low  v2.0"
