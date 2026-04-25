@@ -49,6 +49,11 @@ WAN_MODELS = {
         'filename': 'wan2.2_i2v_low_noise_14B_fp16.safetensors',
         'subdir': 'diffusion_models'
     },
+    'wan2.2_i2v_high_noise_fp16': {
+        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors',
+        'filename': 'wan2.2_i2v_high_noise_14B_fp16.safetensors',
+        'subdir': 'diffusion_models'
+    },
     # --- Text Encoder (shared by all WAN 2.2 models) ---
     'umt5_xxl_fp8': {
         'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors',
@@ -154,8 +159,9 @@ WAN_BUNDLES = {
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # SVI 2.0 Pro bundles — NO LightX2V (step-distillation conflicts with SVI error-recycling)
-    # Use HUGGINGFACE_MODELS=svi_i2v_bundle for i2v_svi_standard.json
     'svi_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora'],
+    # fp16 variant — cleaner output, ~28GB extra vs fp8, use if fp8 artifacts are visible
+    'svi_i2v_fp16_bundle': ['wan2.2_i2v_fp16', 'wan2.2_i2v_high_noise_fp16', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora'],
     # Use HUGGINGFACE_MODELS=svi_nsfw_i2v_bundle for i2v_svi_nsfw_lora.json
     'svi_nsfw_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora', 'nsfw_lora_h'],
 }

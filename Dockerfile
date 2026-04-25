@@ -2,10 +2,11 @@
 # Two-stage build: devel for compilation, runtime for deployment
 # Eliminates double-torch layer bloat + strips compiler toolchain from final image
 # SageAttention2++ compiled at build time for RTX 5090 (sm_120) — ready on first boot
+# CUDA 13.0 + PyTorch cu130 — enables comfy_kitchen optimized fp8 CUDA kernels
 
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
 # Full devel image: needs nvcc to compile SageAttention CUDA kernels
-FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04 AS builder
+FROM nvidia/cuda:13.0.3-cudnn-devel-ubuntu24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -27,9 +28,9 @@ RUN python3 -m venv --copies /opt/venv
 # Core tooling
 RUN pip install --no-cache-dir packaging setuptools wheel
 
-# Install PyTorch nightly with CUDA 12.8 — installed once, no uninstall dance
+# Install PyTorch nightly with CUDA 13.0 — unlocks comfy_kitchen optimized fp8 kernels
 RUN pip install --no-cache-dir --pre torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/nightly/cu128
+    --index-url https://download.pytorch.org/whl/nightly/cu130
 
 # Verify PyTorch (fail build immediately if broken)
 RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.version.cuda is not None, 'No CUDA'"
@@ -125,7 +126,7 @@ RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} CUDA {torch.ve
 
 # ── Stage 2: Final (runtime) ──────────────────────────────────────────────────
 # Runtime image: no compiler toolchain — strips nvcc, CUDA headers, static libs
-FROM nvidia/cuda:12.8.1-cudnn-runtime-ubuntu24.04 AS final
+FROM nvidia/cuda:13.0.3-cudnn-runtime-ubuntu24.04 AS final
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \

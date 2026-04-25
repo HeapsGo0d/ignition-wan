@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.44-svi",
+  "name": "Ignition WAN v1.0.45-svi",
   "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.44-svi",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.45-svi",
   "ports": [
     {
       "privatePort": 8188,
