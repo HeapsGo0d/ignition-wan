@@ -219,10 +219,10 @@
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_high_noise_14B_fp16.safetensors",
         "default"
       ],
-      "title": "UNet — high noise"
+      "title": "UNet — high noise (fp16)"
     },
     {
       "id": 14,
@@ -253,10 +253,10 @@
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_low_noise_14B_fp16.safetensors",
         "default"
       ],
-      "title": "UNet — low noise"
+      "title": "UNet — low noise (fp16)"
     },
     {
       "id": 11,
@@ -339,86 +339,6 @@
       "title": "LoRA — SVI_v2_PRO LOW fp16 (Kijai)"
     },
     {
-      "id": 12,
-      "type": "PathchSageAttentionKJ",
-      "pos": [
-        800,
-        820
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 5
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            7
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PathchSageAttentionKJ"
-      },
-      "widgets_values": [
-        "sageattn3",
-        false
-      ],
-      "title": "Sage patch (high) — sageattn3"
-    },
-    {
-      "id": 16,
-      "type": "PathchSageAttentionKJ",
-      "pos": [
-        800,
-        950
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 6
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            8
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PathchSageAttentionKJ"
-      },
-      "widgets_values": [
-        "sageattn3",
-        false
-      ],
-      "title": "Sage patch (low) — sageattn3"
-    },
-    {
       "id": 13,
       "type": "ModelSamplingSD3",
       "pos": [
@@ -436,7 +356,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 7
+          "link": 5
         }
       ],
       "outputs": [
@@ -475,7 +395,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 8
+          "link": 6
         }
       ],
       "outputs": [
@@ -874,11 +794,11 @@
       },
       "widgets_values": [
         "bilinear",
-        832,
-        480,
+        960,
+        640,
         "disabled"
       ],
-      "title": "Resize → 832×480"
+      "title": "Resize → 960×640"
     }
   ],
   "links": [
@@ -918,29 +838,13 @@
       5,
       11,
       0,
-      12,
+      13,
       0,
       "MODEL"
     ],
     [
       6,
       15,
-      0,
-      16,
-      0,
-      "MODEL"
-    ],
-    [
-      7,
-      12,
-      0,
-      13,
-      0,
-      "MODEL"
-    ],
-    [
-      8,
-      16,
       0,
       17,
       0,
