@@ -162,8 +162,8 @@ WAN_BUNDLES = {
     'svi_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora'],
     # fp16 variant — cleaner output, ~28GB extra vs fp8, use if fp8 artifacts are visible
     'svi_i2v_fp16_bundle': ['wan2.2_i2v_fp16', 'wan2.2_i2v_high_noise_fp16', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora'],
-    # Use HUGGINGFACE_MODELS=svi_nsfw_i2v_bundle for i2v_svi_nsfw_lora.json
     'svi_nsfw_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora', 'nsfw_lora_h'],
+    'svi_nsfw_i2v_fp16_bundle': ['wan2.2_i2v_fp16', 'wan2.2_i2v_high_noise_fp16', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'svi_wan22_high_lora', 'svi_wan22_low_lora', 'nsfw_lora_h'],
 }
 
 

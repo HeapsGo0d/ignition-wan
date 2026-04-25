@@ -156,8 +156,8 @@ get_configuration() {
     echo "  6) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
     echo "  7) NSFW I2V Full (all 3 NSFW I2V workflows, ~70GB)"
     echo "  --- SVI 2.0 Pro (long video, no LightX2V) ---"
-    echo "  8) SVI I2V (official Wan 2.2 + SVI LoRAs, ~30GB)"
-    echo "  9) SVI NSFW I2V (official Wan 2.2 + SVI + NSFW LoRAs, ~32GB)"
+    echo "  8) SVI I2V fp16 (official Wan 2.2 fp16 + SVI LoRAs, ~56GB)"
+    echo "  9) SVI NSFW I2V fp16 (official Wan 2.2 fp16 + SVI LoRAs + NSFW LoRA, ~58GB)"
     echo "  10) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
@@ -192,14 +192,14 @@ get_configuration() {
             echo "  → Selected: NSFW I2V Full (~70GB — Remix v3.0 + MEGA + official SFW base + LoRAs)"
             ;;
         8)
-            HUGGINGFACE_MODELS="svi_i2v_bundle"
-            echo "  → Selected: SVI I2V (~30GB — official Wan 2.2 + SVI 2.0 Pro LoRAs, no LightX2V)"
-            echo "     Use workflow: i2v_svi_4chunk.json (~20s video)"
+            HUGGINGFACE_MODELS="svi_i2v_fp16_bundle"
+            echo "  → Selected: SVI I2V fp16 (~56GB — official Wan 2.2 fp16 + SVI 2.0 Pro LoRAs)"
+            echo "     Use workflow: i2v_svi_4chunk.json (~14 min / ~20s video)"
             ;;
         9)
-            HUGGINGFACE_MODELS="svi_nsfw_i2v_bundle"
-            echo "  → Selected: SVI NSFW I2V (~32GB — official Wan 2.2 + SVI LoRAs + NSFW LoRA)"
-            echo "     Use workflow: i2v_svi_nsfw_4chunk.json (~20s video)"
+            HUGGINGFACE_MODELS="svi_nsfw_i2v_fp16_bundle"
+            echo "  → Selected: SVI NSFW I2V fp16 (~58GB — Wan 2.2 fp16 + SVI LoRAs + NSFW LoRA)"
+            echo "     Use workflow: i2v_svi_nsfw_4chunk.json (~14 min / ~20s video)"
             ;;
         10)
             read -p "Enter model keys (comma-separated): " input_hf
