@@ -1,6 +1,6 @@
 {
-  "last_node_id": 74,
-  "last_link_id": 24,
+  "last_node_id": 75,
+  "last_link_id": 25,
   "nodes": [
     {
       "id": 1,
@@ -76,7 +76,7 @@
         "wan",
         "default"
       ],
-      "title": "CLIP \u2014 umt5_xxl"
+      "title": "CLIP — umt5_xxl"
     },
     {
       "id": 3,
@@ -188,7 +188,7 @@
       "widgets_values": [
         "wan_2.1_vae.safetensors"
       ],
-      "title": "VAE \u2014 wan_2.1"
+      "title": "VAE — wan_2.1"
     },
     {
       "id": 10,
@@ -222,7 +222,7 @@
         "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
         "default"
       ],
-      "title": "UNet \u2014 high noise"
+      "title": "UNet — high noise"
     },
     {
       "id": 14,
@@ -256,7 +256,7 @@
         "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
         "default"
       ],
-      "title": "UNet \u2014 low noise"
+      "title": "UNet — low noise"
     },
     {
       "id": 11,
@@ -296,7 +296,7 @@
         "SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors",
         1.0
       ],
-      "title": "LoRA \u2014 SVI_v2_PRO HIGH fp16 (Kijai)"
+      "title": "LoRA — SVI_v2_PRO HIGH fp16 (Kijai)"
     },
     {
       "id": 15,
@@ -336,7 +336,7 @@
         "SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors",
         1.0
       ],
-      "title": "LoRA \u2014 SVI_v2_PRO LOW fp16 (Kijai)"
+      "title": "LoRA — SVI_v2_PRO LOW fp16 (Kijai)"
     },
     {
       "id": 12,
@@ -376,7 +376,7 @@
         "sageattn3",
         false
       ],
-      "title": "Sage patch (high) \u2014 sageattn3"
+      "title": "Sage patch (high) — sageattn3"
     },
     {
       "id": 16,
@@ -416,7 +416,7 @@
         "sageattn3",
         false
       ],
-      "title": "Sage patch (low) \u2014 sageattn3"
+      "title": "Sage patch (low) — sageattn3"
     },
     {
       "id": 13,
@@ -455,7 +455,7 @@
       "widgets_values": [
         5.0
       ],
-      "title": "ModelSamplingSD3 high \u2014 shift=5.0"
+      "title": "ModelSamplingSD3 high — shift=5.0"
     },
     {
       "id": 17,
@@ -494,7 +494,7 @@
       "widgets_values": [
         5.0
       ],
-      "title": "ModelSamplingSD3 low \u2014 shift=5.0"
+      "title": "ModelSamplingSD3 low — shift=5.0"
     },
     {
       "id": 74,
@@ -514,7 +514,7 @@
         {
           "name": "pixels",
           "type": "IMAGE",
-          "link": 9,
+          "link": 25,
           "slot_index": 0
         },
         {
@@ -538,7 +538,7 @@
         "Node name for S&R": "VAEEncode"
       },
       "widgets_values": [],
-      "title": "VAEEncode \u2014 anchor_samples"
+      "title": "VAEEncode — anchor_samples"
     },
     {
       "id": 20,
@@ -609,7 +609,7 @@
         41,
         1
       ],
-      "title": "WanImageToVideoSVIPro \u2014 length=41, CFG=6.0"
+      "title": "WanImageToVideoSVIPro — length=41, CFG=6.0"
     },
     {
       "id": 21,
@@ -672,7 +672,7 @@
         12,
         "enable"
       ],
-      "title": "KSampler high \u2014 CFG 6.0 \u2014 steps 0\u219212"
+      "title": "KSampler high — CFG 6.0 — steps 0→12"
     },
     {
       "id": 22,
@@ -735,11 +735,11 @@
         25,
         "disable"
       ],
-      "title": "KSampler low  \u2014 CFG 6.0 \u2014 steps 12\u219225"
+      "title": "KSampler low  — CFG 6.0 — steps 12→25"
     },
     {
       "id": 23,
-      "type": "VAEDecode",
+      "type": "VAEDecodeTiled",
       "pos": [
         2710,
         560
@@ -774,10 +774,12 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VAEDecode"
+        "Node name for S&R": "VAEDecodeTiled"
       },
-      "widgets_values": [],
-      "title": "VAEDecode"
+      "widgets_values": [
+        512
+      ],
+      "title": "VAEDecodeTiled"
     },
     {
       "id": 70,
@@ -833,7 +835,50 @@
           }
         }
       ],
-      "title": "VHS output \u2014 16 fps"
+      "title": "VHS output — 16 fps"
+    },
+    {
+      "id": 75,
+      "type": "ImageScale",
+      "pos": [
+        240,
+        200
+      ],
+      "size": {
+        "0": 170,
+        "1": 130
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 9,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            25
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "bilinear",
+        832,
+        480,
+        "disabled"
+      ],
+      "title": "Resize → 832×480"
     }
   ],
   "links": [
@@ -905,7 +950,7 @@
       9,
       1,
       0,
-      74,
+      75,
       0,
       "IMAGE"
     ],
@@ -1026,6 +1071,14 @@
       23,
       0,
       70,
+      0,
+      "IMAGE"
+    ],
+    [
+      25,
+      75,
+      0,
+      74,
       0,
       "IMAGE"
     ]

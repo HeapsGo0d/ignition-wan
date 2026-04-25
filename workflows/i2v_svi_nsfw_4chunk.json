@@ -1,6 +1,6 @@
 {
-  "last_node_id": 78,
-  "last_link_id": 112,
+  "last_node_id": 79,
+  "last_link_id": 113,
   "nodes": [
     {
       "id": 1,
@@ -223,9 +223,10 @@
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_high_noise_14B_fp16.safetensors",
         "default"
-      ]
+      ],
+      "title": "UNet — high noise (fp16)"
     },
     {
       "id": 14,
@@ -256,9 +257,10 @@
         "Node name for S&R": "UNETLoader"
       },
       "widgets_values": [
-        "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+        "wan2.2_i2v_low_noise_14B_fp16.safetensors",
         "default"
-      ]
+      ],
+      "title": "UNet — low noise (fp16)"
     },
     {
       "id": 18,
@@ -417,84 +419,6 @@
       ]
     },
     {
-      "id": 12,
-      "type": "PathchSageAttentionKJ",
-      "pos": [
-        1170,
-        820
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 27
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            29
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PathchSageAttentionKJ"
-      },
-      "widgets_values": [
-        "sageattn3",
-        false
-      ]
-    },
-    {
-      "id": 16,
-      "type": "PathchSageAttentionKJ",
-      "pos": [
-        1170,
-        950
-      ],
-      "size": {
-        "0": 315,
-        "1": 82
-      },
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 28
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            30
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PathchSageAttentionKJ"
-      },
-      "widgets_values": [
-        "sageattn3",
-        false
-      ]
-    },
-    {
       "id": 13,
       "type": "ModelSamplingSD3",
       "pos": [
@@ -512,7 +436,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 29
+          "link": 27
         }
       ],
       "outputs": [
@@ -553,7 +477,7 @@
         {
           "name": "model",
           "type": "MODEL",
-          "link": 30
+          "link": 28
         }
       ],
       "outputs": [
@@ -773,7 +697,7 @@
     },
     {
       "id": 23,
-      "type": "VAEDecode",
+      "type": "VAEDecodeTiled",
       "pos": [
         2710,
         560
@@ -808,9 +732,12 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VAEDecode"
+        "Node name for S&R": "VAEDecodeTiled"
       },
-      "widgets_values": []
+      "widgets_values": [
+        512
+      ],
+      "title": "VAEDecodeTiled"
     },
     {
       "id": 30,
@@ -1015,7 +942,7 @@
     },
     {
       "id": 33,
-      "type": "VAEDecode",
+      "type": "VAEDecodeTiled",
       "pos": [
         2710,
         1160
@@ -1050,9 +977,12 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VAEDecode"
+        "Node name for S&R": "VAEDecodeTiled"
       },
-      "widgets_values": []
+      "widgets_values": [
+        512
+      ],
+      "title": "VAEDecodeTiled"
     },
     {
       "id": 40,
@@ -1257,7 +1187,7 @@
     },
     {
       "id": 43,
-      "type": "VAEDecode",
+      "type": "VAEDecodeTiled",
       "pos": [
         2710,
         1760
@@ -1292,9 +1222,12 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VAEDecode"
+        "Node name for S&R": "VAEDecodeTiled"
       },
-      "widgets_values": []
+      "widgets_values": [
+        512
+      ],
+      "title": "VAEDecodeTiled"
     },
     {
       "id": 50,
@@ -1498,7 +1431,7 @@
     },
     {
       "id": 53,
-      "type": "VAEDecode",
+      "type": "VAEDecodeTiled",
       "pos": [
         2710,
         2360
@@ -1533,9 +1466,12 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "VAEDecode"
+        "Node name for S&R": "VAEDecodeTiled"
       },
-      "widgets_values": []
+      "widgets_values": [
+        512
+      ],
+      "title": "VAEDecodeTiled"
     },
     {
       "id": 60,
@@ -1733,7 +1669,7 @@
         {
           "name": "pixels",
           "type": "IMAGE",
-          "link": 104,
+          "link": 113,
           "slot_index": 0
         },
         {
@@ -1760,6 +1696,49 @@
         "Node name for S&R": "VAEEncode"
       },
       "widgets_values": []
+    },
+    {
+      "id": 79,
+      "type": "ImageScale",
+      "pos": [
+        250,
+        200
+      ],
+      "size": {
+        "0": 170,
+        "1": 130
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 104,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            113
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "bilinear",
+        960,
+        640,
+        "disabled"
+      ],
+      "title": "Resize → 960×640"
     }
   ],
   "links": [
@@ -1911,29 +1890,13 @@
       27,
       11,
       0,
-      12,
+      13,
       0,
       "MODEL"
     ],
     [
       28,
       15,
-      0,
-      16,
-      0,
-      "MODEL"
-    ],
-    [
-      29,
-      12,
-      0,
-      13,
-      0,
-      "MODEL"
-    ],
-    [
-      30,
-      16,
       0,
       17,
       0,
@@ -2287,7 +2250,7 @@
       104,
       1,
       0,
-      74,
+      79,
       0,
       "IMAGE"
     ],
@@ -2354,6 +2317,14 @@
       50,
       3,
       "LATENT"
+    ],
+    [
+      113,
+      79,
+      0,
+      74,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [],
