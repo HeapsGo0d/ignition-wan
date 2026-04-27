@@ -33,7 +33,7 @@
         {"name": "IMAGE", "type": "IMAGE", "links": [2], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "ImageScaleBy"},
-      "widgets_values": ["lanczos", 1.0]
+      "widgets_values": ["lanczos", 2.0]
     },
     {
       "id": 3,
@@ -109,8 +109,8 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "high quality photo, natural detail, clean image, realistic texture",
-        "noise, grain, oversharpening, artifacts, dirty texture, compression artifacts, speckles, deformed anatomy, extra limbs"
+        "photographed on full-frame DSLR, 85mm portrait lens, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, gentle asymmetric lighting",
+        "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts"
       ]
     },
     {
@@ -133,16 +133,16 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        36,
-        2.0, 2.0,
-        0,
+        32,
+        4.5, 2.5,
+        5,
+        1.003,
         1.0,
-        1.0,
-        1.0, 1.0,
-        0.0,
+        1.0, 0.75,
+        1.5,
         false,
         "RestoreEDMSampler",
-        1024, 1024
+        1024, 512
       ]
     },
     {
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — v0F fidelity model, steps=36, cfg=2.0, churn=0, s_noise=1.0, restore_cfg=0, no pre-upscale. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download: HUGGINGFACE_MODELS=supir_v0f,sdxl_base. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — Balanced preset (pure SUPIR, no ESRGAN). v0F + 2x lanczos pre-upscale + SUPIR generative pass. CFG 4.5→2.5, EDM s_churn=5, s_noise=1.003, control_scale 1.0→0.75, restore_cfg=1.5 (face anchor). For ESRGAN+SUPIR chain see _2stage variant. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

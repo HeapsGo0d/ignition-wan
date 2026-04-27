@@ -109,8 +109,8 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "high quality photo, sharp details, 8k resolution, detailed texture, professional photography, photorealistic",
-        "bad quality, blurry, messy, artifacts, noise, compression artifacts, watermark, low resolution"
+        "photographed on full-frame mirrorless, 35mm lens, sharp micro-detail, material texture clearly visible, fabric weave, surface scratches, natural light bouncing off matte and glossy areas, micro-contrast, photographic colour, subtle film grain, balanced exposure",
+        "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts"
       ]
     },
     {
@@ -133,16 +133,16 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        30,
-        2.5, 2.5,
-        3,
-        1.001,
+        35,
+        5.0, 3.0,
+        6,
+        1.003,
         1.0,
-        1.0, 1.0,
+        1.0, 0.7,
         -1.0,
         false,
         "RestoreEDMSampler",
-        1024, 1024
+        1024, 512
       ]
     },
     {
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR SFW upscale — BALANCED preset (steps=30, cfg=2.5, reduced artifacts). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR SFW upscale — Balanced preset (default daily driver). v0Q creative model, 35 steps, CFG 5.0→3.0, EDM s_churn=6, s_noise=1.003, control_scale 1.0→0.7, restore_cfg=-1.0 (no anchor — SFW typically doesn't need face protection). ~75-110s on 4090. Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

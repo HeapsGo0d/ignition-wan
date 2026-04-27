@@ -184,9 +184,23 @@ prefetch_support_models() {
         upscale_status="ready (cached)"
     fi
 
+    local nmkd_status="missing"
+    if [[ ! -f "$UPSCALE_DIR/4x_NMKD-Siax_200k.pth" ]]; then
+        log "INFO" "  • Downloading 4x_NMKD-Siax_200k.pth (~67MB)..."
+        aria2c -x4 -q --continue=true \
+            -d "$UPSCALE_DIR" -o "4x_NMKD-Siax_200k.pth" \
+            "https://huggingface.co/uwg/upscaler/resolve/main/ESRGAN/4x_NMKD-Siax_200k.pth" \
+            && nmkd_status="ready" \
+            || log "WARN" "  ⚠️  4x_NMKD-Siax_200k.pth download failed — SUPIR 2-stage workflow will fall back to 4xLSDIR"
+    else
+        log "INFO" "  • 4x_NMKD-Siax_200k.pth already cached"
+        nmkd_status="ready (cached)"
+    fi
+
     log "INFO" "  ┌─ Support model status ──────────────────┐"
     log "INFO" "  │  RIFE (rife49.pth):    $rife_status"
     log "INFO" "  │  Upscaler (4xLSDIR):   $upscale_status"
+    log "INFO" "  │  Upscaler (NMKD-Siax): $nmkd_status"
     log "INFO" "  └────────────────────────────────────────┘"
     log "INFO" ""
 }

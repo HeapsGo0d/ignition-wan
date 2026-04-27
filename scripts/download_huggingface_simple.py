@@ -161,10 +161,10 @@ WAN_BUNDLES = {
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    # SUPIR image upscaling: SUPIR-v0Q + SDXL base (~12GB total) — non-commercial license
-    'supir_bundle': ['supir_v0q', 'sdxl_base'],
-    # SUPIR model only — for instances that already have an SDXL checkpoint
-    'supir_core_only': ['supir_v0q'],
+    # SUPIR image upscaling: both v0Q (creative) + v0F (fidelity) + SDXL base (~17GB total) — non-commercial license
+    'supir_bundle': ['supir_v0q', 'supir_v0f', 'sdxl_base'],
+    # SUPIR models only — both variants for instances that already have an SDXL checkpoint
+    'supir_core_only': ['supir_v0q', 'supir_v0f'],
 }
 
 

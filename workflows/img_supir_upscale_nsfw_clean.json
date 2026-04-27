@@ -70,7 +70,7 @@
         {"name": "SUPIR_VAE",   "type": "SUPIRVAE",   "links": [8, 9], "slot_index": 1}
       ],
       "properties": {"Node name for S&R": "SUPIR_model_loader_v2"},
-      "widgets_values": ["SUPIR-v0Q.ckpt", false, "auto", false]
+      "widgets_values": ["SUPIR-v0F.ckpt", false, "auto", false]
     },
     {
       "id": 5,
@@ -109,8 +109,8 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "high quality photo, sharp details, 8k resolution, detailed skin texture, professional lighting, photorealistic, anatomically correct",
-        "bad quality, blurry, messy, artifacts, noise, compression artifacts, watermark, low resolution, deformed anatomy, extra limbs"
+        "photographed on full-frame DSLR, 85mm portrait lens, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, gentle asymmetric lighting",
+        "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts"
       ]
     },
     {
@@ -133,16 +133,16 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        30,
-        2.5, 2.5,
-        3,
-        1.001,
+        18,
+        3.5, 2.5,
+        4,
+        1.003,
         1.0,
-        1.0, 1.0,
-        -1.0,
+        1.0, 0.85,
+        2.0,
         false,
-        "RestoreEDMSampler",
-        1024, 1024
+        "RestoreDPMPP2MSampler",
+        1024, 512
       ]
     },
     {
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — CLEAN preset (steps=30, cfg=2.5, conservative — minimal hallucination, artifact-safe). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — Fast preset (drafts, batch culling). v0F + DPMPP2M sampler, 18 steps, CFG 3.5→2.5, churn=4, restore_cfg=2.0 (strong face anchor for fast safety). ~30-45s on 4090. For Balanced see _nsfw.json or _2stage.json; for max detail see _detail.json. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

@@ -156,8 +156,8 @@ get_configuration() {
     echo "  6) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
     echo "  7) NSFW I2V Full (all 3 NSFW I2V workflows, ~70GB)"
     echo "  --- Image upscaling ---"
-    echo "  8) SUPIR bundle (SUPIR-v0Q + SDXL base, ~12GB — non-commercial license)"
-    echo "  9) SUPIR core only (SUPIR-v0Q only — if SDXL already present, ~5GB)"
+    echo "  8) SUPIR bundle (SUPIR-v0Q + v0F + SDXL base, ~17GB — non-commercial license)"
+    echo "  9) SUPIR core only (SUPIR-v0Q + v0F — if SDXL already present, ~10GB)"
     echo "  10) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
@@ -193,12 +193,12 @@ get_configuration() {
             ;;
         8)
             HUGGINGFACE_MODELS="supir_bundle"
-            echo "  → Selected: SUPIR bundle (~12GB — SUPIR-v0Q + SDXL base)"
+            echo "  → Selected: SUPIR bundle (~17GB — SUPIR-v0Q + v0F + SDXL base)"
             echo "     NOTE: SUPIR is non-commercial use only — see https://github.com/Fanghua-Yu/SUPIR"
             ;;
         9)
             HUGGINGFACE_MODELS="supir_core_only"
-            echo "  → Selected: SUPIR core only (~5GB — SUPIR-v0Q model only)"
+            echo "  → Selected: SUPIR core only (~10GB — SUPIR-v0Q + v0F)"
             echo "     Requires an SDXL checkpoint already in checkpoints/ (e.g. sd_xl_base_1.0_0.9vae.safetensors)"
             echo "     NOTE: SUPIR is non-commercial use only — see https://github.com/Fanghua-Yu/SUPIR"
             ;;
@@ -381,10 +381,10 @@ Set \`HUGGINGFACE_MODELS\` to one of these bundle keys:
 | \`wan2.2_i2v_lightx2v_bundle\` | I2V FP8 (both variants) + LightX2V LoRAs | ~22GB | I2V 4-step (5x faster) |
 | \`wan2.2_full_bundle\` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
 | \`nsfw_i2v_full_bundle\` | Remix v3.0 + MEGA + SFW base + LoRAs | ~70GB | All NSFW I2V workflows |
-| \`supir_bundle\` | SUPIR-v0Q + SDXL base | ~12GB | Image upscaling (non-commercial) |
-| \`supir_core_only\` | SUPIR-v0Q only | ~5GB | Upscale if SDXL already present |
+| \`supir_bundle\` | SUPIR-v0Q + v0F + SDXL base | ~17GB | Image upscaling (non-commercial) |
+| \`supir_core_only\` | SUPIR-v0Q + v0F | ~10GB | Upscale if SDXL already present |
 
-Individual keys also work: \`wan2.2_t2v_fp8\`, \`wan2.2_i2v_fp8\`, \`umt5_xxl_fp8\`, \`wan_vae\`, \`clip_vision_h\`, \`lightx2v_t2v_low_noise\`, \`lightx2v_i2v_low_noise\`, \`supir_v0q\`, \`sdxl_base\`
+Individual keys also work: \`wan2.2_t2v_fp8\`, \`wan2.2_i2v_fp8\`, \`umt5_xxl_fp8\`, \`wan_vae\`, \`clip_vision_h\`, \`lightx2v_t2v_low_noise\`, \`lightx2v_i2v_low_noise\`, \`supir_v0q\`, \`supir_v0f\`, \`sdxl_base\`
 
 ## Environment Variables
 

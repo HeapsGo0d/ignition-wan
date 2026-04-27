@@ -109,8 +109,8 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "high quality photo, sharp details, 8k resolution, detailed skin texture, professional lighting, photorealistic, anatomically correct",
-        "bad quality, blurry, messy, artifacts, noise, compression artifacts, watermark, low resolution, deformed anatomy, extra limbs"
+        "photographed on full-frame DSLR, 85mm portrait lens, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, gentle asymmetric lighting",
+        "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts"
       ]
     },
     {
@@ -133,16 +133,16 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        45,
-        4.0, 4.0,
-        5,
-        1.003,
+        50,
+        5.0, 2.5,
+        8,
+        1.005,
         1.0,
-        1.0, 1.0,
+        1.0, 0.7,
         -1.0,
         false,
         "RestoreEDMSampler",
-        1024, 1024
+        1024, 512
       ]
     },
     {
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — DETAIL preset (steps=45, cfg=4.0, aggressive hallucination — max detail restoration, higher artifact risk). Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/. Download via HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial license — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — Quality preset (hero shots, max pop). v0Q creative model, 50 steps, CFG 5.0→2.5, EDM s_churn=8, s_noise=1.005, control_scale 1.0→0.7, restore_cfg=-1.0 (disabled). ~150-220s on 4090. Higher detail risk — if speckling appears, drop s_noise to 1.003 and/or set restore_cfg to 1.5. Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

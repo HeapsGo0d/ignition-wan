@@ -42,7 +42,7 @@
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "supir_bundle",
-      "description": "supir_bundle = SUPIR-v0Q + SDXL base (~12GB). Use supir_core_only if you already have an SDXL checkpoint."
+      "description": "supir_bundle = SUPIR-v0Q + v0F + SDXL base (~17GB). Use supir_core_only if you already have an SDXL checkpoint."
     },
     {
       "key": "CIVITAI_TOKEN",
