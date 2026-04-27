@@ -81,15 +81,20 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
 
 # ComfyUI-SUPIR — diffusion-based image super-resolution (kijai/ComfyUI-SUPIR)
 # Pinned to fe0d660f (2026-04-16) — non-commercial license upstream, see SUPIR repo
-# Patch: fe0d660f fixes set_module_tensor_to_device lazy-init bug in SDXL+SUPIR loaders
-# but misses the CLIP-L/CLIP-G blocks. Force-disable accelerate's path so all four
-# loaders fall through to load_state_dict(strict=False). Fixes "Failed to load first
-# clip model from SDXL checkpoint" on ComfyUI ≥16. Upstream issue: kijai/ComfyUI-SUPIR#205
+# Patch: force is_accelerate_available = False module-wide. fe0d660f fixes the
+# set_module_tensor_to_device lazy-init bug for SDXL+SUPIR loaders but misses the
+# CLIP-L/CLIP-G blocks AND leaves init_empty_weights() in place (creates meta-device
+# tensors that load_state_dict(strict=False) can't materialise → fails at .to(device)
+# in SUPIR_conditioner). Forcing the flag false routes through the nullcontext +
+# load_state_dict path that already exists for accelerate-not-installed envs. Fixes
+# "Failed to load first clip model" + "Cannot copy out of meta tensor" on ComfyUI ≥16.
+# Upstream issue: kijai/ComfyUI-SUPIR#205
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/kijai/ComfyUI-SUPIR.git && \
     git -C ComfyUI-SUPIR checkout fe0d660f && \
-    sed -i 's|if is_accelerate_available:|if False:  # patched: ComfyUI 16+ lazy-init incompat (issue #205)|g' \
+    sed -i 's|^    is_accelerate_available = True$|    is_accelerate_available = False  # patched: ComfyUI 16+ lazy-init incompat (issue #205)|' \
         ComfyUI-SUPIR/nodes_v2.py && \
+    grep -q 'is_accelerate_available = False  # patched' ComfyUI-SUPIR/nodes_v2.py || (echo "ERROR: SUPIR patch did not apply" && exit 1) && \
     cd ComfyUI-SUPIR && \
     pip install --no-cache-dir -r requirements.txt
 
