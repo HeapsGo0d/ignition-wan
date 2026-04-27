@@ -151,7 +151,7 @@ Creates `supir-workflows.zip` in `/workspace`. To specify a custom output path:
 /workspace/scripts/package-supir-workflows.sh /workspace/ComfyUI/output/supir-workflows.zip
 ```
 
-Includes: `img_supir_upscale_sfw.json`, `img_supir_upscale_nsfw.json`, and the `_clean` / `_detail` variants for both.
+Includes: `img_supir_upscale_nsfw.json` (balanced, 2-stage ESRGAN→SUPIR), `img_supir_upscale_nsfw_clean.json` (fast), and `img_supir_upscale_nsfw_detail.json` (quality).
 
 ## 🔄 Restarting ComfyUI
 

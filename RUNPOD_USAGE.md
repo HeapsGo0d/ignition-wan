@@ -33,8 +33,11 @@ Set `HUGGINGFACE_MODELS` to one of these bundle keys:
 | `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP | ~22GB | Image-to-video (standard) |
 | `wan2.2_i2v_lightx2v_bundle` | I2V FP8 (both variants) + LightX2V LoRAs | ~22GB | I2V 4-step (5x faster) |
 | `wan2.2_full_bundle` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
+| `nsfw_i2v_full_bundle` | Remix v3.0 + MEGA + SFW base + LoRAs | ~70GB | All NSFW I2V workflows |
+| `supir_bundle` | SUPIR-v0Q + v0F + SDXL base | ~17GB | Image upscaling (non-commercial) |
+| `supir_core_only` | SUPIR-v0Q + v0F | ~10GB | Upscale if SDXL already present |
 
-Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `wan_vae`, `clip_vision_h`, `lightx2v_t2v_low_noise`, `lightx2v_i2v_low_noise`
+Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `wan_vae`, `clip_vision_h`, `lightx2v_t2v_low_noise`, `lightx2v_i2v_low_noise`, `supir_v0q`, `supir_v0f`, `sdxl_base`
 
 ## Environment Variables
 

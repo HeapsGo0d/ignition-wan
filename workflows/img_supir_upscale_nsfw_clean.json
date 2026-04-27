@@ -110,7 +110,7 @@
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
         "photographed on full-frame DSLR, 85mm portrait lens, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, gentle asymmetric lighting",
-        "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts"
+        "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts, lace, fishnet, mesh fabric, crochet, embroidered lace, sheer patterned fabric, netted texture, guipure, lingerie lace trim"
       ]
     },
     {
@@ -133,13 +133,13 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        18,
-        3.5, 2.5,
-        4,
-        1.003,
+        22,
+        3.2, 2.2,
+        3,
+        1.002,
         1.0,
-        1.0, 0.85,
-        2.0,
+        1.0, 0.90,
+        2.2,
         false,
         "RestoreDPMPP2MSampler",
         1024, 512
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — Fast preset (drafts, batch culling). v0F + DPMPP2M sampler, 18 steps, CFG 3.5→2.5, churn=4, restore_cfg=2.0 (strong face anchor for fast safety). ~30-45s on 4090. For Balanced see _nsfw.json or _2stage.json; for max detail see _detail.json. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — Fast preset (drafts, batch culling). v0F + DPMPP2M, 22 steps, CFG 3.2→2.2, churn=3, s_noise=1.002, control 1.0→0.90, restore_cfg=2.2. Lowest hallucination risk — fabric-safe. ~30-40s on 4090. For Balanced (2-stage) see nsfw.json; for max detail see _detail.json. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.28",
+  "name": "Ignition WAN v1.0.38-supir",
   "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.28",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.38-supir",
   "ports": [
     {
       "privatePort": 8188,
@@ -40,8 +40,8 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "nsfw_i2v_full_bundle",
-      "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
+      "value": "supir_bundle",
+      "description": "Model bundle key(s). WAN video: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle, nsfw_i2v_full_bundle. SUPIR upscale: supir_bundle, supir_core_only. Comma-separate to combine."
     },
     {
       "key": "CIVITAI_TOKEN",
