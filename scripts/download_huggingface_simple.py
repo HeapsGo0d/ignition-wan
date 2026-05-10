@@ -119,6 +119,32 @@ WAN_MODELS = {
         'filename': 'control_v11f1e_sd15_tile_fp16.safetensors',
         'subdir': 'controlnet'
     },
+    # --- ESRGAN upscale models for Clarity pre-stage (~60-80MB each) ---
+    '4x_lsdir': {
+        'url': 'https://huggingface.co/LS110824/upscale/resolve/main/4xLSDIR.pth',
+        'filename': '4xLSDIR.pth',
+        'subdir': 'upscale_models'
+    },
+    '4x_ultrasharp': {
+        'url': 'https://huggingface.co/uwg/upscaler/resolve/main/ESRGAN/4x-UltraSharp.pth',
+        'filename': '4x-UltraSharp.pth',
+        'subdir': 'upscale_models'
+    },
+    '4x_nmkd_siax': {
+        'url': 'https://huggingface.co/uwg/upscaler/resolve/main/ESRGAN/4x_NMKD-Siax_200k.pth',
+        'filename': '4x_NMKD-Siax_200k.pth',
+        'subdir': 'upscale_models'
+    },
+    '4x_remacri': {
+        'url': 'https://huggingface.co/uwg/upscaler/resolve/main/ESRGAN/4x_foolhardy_Remacri.pth',
+        'filename': '4x_foolhardy_Remacri.pth',
+        'subdir': 'upscale_models'
+    },
+    '4x_nomos8k': {
+        'url': 'https://huggingface.co/uwg/upscaler/resolve/main/ESRGAN/4xNomos8kDAT.pth',
+        'filename': '4xNomos8kDAT.pth',
+        'subdir': 'upscale_models'
+    },
     # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
     'lightx2v_i2v_low_noise': {
         'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
@@ -153,9 +179,8 @@ WAN_BUNDLES = {
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    # Clarity image upscaler: DreamShaper SD1.5 + ControlNet Tile (~2.85GB total)
-    # 4x_NMKD-Siax_200k.pth auto-downloaded by startup.sh — not in bundle
-    'clarity_bundle': ['dreamshaper_8', 'controlnet_tile_sd15'],
+    # Clarity image upscaler: DreamShaper SD1.5 + ControlNet Tile + 5 ESRGAN upscalers (~3.2GB total)
+    'clarity_bundle': ['dreamshaper_8', 'controlnet_tile_sd15', '4x_lsdir', '4x_ultrasharp', '4x_nmkd_siax', '4x_remacri', '4x_nomos8k'],
 }
 
 

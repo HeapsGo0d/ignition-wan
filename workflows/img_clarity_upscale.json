@@ -31,7 +31,7 @@
         {"name": "UPSCALE_MODEL", "type": "UPSCALE_MODEL", "links": [3], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "UpscaleModelLoader"},
-      "widgets_values": ["4x_NMKD-Siax_200k.pth"]
+      "widgets_values": ["4xLSDIR.pth"]
     },
     {
       "id": 3,
@@ -287,7 +287,7 @@
   "config": {},
   "extra": {
     "ds": {"scale": 0.6, "offset": [0, 0]},
-    "_note": "Clarity-style upscaler — SD1.5 + ControlNet Tile + TiledDiffusion. Two-path design: original image → ControlNet tile conditioning (spatial reference); 4x ESRGAN + 0.5x scale → VAEEncodeTiled → TiledDiffusion KSampler (24 steps, CFG 6, dpmpp_2m/karras, denoise 0.35) → VAEDecodeTiled → net ~2x with diffusion detail. FreeU_V2 (1.3/1.4/0.9/0.2) boosts SD1.5 detail sharpness. ~15-25s on 4090. Models: DreamShaper_8_pruned.safetensors + control_v11f1e_sd15_tile_fp16.safetensors + 4x_NMKD-Siax_200k.pth (auto-downloaded). Bundle: HUGGINGFACE_MODELS=clarity_bundle"
+    "_note": "Clarity-style upscaler — SD1.5 + ControlNet Tile + TiledDiffusion. Two-path design: original image → ControlNet tile conditioning (spatial reference); 4x ESRGAN + 0.5x scale → VAEEncodeTiled → TiledDiffusion KSampler (24 steps, CFG 6, dpmpp_2m/karras, denoise 0.35) → VAEDecodeTiled → net ~2x with diffusion detail. FreeU_V2 (1.3/1.4/0.9/0.2) boosts SD1.5 detail sharpness. ~15-25s on 4090. Default upscaler: 4xLSDIR.pth (swap to 4x-UltraSharp.pth, 4x_NMKD-Siax_200k.pth, 4x_foolhardy_Remacri.pth, or 4xNomos8kDAT.pth in UpscaleModelLoader). Bundle: HUGGINGFACE_MODELS=clarity_bundle"
   },
   "version": 0.4
 }
