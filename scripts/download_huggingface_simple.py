@@ -105,6 +105,20 @@ WAN_MODELS = {
         'filename': 'NSFW-22-H-e8.safetensors',
         'subdir': 'loras'
     },
+    # --- Clarity upscaler: SD1.5 diffusion-based detail enhancement ---
+    # DreamShaper v8 — photorealistic SD1.5 checkpoint, includes VAE (~2.1GB)
+    'dreamshaper_8': {
+        'url': 'https://huggingface.co/Lykon/DreamShaper/resolve/main/DreamShaper_8_pruned.safetensors',
+        'filename': 'DreamShaper_8_pruned.safetensors',
+        'subdir': 'checkpoints'
+    },
+    # ControlNet Tile fp16 — spatial tile conditioning for SD1.5 (~723MB)
+    # fp16 safetensors from comfyanonymous mirror — no HF_TOKEN required
+    'controlnet_tile_sd15': {
+        'url': 'https://huggingface.co/comfyanonymous/ControlNet-v1-1_fp16_safetensors/resolve/main/control_v11f1e_sd15_tile_fp16.safetensors',
+        'filename': 'control_v11f1e_sd15_tile_fp16.safetensors',
+        'subdir': 'controlnet'
+    },
     # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
     'lightx2v_i2v_low_noise': {
         'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
@@ -139,6 +153,9 @@ WAN_BUNDLES = {
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+    # Clarity image upscaler: DreamShaper SD1.5 + ControlNet Tile (~2.85GB total)
+    # 4x_NMKD-Siax_200k.pth auto-downloaded by startup.sh — not in bundle
+    'clarity_bundle': ['dreamshaper_8', 'controlnet_tile_sd15'],
 }
 
 

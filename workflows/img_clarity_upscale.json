@@ -1,0 +1,293 @@
+{
+  "last_node_id": 15,
+  "last_link_id": 20,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "LoadImage",
+      "pos": [50, 50],
+      "size": {"0": 315, "1": 314},
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [1, 2], "slot_index": 0},
+        {"name": "MASK",  "type": "MASK",  "links": [], "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "LoadImage"},
+      "widgets_values": ["upload_image_here.png", "image"]
+    },
+    {
+      "id": 2,
+      "type": "UpscaleModelLoader",
+      "pos": [50, 420],
+      "size": {"0": 315, "1": 58},
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "UPSCALE_MODEL", "type": "UPSCALE_MODEL", "links": [3], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "UpscaleModelLoader"},
+      "widgets_values": ["4x_NMKD-Siax_200k.pth"]
+    },
+    {
+      "id": 3,
+      "type": "ImageUpscaleWithModel",
+      "pos": [50, 520],
+      "size": {"0": 315, "1": 46},
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {"name": "upscale_model", "type": "UPSCALE_MODEL", "link": 3},
+        {"name": "image",         "type": "IMAGE",         "link": 1}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [4], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "ImageUpscaleWithModel"},
+      "widgets_values": []
+    },
+    {
+      "id": 4,
+      "type": "ImageScaleBy",
+      "pos": [420, 520],
+      "size": {"0": 315, "1": 82},
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "image", "type": "IMAGE", "link": 4}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [5], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "ImageScaleBy"},
+      "widgets_values": ["lanczos", 0.5]
+    },
+    {
+      "id": 5,
+      "type": "CheckpointLoaderSimple",
+      "pos": [50, 700],
+      "size": {"0": 315, "1": 98},
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [6],    "slot_index": 0},
+        {"name": "CLIP",  "type": "CLIP",  "links": [7, 8], "slot_index": 1},
+        {"name": "VAE",   "type": "VAE",   "links": [9, 10],"slot_index": 2}
+      ],
+      "properties": {"Node name for S&R": "CheckpointLoaderSimple"},
+      "widgets_values": ["DreamShaper_8_pruned.safetensors"]
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [420, 150],
+      "size": {"0": 425, "1": 180},
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip", "type": "CLIP", "link": 7}
+      ],
+      "outputs": [
+        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [11], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPTextEncode"},
+      "widgets_values": ["masterpiece, best quality, highres, (photorealistic:1.4), skin pore detailing, extreme meticulous detailing, sharp fabric texture, fine thread weave, individual hair strands, (sharp focus:1.2), natural skin texture, Color Grading"]
+    },
+    {
+      "id": 7,
+      "type": "CLIPTextEncode",
+      "pos": [420, 350],
+      "size": {"0": 425, "1": 180},
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {"name": "clip", "type": "CLIP", "link": 8}
+      ],
+      "outputs": [
+        {"name": "CONDITIONING", "type": "CONDITIONING", "links": [12, 15], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "CLIPTextEncode"},
+      "widgets_values": ["(worst quality, low quality, normal quality:2), blurry, jpeg artifacts, plastic skin, airbrushed, smooth skin, watermark, text, deformed, extra limbs"]
+    },
+    {
+      "id": 8,
+      "type": "ControlNetLoader",
+      "pos": [420, 700],
+      "size": {"0": 315, "1": 58},
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {"name": "CONTROL_NET", "type": "CONTROL_NET", "links": [13], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "ControlNetLoader"},
+      "widgets_values": ["control_v11f1e_sd15_tile_fp16.safetensors"]
+    },
+    {
+      "id": 9,
+      "type": "ControlNetApplyAdvanced",
+      "pos": [800, 450],
+      "size": {"0": 345, "1": 166},
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {"name": "positive",    "type": "CONDITIONING", "link": 11},
+        {"name": "negative",    "type": "CONDITIONING", "link": 12},
+        {"name": "control_net", "type": "CONTROL_NET",  "link": 13},
+        {"name": "image",       "type": "IMAGE",        "link": 2}
+      ],
+      "outputs": [
+        {"name": "positive", "type": "CONDITIONING", "links": [14], "slot_index": 0},
+        {"name": "negative", "type": "CONDITIONING", "links": [],   "slot_index": 1}
+      ],
+      "properties": {"Node name for S&R": "ControlNetApplyAdvanced"},
+      "widgets_values": [0.9, 0.0, 0.9]
+    },
+    {
+      "id": 10,
+      "type": "TiledDiffusion",
+      "pos": [800, 700],
+      "size": {"0": 315, "1": 154},
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 6}
+      ],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [16], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "TiledDiffusion"},
+      "widgets_values": ["MultiDiffusion", 768, 768, 64, 8]
+    },
+    {
+      "id": 11,
+      "type": "FreeU_V2",
+      "pos": [1200, 700],
+      "size": {"0": 315, "1": 130},
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {"name": "model", "type": "MODEL", "link": 16}
+      ],
+      "outputs": [
+        {"name": "MODEL", "type": "MODEL", "links": [17], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "FreeU_V2"},
+      "widgets_values": [1.3, 1.4, 0.9, 0.2]
+    },
+    {
+      "id": 12,
+      "type": "VAEEncodeTiled",
+      "pos": [1200, 450],
+      "size": {"0": 315, "1": 78},
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {"name": "pixels", "type": "IMAGE",  "link": 5},
+        {"name": "vae",    "type": "VAE",    "link": 9}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [18], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "VAEEncodeTiled"},
+      "widgets_values": [768]
+    },
+    {
+      "id": 13,
+      "type": "KSampler",
+      "pos": [1600, 550],
+      "size": {"0": 315, "1": 262},
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {"name": "model",        "type": "MODEL",       "link": 17},
+        {"name": "positive",     "type": "CONDITIONING","link": 14},
+        {"name": "negative",     "type": "CONDITIONING","link": 15},
+        {"name": "latent_image", "type": "LATENT",      "link": 18}
+      ],
+      "outputs": [
+        {"name": "LATENT", "type": "LATENT", "links": [19], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "KSampler"},
+      "widgets_values": [623550544877658, "randomize", 24, 6, "dpmpp_2m", "karras", 0.35]
+    },
+    {
+      "id": 14,
+      "type": "VAEDecodeTiled",
+      "pos": [2050, 550],
+      "size": {"0": 315, "1": 78},
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {"name": "samples", "type": "LATENT", "link": 19},
+        {"name": "vae",     "type": "VAE",    "link": 10}
+      ],
+      "outputs": [
+        {"name": "IMAGE", "type": "IMAGE", "links": [20], "slot_index": 0}
+      ],
+      "properties": {"Node name for S&R": "VAEDecodeTiled"},
+      "widgets_values": [768]
+    },
+    {
+      "id": 15,
+      "type": "SaveImage",
+      "pos": [2420, 550],
+      "size": {"0": 315, "1": 130},
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {"name": "images", "type": "IMAGE", "link": 20}
+      ],
+      "outputs": [],
+      "properties": {"Node name for S&R": "SaveImage"},
+      "widgets_values": ["Clarity_upscale"]
+    }
+  ],
+  "links": [
+    [1,  1,  0, 3,  1, "IMAGE"],
+    [2,  1,  0, 9,  3, "IMAGE"],
+    [3,  2,  0, 3,  0, "UPSCALE_MODEL"],
+    [4,  3,  0, 4,  0, "IMAGE"],
+    [5,  4,  0, 12, 0, "IMAGE"],
+    [6,  5,  0, 10, 0, "MODEL"],
+    [7,  5,  1, 6,  0, "CLIP"],
+    [8,  5,  1, 7,  0, "CLIP"],
+    [9,  5,  2, 12, 1, "VAE"],
+    [10, 5,  2, 14, 1, "VAE"],
+    [11, 6,  0, 9,  0, "CONDITIONING"],
+    [12, 7,  0, 9,  1, "CONDITIONING"],
+    [13, 8,  0, 9,  2, "CONTROL_NET"],
+    [14, 9,  0, 13, 1, "CONDITIONING"],
+    [15, 7,  0, 13, 2, "CONDITIONING"],
+    [16, 10, 0, 11, 0, "MODEL"],
+    [17, 11, 0, 13, 0, "MODEL"],
+    [18, 12, 0, 13, 3, "LATENT"],
+    [19, 13, 0, 14, 0, "LATENT"],
+    [20, 14, 0, 15, 0, "IMAGE"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {"scale": 0.6, "offset": [0, 0]},
+    "_note": "Clarity-style upscaler — SD1.5 + ControlNet Tile + TiledDiffusion. Two-path design: original image → ControlNet tile conditioning (spatial reference); 4x ESRGAN + 0.5x scale → VAEEncodeTiled → TiledDiffusion KSampler (24 steps, CFG 6, dpmpp_2m/karras, denoise 0.35) → VAEDecodeTiled → net ~2x with diffusion detail. FreeU_V2 (1.3/1.4/0.9/0.2) boosts SD1.5 detail sharpness. ~15-25s on 4090. Models: DreamShaper_8_pruned.safetensors + control_v11f1e_sd15_tile_fp16.safetensors + 4x_NMKD-Siax_200k.pth (auto-downloaded). Bundle: HUGGINGFACE_MODELS=clarity_bundle"
+  },
+  "version": 0.4
+}

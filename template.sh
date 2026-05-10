@@ -155,7 +155,9 @@ get_configuration() {
     echo "  5) FX-FeiHou Remix NSFW I2V v3.0 (high + low + CLIP, ~24GB)"
     echo "  6) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
     echo "  7) NSFW I2V Full (all 3 NSFW I2V workflows, ~70GB)"
-    echo "  8) Custom (manual entry)"
+    echo "  --- Image upscaling ---"
+    echo "  8) Clarity bundle (DreamShaper SD1.5 + ControlNet Tile fp16, ~2.9GB)"
+    echo "  9) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
@@ -189,6 +191,11 @@ get_configuration() {
             echo "  → Selected: NSFW I2V Full (~70GB — Remix v3.0 + MEGA + official SFW base + LoRAs)"
             ;;
         8)
+            HUGGINGFACE_MODELS="clarity_bundle"
+            echo "  → Selected: Clarity bundle (~2.9GB — DreamShaper SD1.5 + ControlNet Tile fp16)"
+            echo "     Note: 4x_NMKD-Siax upscaler auto-downloaded by startup.sh"
+            ;;
+        9)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"

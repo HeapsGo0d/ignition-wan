@@ -78,6 +78,14 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-Frame-Interpolation && \
     pip install --no-cache-dir -r requirements-no-cupy.txt
 
+# ComfyUI-TiledDiffusion — tiled multi-diffusion sampling for large images
+# shiimizu fork is the actively maintained ComfyUI port of pkuliyi2015/multidiffusion-upscaler
+# Used by the Clarity upscaler workflow; provides TiledDiffusion node type
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git && \
+    cd ComfyUI-TiledDiffusion && \
+    ([ -f requirements.txt ] && pip install --no-cache-dir -r requirements.txt || true)
+
 # Compile SageAttention2++ for RTX 5090 Blackwell (sm_120)
 # AOT compile — no physical GPU needed, TORCH_CUDA_ARCH_LIST specifies the target
 # nvcc is available in this devel stage; will NOT be present in final runtime image
