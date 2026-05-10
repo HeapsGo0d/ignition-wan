@@ -83,7 +83,7 @@
         {"name": "VAE",   "type": "VAE",   "links": [9, 10],"slot_index": 2}
       ],
       "properties": {"Node name for S&R": "CheckpointLoaderSimple"},
-      "widgets_values": ["DreamShaper_8_pruned.safetensors"]
+      "widgets_values": ["Realistic_Vision_V5.1_fp16-no-ema.safetensors"]
     },
     {
       "id": 6,
@@ -100,7 +100,7 @@
         {"name": "CONDITIONING", "type": "CONDITIONING", "links": [11], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "CLIPTextEncode"},
-      "widgets_values": ["masterpiece, best quality, highres, (photorealistic:1.4), skin pore detailing, extreme meticulous detailing, sharp fabric texture, fine thread weave, individual hair strands, (sharp focus:1.2), natural skin texture, Color Grading"]
+      "widgets_values": ["faithful high-quality upscale, preserve identity, preserve age, preserve facial structure, natural skin texture, accurate fabric pattern, clean high resolution, sharp focus, photorealistic"]
     },
     {
       "id": 7,
@@ -117,7 +117,7 @@
         {"name": "CONDITIONING", "type": "CONDITIONING", "links": [12, 15], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "CLIPTextEncode"},
-      "widgets_values": ["(worst quality, low quality, normal quality:2), blurry, jpeg artifacts, plastic skin, airbrushed, smooth skin, watermark, text, deformed, extra limbs"]
+      "widgets_values": ["(worst quality, low quality, normal quality:2), blurry, jpeg artifacts, plastic skin, airbrushed, smooth skin, waxy skin, changed face, changed identity, aged face, older, altered bone structure, exaggerated pores, harsh contrast, hallucinated fabric pattern, watermark, text, deformed, extra limbs"]
     },
     {
       "id": 8,
@@ -153,7 +153,7 @@
         {"name": "negative", "type": "CONDITIONING", "links": [],   "slot_index": 1}
       ],
       "properties": {"Node name for S&R": "ControlNetApplyAdvanced"},
-      "widgets_values": [0.9, 0.0, 0.9]
+      "widgets_values": [0.65, 0.0, 1.0]
     },
     {
       "id": 10,
@@ -225,7 +225,7 @@
         {"name": "LATENT", "type": "LATENT", "links": [19], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "KSampler"},
-      "widgets_values": [623550544877658, "randomize", 24, 6, "dpmpp_2m", "karras", 0.35]
+      "widgets_values": [623550544877658, "randomize", 24, 6, "dpmpp_2m", "karras", 0.30]
     },
     {
       "id": 14,
@@ -287,7 +287,7 @@
   "config": {},
   "extra": {
     "ds": {"scale": 0.6, "offset": [0, 0]},
-    "_note": "Clarity-style upscaler — SD1.5 + ControlNet Tile + TiledDiffusion. Two-path design: original image → ControlNet tile conditioning (spatial reference); 4x ESRGAN + 0.5x scale → VAEEncodeTiled → TiledDiffusion KSampler (24 steps, CFG 6, dpmpp_2m/karras, denoise 0.35) → VAEDecodeTiled → net ~2x with diffusion detail. FreeU_V2 (1.3/1.4/0.9/0.2) boosts SD1.5 detail sharpness. ~15-25s on 4090. Default upscaler: 4xLSDIR.pth (swap to 4x-UltraSharp.pth, 4x_NMKD-Siax_200k.pth, 4x_foolhardy_Remacri.pth, or 4xNomos8kDAT.pth in UpscaleModelLoader). Bundle: HUGGINGFACE_MODELS=clarity_bundle"
+    "_note": "Clarity-style upscaler — SD1.5 + ControlNet Tile + TiledDiffusion. Two-path design: original image → ControlNet tile conditioning (spatial reference); 4x ESRGAN + 0.5x scale → VAEEncodeTiled → TiledDiffusion KSampler (24 steps, CFG 6, dpmpp_2m/karras, denoise 0.30) → VAEDecodeTiled → net ~2x with diffusion detail. FreeU_V2 (1.3/1.4/0.9/0.2) boosts SD1.5 detail sharpness. ~15-25s on 4090. Default checkpoint: Realistic_Vision_V5.1_fp16-no-ema.safetensors (identity-preserving, original Clarity-style). Swap to DreamShaper_8_pruned.safetensors for more creative/aggressive enhancement. Default upscaler: 4xLSDIR.pth (swap to 4x-UltraSharp.pth, 4x_NMKD-Siax_200k.pth, 4x_foolhardy_Remacri.pth, or 4xNomos8kDAT.pth in UpscaleModelLoader). ControlNet strength 0.65 (original Clarity spec). Bundle: HUGGINGFACE_MODELS=clarity_bundle"
   },
   "version": 0.4
 }

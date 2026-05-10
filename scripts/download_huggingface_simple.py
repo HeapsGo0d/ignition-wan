@@ -119,6 +119,14 @@ WAN_MODELS = {
         'filename': 'control_v11f1e_sd15_tile_fp16.safetensors',
         'subdir': 'controlnet'
     },
+    # Realistic Vision V5.1 fp16 — photorealistic SD1.5 checkpoint (~2.1GB, no VAE)
+    # Conservative/neutral model; identity-preserving equivalent to Juggernaut Reborn
+    # (original Clarity checkpoint). noVAE version — ComfyUI uses its built-in SD1.5 VAE.
+    'realistic_vision_v5': {
+        'url': 'https://huggingface.co/SG161222/Realistic_Vision_V5.1_noVAE/resolve/main/Realistic_Vision_V5.1_fp16-no-ema.safetensors',
+        'filename': 'Realistic_Vision_V5.1_fp16-no-ema.safetensors',
+        'subdir': 'checkpoints'
+    },
     # --- ESRGAN upscale models for Clarity pre-stage (~60-80MB each) ---
     '4x_lsdir': {
         'url': 'https://huggingface.co/LS110824/upscale/resolve/main/4xLSDIR.pth',
@@ -179,8 +187,9 @@ WAN_BUNDLES = {
     'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
     # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
     'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    # Clarity image upscaler: DreamShaper SD1.5 + ControlNet Tile + 5 ESRGAN upscalers (~3.2GB total)
-    'clarity_bundle': ['dreamshaper_8', 'controlnet_tile_sd15', '4x_lsdir', '4x_ultrasharp', '4x_nmkd_siax', '4x_remacri', '4x_nomos8k'],
+    # Clarity image upscaler: 2 checkpoints + ControlNet Tile + 5 ESRGAN upscalers (~5.3GB total)
+    # realistic_vision_v5 = identity-preserving default; dreamshaper_8 = creative enhancement
+    'clarity_bundle': ['realistic_vision_v5', 'dreamshaper_8', 'controlnet_tile_sd15', '4x_lsdir', '4x_ultrasharp', '4x_nmkd_siax', '4x_remacri', '4x_nomos8k'],
 }
 
 

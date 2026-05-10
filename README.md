@@ -219,6 +219,17 @@ Two upscaling workflows are available. Both are in `workflows/` and work with th
 
 The Clarity workflow does a two-stage process: ESRGAN pixel upscale → 0.5× scale → diffusion detail pass. Net output is ~2× the input resolution.
 
+#### Node: CheckpointLoaderSimple — which diffusion model to use
+
+Two checkpoints ship in the `clarity_bundle`:
+
+| Checkpoint | Character | Best for |
+|---|---|---|
+| `Realistic_Vision_V5.1_fp16-no-ema.safetensors` *(default)* | Conservative, neutral, photorealistic. Preserves identity, age, bone structure. | Portraits, identity-critical work |
+| `DreamShaper_8_pruned.safetensors` | Creative/artistic. Beautifies and adds interpretive detail. | Fashion, objects, non-portrait work |
+
+**If faces look older or bone structure drifts — stay on Realistic Vision.** DreamShaper's creative bias is the primary cause of identity drift in upscaling.
+
 #### Node: UpscaleModelLoader — which ESRGAN to use
 
 | Model | Character | Best for |
@@ -236,15 +247,15 @@ The Clarity workflow does a two-stage process: ESRGAN pixel upscale → 0.5× sc
 | `steps` | 24 | More steps = more refined but slower. 20–30 is the useful range. |
 | `cfg` | 6 | How hard the diffusion pushes toward the prompt. Lower = softer/natural. Higher = sharper/riskier. |
 | `sampler` | dpmpp_2m | Leave this alone unless experimenting. |
-| `denoise` | **0.35** | **The most important dial.** 0 = no change, 1 = full redraw. 0.25–0.50 is the practical range. |
+| `denoise` | **0.30** | **The most important dial.** 0 = no change, 1 = full redraw. 0.20–0.45 is the practical range. |
 
 #### Node: ControlNetApplyAdvanced — how much the original is respected
 
 | Widget | Default | What it does |
 |---|---|---|
-| `strength` | 0.9 | How strongly original spatial structure guides output. Lower = more creative. |
+| `strength` | 0.65 | How strongly original spatial structure guides output. Original Clarity spec. Lower = more creative. |
 | `start` | 0.0 | When ControlNet kicks in (0 = from step 1). |
-| `end` | 0.9 | When ControlNet stops guiding. Lower = final steps are more freely diffused. |
+| `end` | 1.0 | When ControlNet stops. 1.0 = guides the full process. Lower = final steps are more freely diffused. |
 
 #### Node: FreeU_V2 — sharpness booster
 
@@ -273,13 +284,15 @@ Default `0.5` means: 4× ESRGAN then halve → net **2× output**. Change to `0.
 
 | Symptom | Fix |
 |---|---|
-| **Skin looks plastic / airbrushed** | Lower `denoise` to 0.20–0.25. Switch to `4x_NMKD-Siax_200k.pth`. Lower `cfg` to 4–5. Reduce `b1`/`b2` in FreeU to 1.1/1.2. |
-| **Over-processed / AI-looking** | Lower `denoise` to 0.20–0.25. Lower `cfg` to 3–4. Lower ControlNet `end` to 0.7. |
-| **Not enough detail / still blurry** | Raise `denoise` to 0.45–0.50. Switch to `4x-UltraSharp.pth`. Raise `cfg` to 7–8. |
-| **Fabric texture washed out** | Raise `denoise` to 0.40+. Switch to `4x-UltraSharp.pth`. Raise ControlNet `strength` to 0.95. |
+| **Face looks older / bone structure changed** | Switch checkpoint to `Realistic_Vision_V5.1_fp16-no-ema.safetensors` (if not already). This is the highest-impact change for identity preservation. Lower `denoise` to 0.20–0.22. |
+| **Skin looks plastic / airbrushed** | Switch to `Realistic_Vision_V5.1` checkpoint. Lower `denoise` to 0.20–0.25. Switch ESRGAN to `4x_NMKD-Siax_200k.pth`. Lower `cfg` to 4–5. |
+| **Over-processed / AI-looking** | Switch to `Realistic_Vision_V5.1` checkpoint. Lower `denoise` to 0.20–0.25. Lower `cfg` to 3–4. |
+| **Not enough detail / still blurry** | Raise `denoise` to 0.40–0.45. Switch ESRGAN to `4x-UltraSharp.pth`. Raise `cfg` to 7–8. For more aggressive: swap to `DreamShaper_8_pruned.safetensors`. |
+| **Want more creative enhancement (fashion, objects)** | Switch checkpoint to `DreamShaper_8_pruned.safetensors`. Raise `denoise` to 0.35–0.45. |
+| **Fabric texture washed out** | Raise `denoise` to 0.40+. Switch ESRGAN to `4x-UltraSharp.pth`. Raise ControlNet `strength` to 0.80. |
 | **Tile seams visible** | Increase `overlap` to 96 or 128 in TiledDiffusion. |
-| **Colours shifted / grading changed** | Lower `denoise`. Lower ControlNet `end` to 0.7. |
-| **Face distorted or anatomy wrong** | Lower `denoise` to 0.20–0.25. Lower `cfg` to 3–4. |
+| **Colours shifted / grading changed** | Lower `denoise`. Lower ControlNet `end` to 0.8. |
+| **Face distorted or anatomy wrong** | Lower `denoise` to 0.18–0.22. Lower `cfg` to 3–4. |
 | **Out of memory** | Lower `batch_size` in TiledDiffusion. Change ImageScaleBy to `0.25`. |
 | **Too slow** | Lower `steps` to 16–20. Switch to `4xLSDIR.pth` (fastest ESRGAN). |
 

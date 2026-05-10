@@ -156,7 +156,7 @@ get_configuration() {
     echo "  6) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
     echo "  7) NSFW I2V Full (all 3 NSFW I2V workflows, ~70GB)"
     echo "  --- Image upscaling ---"
-    echo "  8) Clarity bundle (DreamShaper SD1.5 + ControlNet Tile + 5 ESRGAN upscalers, ~3.2GB)"
+    echo "  8) Clarity bundle (Realistic Vision + DreamShaper + ControlNet Tile + 5 ESRGAN upscalers, ~5.3GB)"
     echo "  9) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
@@ -192,7 +192,7 @@ get_configuration() {
             ;;
         8)
             HUGGINGFACE_MODELS="clarity_bundle"
-            echo "  → Selected: Clarity bundle (~3.2GB — DreamShaper SD1.5 + ControlNet Tile + 5 ESRGAN upscalers)"
+            echo "  → Selected: Clarity bundle (~5.3GB — Realistic Vision + DreamShaper + ControlNet Tile + 5 ESRGAN upscalers)"
             echo "     Note: 4x_NMKD-Siax upscaler auto-downloaded by startup.sh"
             ;;
         9)
