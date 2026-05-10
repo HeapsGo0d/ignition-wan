@@ -109,7 +109,7 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "photographed on full-frame DSLR, 85mm portrait lens, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, gentle asymmetric lighting",
+        "Cinematic, High Contrast, hyper detailed photo-realistic maximum detail, 32k, photographed on full-frame DSLR, 85mm portrait lens, skin pore detailing, extreme meticulous detailing, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fine thread texture and fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, Color Grading, hyper sharpness, perfect without deformations",
         "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts, lace, fishnet, mesh fabric, crochet, embroidered lace, sheer patterned fabric, netted texture, guipure, lingerie lace trim"
       ]
     },
@@ -133,13 +133,13 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        44,
-        4.6, 2.6,
+        100,
+        7.5, 4.0,
         6,
         1.003,
-        1.0,
+        0.93,
         1.0, 0.78,
-        1.4,
+        1.0,
         false,
         "RestoreEDMSampler",
         1024, 512
@@ -203,7 +203,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — Quality preset (hero shots, controlled detail). v0Q, 44 steps, CFG 4.6→2.6, EDM s_churn=6, s_noise=1.003, control 1.0→0.78, restore_cfg=1.4 (light face anchor). Lace-safe: lower churn/noise vs previous. ~120-170s on 4090. If still hallucinating fabric: restore_cfg→2.0, churn→5. Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — Quality preset (hero shots, max detail). v0Q, 100 steps, CFG 7.5→4.0, EDM s_churn=6, s_noise=1.003, s_stage2=0.93 (creative texture), control 1.0→0.78, restore_cfg=1.0. ~200-250s on 4090. Tuned for Krea-like fabric/skin/hair detail. If hallucinating fabric: restore_cfg→1.4, s_stage2→1.0. Requires: SUPIR-v0Q.ckpt + sd_xl_base_1.0_0.9vae.safetensors. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }

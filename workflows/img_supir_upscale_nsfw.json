@@ -142,7 +142,7 @@
       ],
       "properties": {"Node name for S&R": "SUPIR_conditioner"},
       "widgets_values": [
-        "photographed on full-frame DSLR, 85mm portrait lens, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, gentle asymmetric lighting",
+        "Cinematic, High Contrast, hyper detailed photo-realistic maximum detail, 32k, photographed on full-frame DSLR, 85mm portrait lens, skin pore detailing, extreme meticulous detailing, natural skin with visible pores and fine peach-fuzz, subtle subsurface scattering, individual hair strands, wet catchlights in the iris, soft shadow on the jawline, fine thread texture and fabric weave visible on cloth, micro-contrast, shot on Kodak Portra, slight film grain, Color Grading, hyper sharpness, perfect without deformations",
         "plastic skin, waxy skin, airbrushed, smooth-shaded, painted, illustration, 3D render, oversharpened halos, doubled features, extra fingers, deformed hands, warped face, melted features, watermark, text overlay, jpeg artifacts, lace, fishnet, mesh fabric, crochet, embroidered lace, sheer patterned fabric, netted texture, guipure, lingerie lace trim"
       ]
     },
@@ -166,11 +166,11 @@
       "properties": {"Node name for S&R": "SUPIR_sample"},
       "widgets_values": [
         174277455657960, "randomize",
-        32,
-        4.0, 2.4,
+        50,
+        5.5, 3.2,
         5,
         1.003,
-        1.0,
+        0.95,
         1.0, 0.82,
         1.6,
         false,
@@ -238,7 +238,7 @@
       "scale": 0.6,
       "offset": [0, 0]
     },
-    "_note": "SUPIR NSFW upscale — Balanced (daily driver). 2-stage: 4x_NMKD-Siax_200k → 0.5x → SUPIR v0F. Net ~2x with SUPIR doing the generative texture work. CFG 4.0→2.4, EDM s_churn=5, s_noise=1.003, control 1.0→0.82, restore_cfg=1.6 (face anchor). ~90s on 4090. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/, 4x_NMKD-Siax_200k.pth auto-downloaded by startup.sh. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
+    "_note": "SUPIR NSFW upscale — Balanced (daily driver). 2-stage: 4x_NMKD-Siax_200k → 0.5x → SUPIR v0F. Net ~2x with SUPIR doing the generative texture work. CFG 5.5→3.2, EDM s_churn=5, s_noise=1.003, s_stage2=0.95 (slight creative texture), control 1.0→0.82, restore_cfg=1.6 (face anchor). ~110-130s on 4090. Requires: SUPIR-v0F.ckpt + sd_xl_base_1.0_0.9vae.safetensors in checkpoints/, 4x_NMKD-Siax_200k.pth auto-downloaded by startup.sh. Bundle: HUGGINGFACE_MODELS=supir_bundle. SUPIR non-commercial — see https://github.com/Fanghua-Yu/SUPIR"
   },
   "version": 0.4
 }
