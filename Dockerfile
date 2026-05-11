@@ -162,8 +162,11 @@ RUN mkdir -p \
 # Create HuggingFace cache directory
 RUN mkdir -p /workspace/.cache/huggingface
 
-# Install filebrowser
-RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash
+# Install filebrowser (pinned version — avoids GitHub API rate-limit causing empty version URL)
+RUN curl -fsSL -o /tmp/filebrowser.tar.gz \
+    "https://github.com/filebrowser/filebrowser/releases/download/v2.63.3/linux-amd64-filebrowser.tar.gz" \
+    && tar -xzf /tmp/filebrowser.tar.gz -C /usr/local/bin filebrowser \
+    && rm /tmp/filebrowser.tar.gz
 
 # Copy scripts and workflows
 COPY scripts/ /workspace/scripts/
