@@ -208,7 +208,8 @@ Two upscaling workflows are available. Both are in `workflows/` and work with th
 
 | Workflow | Engine | VRAM | Speed | Best for |
 |---|---|---|---|---|
-| `img_clarity_upscale.json` | SD1.5 + ControlNet Tile + TiledDiffusion | ~6GB | ~15–30s | Portraits, fabric, photorealistic detail |
+| `img_clarity_upscale.json` | SD1.5 + ControlNet Tile + TiledDiffusion | ~6GB | ~15–25s | Portraits, identity-critical, skin |
+| `img_clarity_upscale_detail.json` | SD1.5 + ControlNet Tile + TiledDiffusion | ~6GB | ~20–35s | Fabric, fashion, objects, non-portrait |
 | `img_supir_upscale_nsfw_detail.json` | SDXL (SUPIR) | ~16GB | ~200–250s | Hero shots, maximum micro-texture |
 | `img_supir_upscale_nsfw.json` | SDXL (SUPIR) | ~16GB | ~110–130s | Daily driver balanced quality |
 | `img_supir_upscale_nsfw_clean.json` | SDXL (SUPIR) | ~16GB | ~60–80s | Fast batch / lowest hallucination risk |
@@ -242,12 +243,14 @@ Two checkpoints ship in the `clarity_bundle`:
 
 #### Node: KSampler — the main quality dial
 
-| Widget | Default | What it does |
-|---|---|---|
-| `steps` | 24 | More steps = more refined but slower. 20–30 is the useful range. |
-| `cfg` | 6 | How hard the diffusion pushes toward the prompt. Lower = softer/natural. Higher = sharper/riskier. |
-| `sampler` | dpmpp_2m | Leave this alone unless experimenting. |
-| `denoise` | **0.30** | **The most important dial.** 0 = no change, 1 = full redraw. 0.20–0.45 is the practical range. |
+Portrait preset defaults; detail preset shown in brackets where different.
+
+| Widget | Portrait default | Detail default | What it does |
+|---|---|---|---|
+| `steps` | 24 | 24 | More steps = more refined but slower. 20–30 is the useful range. |
+| `cfg` | **4** | **5.5** | How hard the diffusion pushes toward the prompt. Lower = softer/natural. Higher = sharper/riskier. |
+| `sampler` | dpmpp_2m | dpmpp_2m | Leave this alone unless experimenting. |
+| `denoise` | **0.22** | **0.40** | **The most important dial.** 0 = no change, 1 = full redraw. Portrait: 0.18–0.30. Detail: 0.35–0.50. |
 
 #### Node: ControlNetApplyAdvanced — how much the original is respected
 
@@ -259,12 +262,14 @@ Two checkpoints ship in the `clarity_bundle`:
 
 #### Node: FreeU_V2 — sharpness booster
 
-| Widget | Default | What it does |
-|---|---|---|
-| `b1` | 1.3 | Boosts backbone scale-1 features (large shapes). >1 = more structure. |
-| `b2` | 1.4 | Boosts backbone scale-2 features (medium detail). |
-| `s1` | 0.9 | Suppresses skip-connection scale-1 (reduces ringing). |
-| `s2` | 0.2 | Suppresses skip-connection scale-2 (reduces artifacts). |
+Portrait preset uses softened values to avoid amplifying age cues and skin texture. Detail preset uses full standard Clarity values.
+
+| Widget | Portrait default | Detail default | What it does |
+|---|---|---|---|
+| `b1` | **1.1** | **1.3** | Boosts backbone scale-1 features (large shapes/structure). |
+| `b2` | **1.2** | **1.4** | Boosts backbone scale-2 features (medium detail/texture). |
+| `s1` | 0.9 | 0.9 | Suppresses skip-connection scale-1 (reduces ringing). |
+| `s2` | 0.2 | 0.2 | Suppresses skip-connection scale-2 (reduces artifacts). |
 
 #### Node: TiledDiffusion — handles large images without OOM
 
@@ -282,19 +287,22 @@ Default `0.5` means: 4× ESRGAN then halve → net **2× output**. Change to `0.
 
 #### Clarity Troubleshooting
 
+> Use `img_clarity_upscale.json` for portraits/faces. Use `img_clarity_upscale_detail.json` for fabric, fashion, and objects.
+
 | Symptom | Fix |
 |---|---|
-| **Face looks older / bone structure changed** | Switch checkpoint to `Realistic_Vision_V5.1_fp16-no-ema.safetensors` (if not already). This is the highest-impact change for identity preservation. Lower `denoise` to 0.20–0.22. |
-| **Skin looks plastic / airbrushed** | Switch to `Realistic_Vision_V5.1` checkpoint. Lower `denoise` to 0.20–0.25. Switch ESRGAN to `4x_NMKD-Siax_200k.pth`. Lower `cfg` to 4–5. |
-| **Over-processed / AI-looking** | Switch to `Realistic_Vision_V5.1` checkpoint. Lower `denoise` to 0.20–0.25. Lower `cfg` to 3–4. |
-| **Not enough detail / still blurry** | Raise `denoise` to 0.40–0.45. Switch ESRGAN to `4x-UltraSharp.pth`. Raise `cfg` to 7–8. For more aggressive: swap to `DreamShaper_8_pruned.safetensors`. |
-| **Want more creative enhancement (fashion, objects)** | Switch checkpoint to `DreamShaper_8_pruned.safetensors`. Raise `denoise` to 0.35–0.45. |
-| **Fabric texture washed out** | Raise `denoise` to 0.40+. Switch ESRGAN to `4x-UltraSharp.pth`. Raise ControlNet `strength` to 0.80. |
+| **Face looks older / bone structure changed** | Use portrait workflow. Lower `denoise` to 0.18–0.20. Lower `cfg` to 3–3.5. |
+| **Skin looks plastic / airbrushed** | Use portrait workflow. Lower `denoise` to 0.18–0.20. Switch ESRGAN to `4x_NMKD-Siax_200k.pth`. Lower `cfg` to 3–4. |
+| **Over-processed / AI-looking** | Use portrait workflow. Lower `denoise` to 0.18–0.22. Lower `cfg` to 3. |
+| **Not enough detail / still blurry** | Switch to detail workflow. Or raise `denoise` to 0.35–0.45 and switch ESRGAN to `4x-UltraSharp.pth`. |
+| **Fabric texture wrong / hallucinated** | Use detail workflow with `4x-UltraSharp.pth`. Raise ControlNet `strength` to 0.80. Keep `denoise` at 0.40. |
+| **Fabric too sharp for portraits** | Use portrait workflow — the lower denoise preserves original pattern better. |
+| **Want maximum creative enhancement** | Switch checkpoint to `DreamShaper_8_pruned.safetensors`. Raise `denoise` to 0.40–0.50. |
 | **Tile seams visible** | Increase `overlap` to 96 or 128 in TiledDiffusion. |
 | **Colours shifted / grading changed** | Lower `denoise`. Lower ControlNet `end` to 0.8. |
-| **Face distorted or anatomy wrong** | Lower `denoise` to 0.18–0.22. Lower `cfg` to 3–4. |
+| **Face distorted or anatomy wrong** | Lower `denoise` to 0.18–0.20. Lower `cfg` to 3. |
 | **Out of memory** | Lower `batch_size` in TiledDiffusion. Change ImageScaleBy to `0.25`. |
-| **Too slow** | Lower `steps` to 16–20. Switch to `4xLSDIR.pth` (fastest ESRGAN). |
+| **Too slow** | Lower `steps` to 16–20. Switch ESRGAN to `4xLSDIR.pth` (fastest). |
 
 ---
 

@@ -1,7 +1,7 @@
 {
-  "name": "Ignition WAN v1.0.43-clarity",
+  "name": "Ignition WAN v1.0.44-clarity",
   "description": "ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support",
-  "dockerImage": "heapsgo0d/ignition-wan:v1.0.43-clarity",
+  "dockerImage": "heapsgo0d/ignition-wan:v1.0.44-clarity",
   "ports": [
     {
       "privatePort": 8188,

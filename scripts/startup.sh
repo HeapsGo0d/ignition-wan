@@ -68,7 +68,7 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║   🎬 IGNITION WAN v1.0.43-clarity        ║"
+    log "INFO" "║   🎬 IGNITION WAN v1.0.44-clarity        ║"
     log "INFO" "║   ComfyUI Clarity Image Upscaler         ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"

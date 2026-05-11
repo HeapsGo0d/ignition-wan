@@ -31,7 +31,7 @@
         {"name": "UPSCALE_MODEL", "type": "UPSCALE_MODEL", "links": [3], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "UpscaleModelLoader"},
-      "widgets_values": ["4xLSDIR.pth"]
+      "widgets_values": ["4x-UltraSharp.pth"]
     },
     {
       "id": 3,
@@ -100,7 +100,7 @@
         {"name": "CONDITIONING", "type": "CONDITIONING", "links": [11], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "CLIPTextEncode"},
-      "widgets_values": ["faithful high-quality upscale, preserve identity, preserve age, preserve facial structure, natural skin texture, accurate fabric pattern, clean high resolution, subtle detail, original lighting"]
+      "widgets_values": ["high quality upscale, accurate fabric pattern, sharp fabric texture, fine detail, natural skin texture, clean high resolution, sharp focus, photorealistic"]
     },
     {
       "id": 7,
@@ -153,7 +153,7 @@
         {"name": "negative", "type": "CONDITIONING", "links": [],   "slot_index": 1}
       ],
       "properties": {"Node name for S&R": "ControlNetApplyAdvanced"},
-      "widgets_values": [0.65, 0.0, 1.0]
+      "widgets_values": [0.75, 0.0, 1.0]
     },
     {
       "id": 10,
@@ -187,7 +187,7 @@
         {"name": "MODEL", "type": "MODEL", "links": [17], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "FreeU_V2"},
-      "widgets_values": [1.1, 1.2, 0.9, 0.2]
+      "widgets_values": [1.3, 1.4, 0.9, 0.2]
     },
     {
       "id": 12,
@@ -225,7 +225,7 @@
         {"name": "LATENT", "type": "LATENT", "links": [19], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "KSampler"},
-      "widgets_values": [623550544877658, "randomize", 24, 4, "dpmpp_2m", "karras", 0.22]
+      "widgets_values": [623550544877658, "randomize", 24, 5.5, "dpmpp_2m", "karras", 0.40]
     },
     {
       "id": 14,
@@ -258,7 +258,7 @@
       ],
       "outputs": [],
       "properties": {"Node name for S&R": "SaveImage"},
-      "widgets_values": ["Clarity_upscale"]
+      "widgets_values": ["Clarity_detail_upscale"]
     }
   ],
   "links": [
@@ -287,7 +287,7 @@
   "config": {},
   "extra": {
     "ds": {"scale": 0.6, "offset": [0, 0]},
-    "_note": "Clarity portrait preset — identity-safe SD1.5 upscaler. KSampler: 24 steps, CFG 4, denoise 0.22. FreeU_V2 (1.1/1.2/0.9/0.2) softened to avoid amplifying age cues. ControlNet Tile strength 0.65, full guidance 0.0→1.0. Default checkpoint: Realistic_Vision_V5.1_fp16-no-ema.safetensors. Default ESRGAN: 4xLSDIR.pth (swap to 4x_NMKD-Siax_200k.pth for skin-heavy shots). For fabric/fashion/objects use img_clarity_upscale_detail.json. Bundle: HUGGINGFACE_MODELS=clarity_bundle"
+    "_note": "Clarity detail preset — fabric, fashion, objects, non-portrait. KSampler: 24 steps, CFG 5.5, denoise 0.40. FreeU_V2 (1.3/1.4/0.9/0.2) full standard Clarity values for texture synthesis. ControlNet Tile strength 0.75, full guidance 0.0→1.0. ESRGAN: 4x-UltraSharp.pth for sharp fabric/edge detail. For portraits and identity-critical images use img_clarity_upscale.json instead. Bundle: HUGGINGFACE_MODELS=clarity_bundle"
   },
   "version": 0.4
 }
