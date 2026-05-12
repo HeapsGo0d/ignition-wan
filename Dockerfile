@@ -48,7 +48,8 @@ RUN pip install --no-cache-dir \
     requests aiohttp aiofiles \
     huggingface-hub tqdm \
     pillow numpy opencv-python \
-    psutil onnx onnxruntime
+    psutil onnx onnxruntime \
+    sentencepiece
 
 # ComfyUI — filter torch packages to prevent nightly downgrade
 RUN git clone https://github.com/comfyanonymous/ComfyUI.git /workspace/ComfyUI && \
