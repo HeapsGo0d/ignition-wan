@@ -134,7 +134,7 @@
         {"name": "MODEL", "type": "MODEL", "links": [21], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "LoraLoaderModelOnly"},
-      "widgets_values": ["wan2.2_t2v_lightx2v_4steps_lora_v1_high_noise.safetensors", 1.0]
+      "widgets_values": ["wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors", 1.0]
     },
     {
       "id": 9,
