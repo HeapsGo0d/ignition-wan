@@ -147,42 +147,55 @@ get_configuration() {
 
     # LTX-2.3 Model Preset Selection
     echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
-    echo "  1) Distilled FP8 bundle (T2V + I2V, ~53GB, needs HF_TOKEN for Gemma)"
-    echo "  2) Dev FP8 bundle (highest quality, ~53GB, needs HF_TOKEN for Gemma)"
-    echo "  3) NVFP4 bundle (RTX 5090 Blackwell only, ~46GB, fastest)"
-    echo "  4) Full bundle (distilled FP8 + distilled LoRA + upscalers, ~63GB)"
-    echo "  5) Custom (manual entry)"
+    echo "  Gemma FP8 bundles (~12 GB Gemma, no token needed):"
+    echo "  1) Distilled FP8 + Gemma FP8     (~41 GB, T2V + I2V — recommended)"
+    echo "  2) Dev FP8 + Gemma FP8           (~41 GB, highest quality diffusion)"
+    echo "  3) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
+    echo "  4) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
+    echo "  Gemma BF16 bundles (~24 GB Gemma, full text encoder quality):"
+    echo "  5) Distilled FP8 + Gemma BF16    (~53 GB)"
+    echo "  6) Dev FP8 + Gemma BF16          (~53 GB)"
+    echo "  7) Full bundle + Gemma BF16      (~63 GB, FP8 + LoRA + upscalers)"
+    echo "  8) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
-            echo "  → Selected: Distilled FP8 bundle (~53GB, T2V + I2V)"
-            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
+            echo "  → Selected: Distilled FP8 + Gemma FP8 (~41 GB)"
             ;;
         2)
             HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
-            echo "  → Selected: Dev FP8 bundle (~53GB, highest quality)"
-            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
+            echo "  → Selected: Dev FP8 + Gemma FP8 (~41 GB)"
             ;;
         3)
             HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
-            echo "  → Selected: NVFP4 bundle (~46GB, Blackwell/RTX 5090 only)"
-            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
+            echo "  → Selected: NVFP4 + Gemma FP8 (~34 GB, Blackwell/RTX 5090 only)"
             ;;
         4)
             HUGGINGFACE_MODELS="ltx2.3_full_bundle"
-            echo "  → Selected: Full bundle (~63GB, distilled FP8 + LoRA + upscalers)"
-            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
+            echo "  → Selected: Full bundle + Gemma FP8 (~51 GB)"
             ;;
         5)
+            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle_bf16"
+            echo "  → Selected: Distilled FP8 + Gemma BF16 (~53 GB)"
+            ;;
+        6)
+            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle_bf16"
+            echo "  → Selected: Dev FP8 + Gemma BF16 (~53 GB)"
+            ;;
+        7)
+            HUGGINGFACE_MODELS="ltx2.3_full_bundle_bf16"
+            echo "  → Selected: Full bundle + Gemma BF16 (~63 GB)"
+            ;;
+        8)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
-            echo "  → Invalid selection, defaulting to distilled FP8 bundle"
+            echo "  → Invalid selection, defaulting to Distilled FP8 + Gemma FP8"
             ;;
     esac
     echo ""
@@ -272,7 +285,7 @@ generate_template() {
       "key": "FILEBROWSER_PASSWORD",
       "value": "$FILEBROWSER_PASSWORD",
       "description": "Password for file browser access"
-    },
+    }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
 }
@@ -328,12 +341,6 @@ generate_instructions() {
    - Add network volume for persistent model storage
    - Deploy!
 
-## ⚠️ Required: HuggingFace Token
-
-The Gemma 3 12B text encoder is a **gated model** on HuggingFace.
-Set \`HF_TOKEN\` to your HuggingFace token, and accept the Gemma 3 license at:
-https://huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized
-
 ## Access URLs
 
 Once your pod is running:
@@ -345,23 +352,33 @@ Once your pod is running:
 
 ## LTX-2.3 Model Presets
 
-Set \`HUGGINGFACE_MODELS\` to one of these bundle keys:
+Gemma text encoder sourced from **Comfy-Org/ltx-2** — no HF token required.
 
-| Key | Models Downloaded | Disk | VRAM | Use Case |
-|-----|------------------|------|------|----------|
-| \`ltx2.3_distilled_fp8_bundle\` | Distilled FP8 + Gemma 3 12B | ~53GB | ~18-20GB | T2V + I2V (fast) |
-| \`ltx2.3_dev_fp8_bundle\` | Dev FP8 + Gemma 3 12B | ~53GB | ~20-22GB | T2V + I2V (quality) |
-| \`ltx2.3_nvfp4_bundle\` | Dev NVFP4 + Gemma 3 12B | ~46GB | ~14GB | RTX 5090 Blackwell only |
-| \`ltx2.3_full_bundle\` | Distilled FP8 + LoRA + Gemma + upscalers | ~63GB | ~20GB | Two-stage pipeline |
+**Gemma FP8 bundles** (12 GB Gemma, recommended):
 
-Individual keys also work: \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`ltx2.3_dev_nvfp4\`, \`gemma3_text_encoder\`, \`ltx2.3_spatial_x2\`, \`ltx2.3_temporal_x2\`
+| Key | Disk | VRAM | Use Case |
+|-----|------|------|----------|
+| \`ltx2.3_distilled_fp8_bundle\` | ~41 GB | ~18-20 GB | T2V + I2V (fast) |
+| \`ltx2.3_dev_fp8_bundle\` | ~41 GB | ~20-22 GB | T2V + I2V (quality) |
+| \`ltx2.3_nvfp4_bundle\` | ~34 GB | ~14 GB | RTX 5090 Blackwell only |
+| \`ltx2.3_full_bundle\` | ~51 GB | ~20 GB | FP8 + LoRA + upscalers |
+
+**Gemma BF16 bundles** (24 GB Gemma, full text encoder quality):
+
+| Key | Disk | VRAM | Use Case |
+|-----|------|------|----------|
+| \`ltx2.3_distilled_fp8_bundle_bf16\` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
+| \`ltx2.3_dev_fp8_bundle_bf16\` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
+| \`ltx2.3_full_bundle_bf16\` | ~63 GB | ~24 GB | BF16 + LoRA + upscalers |
+
+Individual keys: \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`ltx2.3_dev_nvfp4\`, \`gemma3_text_encoder\`, \`gemma3_text_encoder_bf16\`, \`ltx2.3_spatial_x2\`, \`ltx2.3_temporal_x2\`
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
 | \`HUGGINGFACE_MODELS\` | LTX-2.3 bundle or comma-separated keys | \`ltx2.3_distilled_fp8_bundle\` |
-| \`HF_TOKEN\` | HuggingFace API token (**required** for Gemma) | \`hf_xxx\` |
+| \`HF_TOKEN\` | HuggingFace token (optional — only needed for private repos) | \`hf_xxx\` |
 | \`CIVITAI_MODELS\` | CivitAI checkpoint IDs (optional) | \`138977\` |
 | \`CIVITAI_LORAS\` | CivitAI LoRA IDs (optional) | \`182404\` |
 | \`CIVITAI_TOKEN\` | CivitAI API token (optional) | \`abc123\` |
@@ -454,7 +471,7 @@ deploy_template() {
     {"key": "CIVITAI_VAES", "value": "$CIVITAI_VAES"},
     {"key": "CIVITAI_TOKEN", "value": "{{ RUNPOD_SECRET_civitai.com }}"},
     {"key": "HF_TOKEN", "value": "{{ RUNPOD_SECRET_huggingface.co }}"},
-    {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"},
+    {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"}
   ]
 }
 EOF
@@ -477,7 +494,11 @@ EOF
 EOF
 )")
 
-    # Error detection
+    # Error detection — check for non-JSON response first (e.g. "Internal Server Error")
+    if ! echo "$response" | grep -q '^{'; then
+        echo -e "${RED}❌ API returned non-JSON response:${NC} $response"
+        return 1
+    fi
     if echo "$response" | grep -q '"errors"'; then
         echo -e "${RED}❌ API Error:${NC}"
         if $HAS_JQ; then

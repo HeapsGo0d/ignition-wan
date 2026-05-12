@@ -91,17 +91,30 @@ LTX_MODELS = {
 }
 
 # Convenience bundle keys that expand to multiple models
+# _fp8 bundles use Gemma FP8 (~12 GB); _bf16 bundles use Gemma BF16 (~24 GB, full quality)
 LTX_BUNDLES = {
-    # Quickstart: distilled fp8 + Gemma FP8 (~41 GB, no token needed)
+    # Quickstart: distilled fp8 + Gemma FP8 (~41 GB)
     'ltx2.3_distilled_fp8_bundle': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder'],
+    # Quickstart BF16 Gemma: distilled fp8 + Gemma BF16 (~53 GB, full text encoder quality)
+    'ltx2.3_distilled_fp8_bundle_bf16': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder_bf16'],
     # Dev fp8 + Gemma FP8 (~41 GB)
     'ltx2.3_dev_fp8_bundle': ['ltx2.3_dev_fp8', 'gemma3_text_encoder'],
+    # Dev fp8 + Gemma BF16 (~53 GB)
+    'ltx2.3_dev_fp8_bundle_bf16': ['ltx2.3_dev_fp8', 'gemma3_text_encoder_bf16'],
     # Blackwell: NVFP4 dev + Gemma FP8 (~34 GB, RTX 5090 only)
     'ltx2.3_nvfp4_bundle': ['ltx2.3_dev_nvfp4', 'gemma3_text_encoder'],
+    # Blackwell BF16 Gemma: NVFP4 dev + Gemma BF16 (~46 GB, RTX 5090 only)
+    'ltx2.3_nvfp4_bundle_bf16': ['ltx2.3_dev_nvfp4', 'gemma3_text_encoder_bf16'],
     # Full distilled: fp8 + distilled LoRA + Gemma FP8 + upscalers (~51 GB, two-stage pipeline)
     'ltx2.3_full_bundle': [
         'ltx2.3_distilled_fp8', 'ltx2.3_distilled_lora',
         'gemma3_text_encoder',
+        'ltx2.3_spatial_x2', 'ltx2.3_temporal_x2'
+    ],
+    # Full BF16 Gemma: fp8 + distilled LoRA + Gemma BF16 + upscalers (~63 GB)
+    'ltx2.3_full_bundle_bf16': [
+        'ltx2.3_distilled_fp8', 'ltx2.3_distilled_lora',
+        'gemma3_text_encoder_bf16',
         'ltx2.3_spatial_x2', 'ltx2.3_temporal_x2'
     ],
     # Upscalers only (if main model already downloaded)
