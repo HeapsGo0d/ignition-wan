@@ -68,8 +68,8 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION WAN v1.0.28            ║"
-    log "INFO" "║    ComfyUI WAN 2.2 Video Generation      ║"
+    log "INFO" "║       🎬 IGNITION LTX v1.0.0             ║"
+    log "INFO" "║    ComfyUI LTX-2.3 Video Generation      ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
     log "INFO" ""
@@ -84,7 +84,6 @@ print_config() {
     log "INFO" "  • Storage: RunPod volume (/workspace)"
     log "INFO" "  • ComfyUI Port: $COMFYUI_PORT"
     log "INFO" "  • File Browser Port: $FILEBROWSER_PORT"
-    log "INFO" "  • SageAttention: ${ENABLE_SAGEATTN:-false}"
     log "INFO" ""
 }
 
@@ -116,9 +115,9 @@ check_system() {
 setup_storage() {
     log "INFO" "💾 Setting up model directories..."
     
-    mkdir -p "$COMFYUI_ROOT/models"/{checkpoints,loras,vae,embeddings,controlnet,upscale_models,diffusion_models,text_encoders,clip,clip_vision,unet}
+    mkdir -p "$COMFYUI_ROOT/models"/{checkpoints,loras,vae,embeddings,controlnet,upscale_models,diffusion_models,text_encoders,clip,clip_vision,unet,latent_upscale_models}
 
-    for model_type in checkpoints loras vae embeddings controlnet upscale_models diffusion_models text_encoders clip clip_vision unet; do
+    for model_type in checkpoints loras vae embeddings controlnet upscale_models diffusion_models text_encoders clip clip_vision unet latent_upscale_models; do
         log "INFO" "  • Created $model_type directory"
     done
     
@@ -147,49 +146,6 @@ download_models() {
     log "INFO" ""
 }
 
-prefetch_support_models() {
-    log "INFO" "📦 Prefetching support models (RIFE + upscaler)..."
-
-    # Node looks for ckpts/rife/rife49.pth — the rife/ subdirectory is required
-    local RIFE_DIR="$COMFYUI_ROOT/custom_nodes/ComfyUI-Frame-Interpolation/ckpts/rife"
-    local UPSCALE_DIR="$COMFYUI_ROOT/models/upscale_models"
-
-    mkdir -p "$RIFE_DIR" "$UPSCALE_DIR"
-
-    local rife_status="missing"
-    local upscale_status="missing"
-
-    # aria2c requires -d (directory) + -o (filename) — absolute paths in -o are not supported
-    if [[ ! -f "$RIFE_DIR/rife49.pth" ]]; then
-        log "INFO" "  • Downloading rife49.pth (~27MB)..."
-        aria2c -x4 -q --continue=true \
-            -d "$RIFE_DIR" -o "rife49.pth" \
-            "https://huggingface.co/marduk191/rife/resolve/main/rife49.pth" \
-            && rife_status="ready" \
-            || log "WARN" "  ⚠️  rife49.pth download failed — RIFE node will auto-download on first use"
-    else
-        log "INFO" "  • rife49.pth already cached"
-        rife_status="ready (cached)"
-    fi
-
-    if [[ ! -f "$UPSCALE_DIR/4xLSDIR.pth" ]]; then
-        log "INFO" "  • Downloading 4xLSDIR.pth (~67MB)..."
-        aria2c -x4 -q --continue=true \
-            -d "$UPSCALE_DIR" -o "4xLSDIR.pth" \
-            "https://huggingface.co/LS110824/upscale/resolve/main/4xLSDIR.pth" \
-            && upscale_status="ready" \
-            || log "WARN" "  ⚠️  4xLSDIR.pth download failed — upscale node will not work"
-    else
-        log "INFO" "  • 4xLSDIR.pth already cached"
-        upscale_status="ready (cached)"
-    fi
-
-    log "INFO" "  ┌─ Support model status ──────────────────┐"
-    log "INFO" "  │  RIFE (rife49.pth):    $rife_status"
-    log "INFO" "  │  Upscaler (4xLSDIR):   $upscale_status"
-    log "INFO" "  └────────────────────────────────────────┘"
-    log "INFO" ""
-}
 
 start_filebrowser() {
     log "INFO" "📁 Starting file browser..."
@@ -459,8 +415,6 @@ main() {
     fi
 
     download_models
-    prefetch_support_models
-
     start_filebrowser
     gpu_preflight
     disable_manager_network
@@ -476,34 +430,6 @@ main() {
             log "WARN" "⚠️  Performance plugin installation had issues, continuing"
         fi
         log "INFO" ""
-    fi
-
-    # SageAttention3: Blackwell-native CUDA kernels compiled at image build time (sm_120)
-    # SA3 avoids SA2++ Triton JIT path which is broken on sm_120 (device kernel image is invalid)
-    # Do NOT add --use-sage-attention to COMFY_FLAGS (Triton backend breaks WAN 2.2 MoE)
-    # Use KJNodes patch node with backend: sageattn3
-    # Runtime GPU tensor test is required — import success alone does not guarantee kernel works
-    if [[ "${ENABLE_SAGEATTN:-false}" == "true" ]]; then
-        if python3 - <<'SATEST' 2>/dev/null
-import torch, sys
-try:
-    from sageattn3 import sageattn3_blackwell
-    B,H,N,D = 1,24,256,128
-    q = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
-    k = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
-    v = torch.randn(B,H,N,D, device='cuda', dtype=torch.float16)
-    sageattn3_blackwell(q,k,v,is_causal=False)
-    sys.exit(0)
-except Exception:
-    sys.exit(1)
-SATEST
-        then
-            log "INFO" "⚡ SageAttention3 Blackwell ready — workflow: KJNodes patch node → sageattn3"
-        else
-            log "WARN" "⚡ SageAttention3 runtime check FAILED — SA3 kernel invalid for this GPU/driver"
-            log "WARN" "  Set KJNodes SA patch node backend to: disabled"
-            log "WARN" "  Generation works normally without SA — performance only, not correctness"
-        fi
     fi
 
     log "INFO" "🚀 All services started successfully"

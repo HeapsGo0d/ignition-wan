@@ -1,157 +1,113 @@
 #!/usr/bin/env python3
 """
-Simple HuggingFace downloader for Ignition WAN.
-Uses aria2c for reliable downloads with direct model URLs.
-Models sourced from Comfy-Org/Wan_2.2_ComfyUI_Repackaged for optimized ComfyUI compatibility.
+Simple HuggingFace downloader for Ignition LTX.
+Uses aria2c for single-file downloads, huggingface_hub snapshot_download for multi-file repos.
+Models sourced from Lightricks/LTX-2.3 and google/gemma-3-12b-it-qat-q4_0-unquantized.
 """
 
 import os
 import sys
 import argparse
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 # Import shared utilities
 from download_utils import log, download_with_aria2, validate_huggingface_repo, validate_models_list
 
-WAN_REPACKAGED_REPO = "Comfy-Org/Wan_2.2_ComfyUI_Repackaged"
+LTX_MAIN_REPO = "Lightricks/LTX-2.3"
+LTX_FP8_REPO = "Lightricks/LTX-2.3-fp8"
+LTX_NVFP4_REPO = "Lightricks/LTX-2.3-nvfp4"
 
-WAN_MODELS = {
-    # --- Text-to-Video (T2V) ---
-    'wan2.2_t2v_fp8': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors',
-        'filename': 'wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors',
-        'subdir': 'diffusion_models'
+# Single-file model downloads (aria2c)
+# All main LTX-2.3 model files go into models/checkpoints/ (ComfyUI-LTXVideo convention)
+# Upscalers go into models/latent_upscale_models/
+# VAE is bundled inside the main model — no separate VAE download needed
+LTX_MODELS = {
+    # --- Main models (BF16, ~46 GB each) ---
+    'ltx2.3_dev': {
+        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-22b-dev.safetensors',
+        'filename': 'ltx-2.3-22b-dev.safetensors',
+        'subdir': 'checkpoints'
     },
-    'wan2.2_t2v_high_noise_fp8': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors',
-        'filename': 'wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors',
-        'subdir': 'diffusion_models'
+    'ltx2.3_distilled': {
+        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-22b-distilled-1.1.safetensors',
+        'filename': 'ltx-2.3-22b-distilled-1.1.safetensors',
+        'subdir': 'checkpoints'
     },
-    'wan2.2_t2v_fp16': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_t2v_low_noise_14B_fp16.safetensors',
-        'filename': 'wan2.2_t2v_low_noise_14B_fp16.safetensors',
-        'subdir': 'diffusion_models'
+    # --- FP8 models (~29 GB each) ---
+    'ltx2.3_dev_fp8': {
+        'url': f'https://huggingface.co/{LTX_FP8_REPO}/resolve/main/ltx-2.3-22b-dev-fp8.safetensors',
+        'filename': 'ltx-2.3-22b-dev-fp8.safetensors',
+        'subdir': 'checkpoints'
     },
-    # --- Image-to-Video (I2V) ---
-    'wan2.2_i2v_fp8': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors',
-        'filename': 'wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors',
-        'subdir': 'diffusion_models'
+    'ltx2.3_distilled_fp8': {
+        'url': f'https://huggingface.co/{LTX_FP8_REPO}/resolve/main/ltx-2.3-22b-distilled-fp8.safetensors',
+        'filename': 'ltx-2.3-22b-distilled-fp8.safetensors',
+        'subdir': 'checkpoints'
     },
-    'wan2.2_i2v_high_noise_fp8': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors',
-        'filename': 'wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors',
-        'subdir': 'diffusion_models'
+    # --- NVFP4 model (~21.7 GB, RTX 5090 / Blackwell only) ---
+    'ltx2.3_dev_nvfp4': {
+        'url': f'https://huggingface.co/{LTX_NVFP4_REPO}/resolve/main/ltx-2.3-22b-dev-nvfp4.safetensors',
+        'filename': 'ltx-2.3-22b-dev-nvfp4.safetensors',
+        'subdir': 'checkpoints'
     },
-    'wan2.2_i2v_fp16': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors',
-        'filename': 'wan2.2_i2v_low_noise_14B_fp16.safetensors',
-        'subdir': 'diffusion_models'
-    },
-    # --- Text Encoder (shared by all WAN 2.2 models) ---
-    'umt5_xxl_fp8': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors',
-        'filename': 'umt5_xxl_fp8_e4m3fn_scaled.safetensors',
-        'subdir': 'text_encoders'
-    },
-    # --- VAE ---
-    'wan_vae': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/vae/wan_2.1_vae.safetensors',
-        'filename': 'wan_2.1_vae.safetensors',
-        'subdir': 'vae'
-    },
-    # --- CLIP Vision (required for I2V image conditioning) ---
-    # Note: clip_vision_h is in the WAN 2.1 repackaged repo, not 2.2
-    'clip_vision_h': {
-        'url': 'https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors',
-        'filename': 'clip_vision_h.safetensors',
-        'subdir': 'clip_vision'
-    },
-    # --- LightX2V LoRAs: T2V (4-step accelerated generation, v1.1) ---
-    'lightx2v_t2v_low_noise': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors',
-        'filename': 'wan2.2_t2v_lightx2v_4steps_lora_v1.1_low_noise.safetensors',
+    # --- Distilled LoRA (7.61 GB, required for two-stage upscale pipelines) ---
+    'ltx2.3_distilled_lora': {
+        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-22b-distilled-lora-384-1.1.safetensors',
+        'filename': 'ltx-2.3-22b-distilled-lora-384-1.1.safetensors',
         'subdir': 'loras'
     },
-    'lightx2v_t2v_high_noise': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors',
-        'filename': 'wan2.2_t2v_lightx2v_4steps_lora_v1.1_high_noise.safetensors',
-        'subdir': 'loras'
+    # --- Spatial upscalers (~1 GB each, latent_upscale_models/) ---
+    'ltx2.3_spatial_x2': {
+        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-spatial-upscaler-x2-1.1.safetensors',
+        'filename': 'ltx-2.3-spatial-upscaler-x2-1.1.safetensors',
+        'subdir': 'latent_upscale_models'
     },
-    # --- NSFW/Uncensored Models ---
-    # FX-FeiHou Remix NSFW v3.0 (age-gate repo - set HF_TOKEN if downloads fail)
-    # fp8_e4m3fn native — improved anatomy, motion, scene consistency over v2.0
-    'remix_nsfw_i2v_high': {
-        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_high_lighting_fp8_e4m3fn_v3.0.safetensors',
-        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_high_lighting_fp8_e4m3fn_v3.0.safetensors',
-        'subdir': 'diffusion_models'
+    'ltx2.3_spatial_x1_5': {
+        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-spatial-upscaler-x1.5-1.0.safetensors',
+        'filename': 'ltx-2.3-spatial-upscaler-x1.5-1.0.safetensors',
+        'subdir': 'latent_upscale_models'
     },
-    'remix_nsfw_i2v_low': {
-        'url': 'https://huggingface.co/FX-FeiHou/wan2.2-Remix/resolve/main/NSFW/Wan2.2_Remix_NSFW_i2v_14b_low_lighting_fp8_e4m3fn_v3.0.safetensors',
-        'filename': 'Wan2.2_Remix_NSFW_i2v_14b_low_lighting_fp8_e4m3fn_v3.0.safetensors',
-        'subdir': 'diffusion_models'
+    # --- Temporal upscaler (262 MB) ---
+    'ltx2.3_temporal_x2': {
+        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-temporal-upscaler-x2-1.0.safetensors',
+        'filename': 'ltx-2.3-temporal-upscaler-x2-1.0.safetensors',
+        'subdir': 'latent_upscale_models'
     },
-    # Phr00t MEGA v12.2 — single unified file (I2V+T2V), bf16 Fun/VACE base, rCM+LightX2V baked in
-    # Load same file in both UNETLoader nodes. Best sampler: dpmpp_sde / beta.
-    'phr00t_mega_nsfw': {
-        'url': 'https://huggingface.co/Phr00t/WAN2.2-14B-Rapid-AllInOne/resolve/main/Mega-v12/wan2.2-rapid-mega-aio-nsfw-v12.2.safetensors',
-        'filename': 'wan2.2-rapid-mega-aio-nsfw-v12.2.safetensors',
-        'subdir': 'diffusion_models'
-    },
-    # General NSFW LoRA — single file works for both high and low noise stages
-    'nsfw_lora_h': {
-        'url': 'https://huggingface.co/rahul7star/wan2.2Lora/resolve/main/wan2.2/NSFW-22-H-e8.safetensors',
-        'filename': 'NSFW-22-H-e8.safetensors',
-        'subdir': 'loras'
-    },
-    # --- LightX2V LoRAs: I2V (4-step accelerated generation, v1) ---
-    'lightx2v_i2v_low_noise': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
-        'filename': 'wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors',
-        'subdir': 'loras'
-    },
-    'lightx2v_i2v_high_noise': {
-        'url': f'https://huggingface.co/{WAN_REPACKAGED_REPO}/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors',
-        'filename': 'wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors',
-        'subdir': 'loras'
+    # --- Gemma 3 text encoder (snapshot: 5 safetensors shards, ~24 GB, gated — HF_TOKEN required) ---
+    # Downloads entire repo to models/text_encoders/gemma-3-12b-it-qat-q4_0-unquantized/
+    'gemma3_text_encoder': {
+        'type': 'snapshot',
+        'repo_id': 'google/gemma-3-12b-it-qat-q4_0-unquantized',
+        'local_subdir': 'text_encoders/gemma-3-12b-it-qat-q4_0-unquantized'
     },
 }
 
 # Convenience bundle keys that expand to multiple models
-WAN_BUNDLES = {
-    # T2V: both noise variants + text encoder + VAE + LightX2V LoRAs (complete for all T2V templates)
-    'wan2.2_t2v_bundle': ['wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
-    # T2V alias kept for clarity
-    'wan2.2_t2v_lightx2v_bundle': ['wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
-    # I2V: both noise variants + text encoder + VAE + CLIP + LightX2V LoRAs (complete for all I2V templates)
-    'wan2.2_i2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
-    # I2V alias kept for clarity
-    'wan2.2_i2v_lightx2v_bundle': ['wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
-    # Full: everything for T2V + I2V including all LightX2V LoRAs
-    'wan2.2_full_bundle': ['wan2.2_t2v_fp8', 'wan2.2_t2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'wan2.2_i2v_high_noise_fp8', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h', 'lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise', 'lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
-    # LightX2V LoRAs only (if models already downloaded)
-    'lightx2v_t2v_bundle': ['lightx2v_t2v_low_noise', 'lightx2v_t2v_high_noise'],
-    'lightx2v_i2v_bundle': ['lightx2v_i2v_low_noise', 'lightx2v_i2v_high_noise'],
-    # NSFW bundles
-    'nsfw_lora_bundle': ['nsfw_lora_h'],
-    'remix_nsfw_i2v_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    'phr00t_mega_nsfw_bundle': ['phr00t_mega_nsfw', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
-    # All 3 NSFW I2V workflows: Remix v3.0 + Phr00t MEGA + official SFW base + NSFW/LightX2V LoRAs (~70GB)
-    'nsfw_i2v_full_bundle': ['remix_nsfw_i2v_high', 'remix_nsfw_i2v_low', 'phr00t_mega_nsfw', 'wan2.2_i2v_high_noise_fp8', 'wan2.2_i2v_fp8', 'lightx2v_i2v_high_noise', 'lightx2v_i2v_low_noise', 'nsfw_lora_h', 'umt5_xxl_fp8', 'wan_vae', 'clip_vision_h'],
+LTX_BUNDLES = {
+    # Quickstart: distilled fp8 + Gemma (~53 GB, needs HF_TOKEN for Gemma)
+    'ltx2.3_distilled_fp8_bundle': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder'],
+    # Dev fp8 + Gemma (~53 GB)
+    'ltx2.3_dev_fp8_bundle': ['ltx2.3_dev_fp8', 'gemma3_text_encoder'],
+    # Blackwell: NVFP4 dev + Gemma (~46 GB, RTX 5090 only)
+    'ltx2.3_nvfp4_bundle': ['ltx2.3_dev_nvfp4', 'gemma3_text_encoder'],
+    # Full distilled: fp8 + distilled LoRA + Gemma + upscalers (~63 GB, two-stage pipeline)
+    'ltx2.3_full_bundle': [
+        'ltx2.3_distilled_fp8', 'ltx2.3_distilled_lora',
+        'gemma3_text_encoder',
+        'ltx2.3_spatial_x2', 'ltx2.3_temporal_x2'
+    ],
+    # Upscalers only (if main model already downloaded)
+    'ltx2.3_upscalers_bundle': ['ltx2.3_spatial_x2', 'ltx2.3_spatial_x1_5', 'ltx2.3_temporal_x2'],
 }
 
 
-def normalize_wan_key(model_input: str) -> str:
-    """Expand bundle keys and normalize repo names to internal WAN keys."""
-    # Expand bundles to comma-separated key lists
-    if model_input in WAN_BUNDLES:
-        return ','.join(WAN_BUNDLES[model_input])
-
-    # If it's already a known key, return as-is
-    if model_input in WAN_MODELS:
+def normalize_ltx_key(model_input: str) -> str:
+    """Expand bundle keys to comma-separated model key lists."""
+    if model_input in LTX_BUNDLES:
+        return ','.join(LTX_BUNDLES[model_input])
+    if model_input in LTX_MODELS:
         return model_input
-
     return model_input
 
 
@@ -175,17 +131,43 @@ def parse_generic_repo(model_input: str) -> Optional[Dict[str, str]]:
     }
 
 
-def download_wan_model(model_key: str, base_output_dir: Path, token: str = "", force: bool = False) -> bool:
-    """Download a WAN model - supports both predefined models and generic HF repos."""
+def download_snapshot(repo_id: str, local_dir: Path, token: str = "") -> bool:
+    """Download entire HuggingFace repo via snapshot_download (for multi-file repos like Gemma)."""
+    try:
+        from huggingface_hub import snapshot_download
+        log('info', f'Snapshot downloading {repo_id} → {local_dir}')
+        if local_dir.exists() and any(local_dir.iterdir()):
+            log('info', f'  Skipping {repo_id} (already present at {local_dir})')
+            return True
+        local_dir.mkdir(parents=True, exist_ok=True)
+        snapshot_download(
+            repo_id=repo_id,
+            local_dir=str(local_dir),
+            token=token or None,
+            ignore_patterns=["*.gitattributes", "*.gitignore", "*.md", "added_tokens.json"],
+        )
+        log('info', f'  ✅ Snapshot complete: {repo_id}')
+        return True
+    except Exception as e:
+        log('error', f'  Snapshot download failed for {repo_id}: {e}')
+        return False
+
+
+def download_ltx_model(model_key: str, base_output_dir: Path, token: str = "", force: bool = False) -> bool:
+    """Download an LTX model — supports predefined, snapshot, and generic HF repo formats."""
 
     model_info: Optional[Dict[str, str]] = None
 
-    # Check if it's a predefined model
-    if model_key in WAN_MODELS:
-        model_info = WAN_MODELS[model_key]
-        log('info', f'Downloading predefined WAN model: {model_key}')
+    if model_key in LTX_MODELS:
+        model_info = LTX_MODELS[model_key]
 
-    # Check if it's a generic repo format (contains colons)
+        # Snapshot download (multi-file repos like Gemma)
+        if model_info.get('type') == 'snapshot':
+            local_dir = base_output_dir / model_info['local_subdir']
+            return download_snapshot(model_info['repo_id'], local_dir, token)
+
+        log('info', f'Downloading predefined LTX model: {model_key}')
+
     elif ':' in model_key:
         model_info = parse_generic_repo(model_key)
         if model_info:
@@ -194,16 +176,15 @@ def download_wan_model(model_key: str, base_output_dir: Path, token: str = "", f
             log('error', f'Invalid generic repo format: {model_key}. Use: repo:filename:subdir[:branch]')
             return False
 
-    # Unknown model
     else:
-        log('error', f'Unknown WAN model: {model_key}. Available predefined: {", ".join(WAN_MODELS.keys())}')
+        available = list(LTX_MODELS.keys()) + list(LTX_BUNDLES.keys())
+        log('error', f'Unknown LTX model: {model_key}. Available: {", ".join(available)}')
         log('info', 'Or use generic format: repo:filename:subdir[:branch]')
         return False
 
     url = model_info['url']
     filename = model_info['filename']
     subdir = model_info['subdir']
-
     target_dir = base_output_dir / subdir
 
     log('info', f'Target directory: {subdir}/')
@@ -212,10 +193,11 @@ def download_wan_model(model_key: str, base_output_dir: Path, token: str = "", f
 
 def main() -> int:
     """Main entry point."""
-    parser = argparse.ArgumentParser(description='HuggingFace downloader for Ignition WAN')
+    available_keys = list(LTX_MODELS.keys()) + list(LTX_BUNDLES.keys())
+    parser = argparse.ArgumentParser(description='HuggingFace downloader for Ignition LTX')
     parser.add_argument('--repos', required=True,
-                        help=('Comma-separated list of WAN model keys. '
-                              f'Predefined: {", ".join(list(WAN_MODELS.keys()) + list(WAN_BUNDLES.keys()))}. '
+                        help=('Comma-separated list of LTX model keys. '
+                              f'Predefined: {", ".join(available_keys)}. '
                               'Generic format: repo:filename:subdir[:branch]'))
     parser.add_argument('--token', default='', help='HuggingFace API token')
     parser.add_argument('--output-dir', default='/workspace/ComfyUI/models',
@@ -223,13 +205,11 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    # Get token from environment if not provided
     token = args.token or os.getenv('HF_TOKEN', '')
 
     if not token:
-        log('warning', 'No HuggingFace token provided - downloads may fail for gated models')
+        log('warning', 'No HuggingFace token provided — Gemma downloads will fail (gated model)')
 
-    # Check for force sync flag
     force_sync = os.getenv('FORCE_MODEL_SYNC', 'false').lower() == 'true'
     if force_sync:
         log('info', 'FORCE_MODEL_SYNC=true - will re-download existing files')
@@ -237,24 +217,22 @@ def main() -> int:
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Validate HuggingFace repository inputs
     valid_model_inputs = validate_models_list(args.repos, validate_huggingface_repo, 'HuggingFace')
 
     if not valid_model_inputs:
         log('error', 'No valid HuggingFace models provided after validation')
-        log('info', 'Use format: username/repository or predefined models like wan2.2_t2v_fp8')
+        log('info', 'Use predefined bundle keys like ltx2.3_distilled_fp8_bundle or individual keys')
         return 1
 
-    # Normalize all inputs and expand bundles/multi-model keys
+    # Expand bundles and deduplicate
     all_model_keys: List[str] = []
     for model_input in valid_model_inputs:
-        normalized = normalize_wan_key(model_input)
+        normalized = normalize_ltx_key(model_input)
         if ',' in normalized:
             all_model_keys.extend([k.strip() for k in normalized.split(',')])
         else:
             all_model_keys.append(normalized)
 
-    # Deduplicate while preserving order (e.g. shared text encoder from two bundles)
     seen = set()
     unique_keys = []
     for k in all_model_keys:
@@ -263,12 +241,12 @@ def main() -> int:
             unique_keys.append(k)
     all_model_keys = unique_keys
 
-    log('info', f'Starting download of {len(all_model_keys)} WAN models to {output_dir}')
+    log('info', f'Starting download of {len(all_model_keys)} LTX models to {output_dir}')
     log('info', f'Model keys: {", ".join(all_model_keys)}')
 
     success_count = 0
     for model_key in all_model_keys:
-        if download_wan_model(model_key, output_dir, token, force=force_sync):
+        if download_ltx_model(model_key, output_dir, token, force=force_sync):
             success_count += 1
         else:
             log('warning', f'Failed to download model {model_key}')

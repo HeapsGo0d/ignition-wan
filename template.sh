@@ -1,6 +1,6 @@
 #!/bin/bash
-# Ignition WAN RunPod Template Creator
-# Creates a RunPod template with pre-configured settings for WAN 2.2 video generation
+# Ignition LTX RunPod Template Creator
+# Creates a RunPod template with pre-configured settings for LTX-2.3 video generation
 # Supports both local file generation and direct RunPod API deployment
 
 set -e
@@ -14,12 +14,12 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOCKER_IMAGE="heapsgo0d/ignition-wan:latest"
-TEMPLATE_NAME="Ignition WAN Latest"
-TEMPLATE_DESCRIPTION="ComfyUI WAN 2.2 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell ready"
+DOCKER_IMAGE="heapsgo0d/ignition-ltx:latest"
+TEMPLATE_NAME="Ignition LTX Latest"
+TEMPLATE_DESCRIPTION="ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell NVFP4 ready"
 
 # Disk defaults (can be overridden interactively or via env)
-CONTAINER_DISK_GB="${CONTAINER_DISK_GB:-200}"
+CONTAINER_DISK_GB="${CONTAINER_DISK_GB:-150}"
 VOLUME_GB="${VOLUME_GB:-0}"
 
 # Check for command line arguments
@@ -32,8 +32,8 @@ fi
 print_banner() {
     echo -e "${CYAN}"
     echo "╔═══════════════════════════════════════════╗"
-    echo "║        🎬 IGNITION WAN TEMPLATE          ║"
-    echo "║     RunPod WAN 2.2 Template Creator       ║"
+    echo "║        🎬 IGNITION LTX TEMPLATE          ║"
+    echo "║     RunPod LTX-2.3 Template Creator       ║"
     echo "╚═══════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -116,11 +116,11 @@ get_configuration() {
     
     # Auto-generate image and template names based on version
     if [[ "$VERSION_TAG" == "latest" ]]; then
-        DOCKER_IMAGE="heapsgo0d/ignition-wan:latest"
-        TEMPLATE_NAME="Ignition WAN Latest"
+        DOCKER_IMAGE="heapsgo0d/ignition-ltx:latest"
+        TEMPLATE_NAME="Ignition LTX Latest"
     else
-        DOCKER_IMAGE="heapsgo0d/ignition-wan:$VERSION_TAG"
-        TEMPLATE_NAME="Ignition WAN $VERSION_TAG"
+        DOCKER_IMAGE="heapsgo0d/ignition-ltx:$VERSION_TAG"
+        TEMPLATE_NAME="Ignition LTX $VERSION_TAG"
     fi
     
     echo "  → Docker Image: $DOCKER_IMAGE"
@@ -145,57 +145,44 @@ get_configuration() {
     CIVITAI_VAES=${input_vaes:-""}
     echo ""
 
-    # WAN 2.2 Model Preset Selection
-    echo -e "${BLUE}WAN 2.2 Video Model Preset:${NC}"
-    echo "  1) T2V bundle (text-to-video, both noise variants + LightX2V LoRAs, ~24GB)"
-    echo "  2) I2V bundle (image-to-video, both noise variants + LightX2V LoRAs + CLIP, ~24GB)"
-    echo "  3) Full bundle (T2V + I2V everything, ~45GB)"
-    echo "  4) Full + NSFW LoRAs (T2V + I2V + NSFW-22-H/L LoRAs, ~46GB)"
-    echo "  --- NSFW/Uncensored models ---"
-    echo "  5) FX-FeiHou Remix NSFW I2V v3.0 (high + low + CLIP, ~24GB)"
-    echo "  6) Phr00t MEGA NSFW v12.2 (unified I2V+T2V + CLIP, ~15GB)"
-    echo "  7) NSFW I2V Full (all 3 NSFW I2V workflows, ~70GB)"
-    echo "  8) Custom (manual entry)"
+    # LTX-2.3 Model Preset Selection
+    echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
+    echo "  1) Distilled FP8 bundle (T2V + I2V, ~53GB, needs HF_TOKEN for Gemma)"
+    echo "  2) Dev FP8 bundle (highest quality, ~53GB, needs HF_TOKEN for Gemma)"
+    echo "  3) NVFP4 bundle (RTX 5090 Blackwell only, ~46GB, fastest)"
+    echo "  4) Full bundle (distilled FP8 + distilled LoRA + upscalers, ~63GB)"
+    echo "  5) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
-            HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
-            echo "  → Selected: T2V bundle"
+            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
+            echo "  → Selected: Distilled FP8 bundle (~53GB, T2V + I2V)"
+            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
             ;;
         2)
-            HUGGINGFACE_MODELS="wan2.2_i2v_bundle"
-            echo "  → Selected: I2V bundle"
+            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
+            echo "  → Selected: Dev FP8 bundle (~53GB, highest quality)"
+            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
             ;;
         3)
-            HUGGINGFACE_MODELS="wan2.2_full_bundle"
-            echo "  → Selected: Full bundle (T2V + I2V)"
+            HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
+            echo "  → Selected: NVFP4 bundle (~46GB, Blackwell/RTX 5090 only)"
+            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
             ;;
         4)
-            HUGGINGFACE_MODELS="wan2.2_full_bundle,nsfw_lora_bundle"
-            echo "  → Selected: Full bundle + NSFW LoRAs"
+            HUGGINGFACE_MODELS="ltx2.3_full_bundle"
+            echo "  → Selected: Full bundle (~63GB, distilled FP8 + LoRA + upscalers)"
+            echo "     ⚠️  Set HF_TOKEN — Gemma text encoder is a gated model"
             ;;
         5)
-            HUGGINGFACE_MODELS="remix_nsfw_i2v_bundle"
-            echo "  → Selected: FX-FeiHou Remix NSFW I2V v3.0"
-            ;;
-        6)
-            HUGGINGFACE_MODELS="phr00t_mega_nsfw_bundle"
-            echo "  → Selected: Phr00t MEGA NSFW v12.2"
-            echo "     Sampler tip: dpmpp_sde / beta for best motion on MEGA v12.2"
-            ;;
-        7)
-            HUGGINGFACE_MODELS="nsfw_i2v_full_bundle"
-            echo "  → Selected: NSFW I2V Full (~70GB — Remix v3.0 + MEGA + official SFW base + LoRAs)"
-            ;;
-        8)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
-            HUGGINGFACE_MODELS="wan2.2_t2v_bundle"
-            echo "  → Invalid selection, defaulting to T2V bundle"
+            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
+            echo "  → Invalid selection, defaulting to distilled FP8 bundle"
             ;;
     esac
     echo ""
@@ -269,7 +256,7 @@ generate_template() {
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "WAN 2.2 model preset or comma-separated model keys. Bundles: wan2.2_t2v_bundle, wan2.2_i2v_bundle, wan2.2_full_bundle"
+      "description": "LTX-2.3 model bundle or comma-separated model keys. Bundles: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle, ltx2.3_nvfp4_bundle, ltx2.3_full_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
@@ -286,11 +273,6 @@ generate_template() {
       "value": "$FILEBROWSER_PASSWORD",
       "description": "Password for file browser access"
     },
-    {
-      "key": "ENABLE_SAGEATTN",
-      "value": "true",
-      "description": "Enable SageAttention2++ for faster attention on RTX 5090 (Blackwell). Use KJNodes patch node in workflow."
-    }
   ],
   "startScript": "bash /workspace/scripts/startup.sh"
 }
@@ -316,7 +298,7 @@ print_summary() {
     echo "  Storage: $(make_storage_note)"
     echo ""
     echo -e "${BLUE}Model Configuration:${NC}"
-    echo "  WAN Model Preset: ${HUGGINGFACE_MODELS:-'None specified'}"
+    echo "  LTX Model Preset: ${HUGGINGFACE_MODELS:-'None specified'}"
     echo "  CivitAI Models: ${CIVITAI_MODELS:-'None'}"
     echo "  CivitAI LoRAs: ${CIVITAI_LORAS:-'None'}"
     echo "  CivitAI VAEs: ${CIVITAI_VAES:-'None'}"
@@ -331,7 +313,7 @@ print_summary() {
 # Generate usage instructions
 generate_instructions() {
     cat > RUNPOD_USAGE.md << EOF
-# 🎬 Ignition WAN RunPod Deployment Guide
+# 🎬 Ignition LTX RunPod Deployment Guide
 
 ## Quick Start
 
@@ -341,10 +323,16 @@ generate_instructions() {
    - Upload the \`ignition_template.json\` file
 
 2. **Deploy Pod**:
-   - Select Ignition WAN template
-   - Choose GPU (RTX 5090 or A100 40GB recommended for 14B FP8 models)
+   - Select Ignition LTX template
+   - Choose GPU (RTX 5090 recommended for NVFP4; 4090/A100 for FP8 distilled)
    - Add network volume for persistent model storage
    - Deploy!
+
+## ⚠️ Required: HuggingFace Token
+
+The Gemma 3 12B text encoder is a **gated model** on HuggingFace.
+Set \`HF_TOKEN\` to your HuggingFace token, and accept the Gemma 3 license at:
+https://huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized
 
 ## Access URLs
 
@@ -355,26 +343,25 @@ Once your pod is running:
   - Username: \`admin\`
   - Password: \`$FILEBROWSER_PASSWORD\`
 
-## WAN 2.2 Model Presets
+## LTX-2.3 Model Presets
 
 Set \`HUGGINGFACE_MODELS\` to one of these bundle keys:
 
-| Key | Models Downloaded | VRAM | Use Case |
-|-----|------------------|------|----------|
-| \`wan2.2_t2v_bundle\` | T2V FP8 + text encoder + VAE | ~22GB | Text-to-video (standard) |
-| \`wan2.2_t2v_lightx2v_bundle\` | Above + LightX2V LoRAs | ~22GB | T2V 4-step (5x faster) |
-| \`wan2.2_i2v_bundle\` | I2V FP8 + text encoder + VAE + CLIP | ~22GB | Image-to-video (standard) |
-| \`wan2.2_i2v_lightx2v_bundle\` | I2V FP8 (both variants) + LightX2V LoRAs | ~22GB | I2V 4-step (5x faster) |
-| \`wan2.2_full_bundle\` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
+| Key | Models Downloaded | Disk | VRAM | Use Case |
+|-----|------------------|------|------|----------|
+| \`ltx2.3_distilled_fp8_bundle\` | Distilled FP8 + Gemma 3 12B | ~53GB | ~18-20GB | T2V + I2V (fast) |
+| \`ltx2.3_dev_fp8_bundle\` | Dev FP8 + Gemma 3 12B | ~53GB | ~20-22GB | T2V + I2V (quality) |
+| \`ltx2.3_nvfp4_bundle\` | Dev NVFP4 + Gemma 3 12B | ~46GB | ~14GB | RTX 5090 Blackwell only |
+| \`ltx2.3_full_bundle\` | Distilled FP8 + LoRA + Gemma + upscalers | ~63GB | ~20GB | Two-stage pipeline |
 
-Individual keys also work: \`wan2.2_t2v_fp8\`, \`wan2.2_i2v_fp8\`, \`umt5_xxl_fp8\`, \`wan_vae\`, \`clip_vision_h\`, \`lightx2v_t2v_low_noise\`, \`lightx2v_i2v_low_noise\`
+Individual keys also work: \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`ltx2.3_dev_nvfp4\`, \`gemma3_text_encoder\`, \`ltx2.3_spatial_x2\`, \`ltx2.3_temporal_x2\`
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| \`HUGGINGFACE_MODELS\` | WAN model bundle or comma-separated keys | \`wan2.2_t2v_bundle\` |
-| \`HF_TOKEN\` | HuggingFace API token (optional) | \`hf_xxx\` |
+| \`HUGGINGFACE_MODELS\` | LTX-2.3 bundle or comma-separated keys | \`ltx2.3_distilled_fp8_bundle\` |
+| \`HF_TOKEN\` | HuggingFace API token (**required** for Gemma) | \`hf_xxx\` |
 | \`CIVITAI_MODELS\` | CivitAI checkpoint IDs (optional) | \`138977\` |
 | \`CIVITAI_LORAS\` | CivitAI LoRA IDs (optional) | \`182404\` |
 | \`CIVITAI_TOKEN\` | CivitAI API token (optional) | \`abc123\` |
@@ -386,10 +373,10 @@ Storage: $(make_storage_note) (Container: ${CONTAINER_DISK_GB}GB disk, ${VOLUME_
 ## Startup Process
 
 1. 🔍 System check + GPU detection
-2. 💾 Storage setup (creates model dirs incl. clip_vision)
-3. 📥 WAN model downloads via HuggingFace (parallel with CivitAI if set)
+2. 💾 Storage setup (creates model dirs incl. latent_upscale_models)
+3. 📥 LTX-2.3 model downloads via HuggingFace (parallel with CivitAI if set)
 4. 📁 File browser start (port 8080)
-5. 🎬 ComfyUI start with WanVideoWrapper (port 8188)
+5. 🎬 ComfyUI start with ComfyUI-LTXVideo nodes (port 8188)
 
 ## 🔄 Restarting ComfyUI
 
@@ -422,13 +409,14 @@ tail -f /tmp/ignition_startup.log
 \`\`\`
 
 ### Common Issues
-- **Models not downloading**: Verify \`HUGGINGFACE_MODELS\` key spelling
-- **Out of VRAM**: Use FP8 bundles instead of FP16; ensure 20GB+ VRAM
+- **Models not downloading**: Verify \`HUGGINGFACE_MODELS\` key spelling; set \`HF_TOKEN\` for Gemma
+- **Gemma download fails**: Accept license at huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized
+- **Out of VRAM**: Use FP8 distilled (~18GB) or NVFP4 (~14GB, Blackwell only)
 - **ComfyUI not responding**: Run \`/workspace/scripts/restart-comfyui.sh\`
 - **Want to re-download models**: Set \`FORCE_MODEL_SYNC=true\` and restart pod
 
 ---
-**🎬 Ready to generate video with Ignition WAN!**
+**🎬 Ready to generate video with Ignition LTX!**
 EOF
 }
 
@@ -458,7 +446,7 @@ deploy_template() {
   "volumeMountPath": "/workspace",
   "dockerArgs": "",
   "ports": "8188/http,8080/http",
-  "readme": "# $TEMPLATE_NAME\\n\\n$TEMPLATE_DESCRIPTION\\n\\n## Configuration\\n- WAN Model Preset: $HUGGINGFACE_MODELS\\n- CivitAI Models: ${CIVITAI_MODELS:-none}\\n- CivitAI LoRAs: ${CIVITAI_LORAS:-none}\\n- Storage: ${STORAGE_NOTE} (${CONTAINER_DISK_GB}GB container disk, ${VOLUME_GB}GB volume)",
+  "readme": "# $TEMPLATE_NAME\\n\\n$TEMPLATE_DESCRIPTION\\n\\n## Configuration\\n- LTX Model Preset: $HUGGINGFACE_MODELS\\n- CivitAI Models: ${CIVITAI_MODELS:-none}\\n- CivitAI LoRAs: ${CIVITAI_LORAS:-none}\\n- Storage: ${STORAGE_NOTE} (${CONTAINER_DISK_GB}GB container disk, ${VOLUME_GB}GB volume)",
   "env": [
     {"key": "HUGGINGFACE_MODELS", "value": "$HUGGINGFACE_MODELS"},
     {"key": "CIVITAI_MODELS", "value": "$CIVITAI_MODELS"},
@@ -467,7 +455,6 @@ deploy_template() {
     {"key": "CIVITAI_TOKEN", "value": "{{ RUNPOD_SECRET_civitai.com }}"},
     {"key": "HF_TOKEN", "value": "{{ RUNPOD_SECRET_huggingface.co }}"},
     {"key": "FILEBROWSER_PASSWORD", "value": "$FILEBROWSER_PASSWORD"},
-    {"key": "ENABLE_SAGEATTN", "value": "true"}
   ]
 }
 EOF
@@ -578,7 +565,7 @@ main() {
     fi
     
     echo ""
-    echo -e "${GREEN}🎬 Happy generating with Ignition WAN!${NC}"
+    echo -e "${GREEN}🎬 Happy generating with Ignition LTX!${NC}"
 }
 
 # Run main function

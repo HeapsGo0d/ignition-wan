@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ignition-wan
+  IMAGE_NAME: ignition-ltx
 
 jobs:
   build-and-push:
@@ -95,7 +95,7 @@ jobs:
         # Exclude current tag from the list
         echo "Fetching tags..."
         TAGS=$(curl -s -H "Authorization: JWT $TOKEN" \
-          "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-wan/tags/?page_size=100" \
+          "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-ltx/tags/?page_size=100" \
           | jq -r '.results | sort_by(.last_updated) | reverse | .[].name' \
           | grep -E '^v[0-9]' \
           | grep -v "^${CURRENT_TAG}$")
@@ -120,7 +120,7 @@ jobs:
           echo "  Deleting: $tag"
           RESULT=$(curl -s -X DELETE \
             -H "Authorization: JWT $TOKEN" \
-            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-wan/tags/$tag/")
+            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-ltx/tags/$tag/")
           echo "    Response: $(echo $RESULT | jq -r '.detail // "deleted"')"
         done
 
