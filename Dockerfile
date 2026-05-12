@@ -5,7 +5,7 @@
 
 # ── Stage 1: Builder ──────────────────────────────────────────────────────────
 # Full devel image: needs nvcc to compile SageAttention CUDA kernels
-FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04 AS builder
+FROM nvidia/cuda:13.0.3-cudnn-devel-ubuntu24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -27,9 +27,9 @@ RUN python3 -m venv --copies /opt/venv
 # Core tooling
 RUN pip install --no-cache-dir packaging setuptools wheel
 
-# Install PyTorch nightly with CUDA 12.8 — installed once, no uninstall dance
+# Install PyTorch nightly with CUDA 13.0 — installed once, no uninstall dance
 RUN pip install --no-cache-dir --pre torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/nightly/cu128
+    --index-url https://download.pytorch.org/whl/nightly/cu130
 
 # Verify PyTorch (fail build immediately if broken)
 RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.version.cuda is not None, 'No CUDA'"
@@ -105,7 +105,7 @@ RUN python3 -c "import torch; print(f'PyTorch {torch.__version__} CUDA {torch.ve
 
 # ── Stage 2: Final (runtime) ──────────────────────────────────────────────────
 # Runtime image: no compiler toolchain — strips nvcc, CUDA headers, static libs
-FROM nvidia/cuda:12.8.1-cudnn-runtime-ubuntu24.04 AS final
+FROM nvidia/cuda:13.0.3-cudnn-runtime-ubuntu24.04 AS final
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
@@ -154,8 +154,11 @@ RUN mkdir -p \
 # Create HuggingFace cache directory
 RUN mkdir -p /workspace/.cache/huggingface
 
-# Install filebrowser
-RUN curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash
+# Install filebrowser — pinned v2.63.3 to avoid GitHub API rate-limit on get.sh
+RUN curl -fsSL -o /tmp/filebrowser.tar.gz \
+    "https://github.com/filebrowser/filebrowser/releases/download/v2.63.3/linux-amd64-filebrowser.tar.gz" \
+    && tar -xzf /tmp/filebrowser.tar.gz -C /usr/local/bin filebrowser \
+    && rm /tmp/filebrowser.tar.gz
 
 # Copy scripts and workflows
 COPY scripts/ /workspace/scripts/

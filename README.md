@@ -2,18 +2,25 @@
 
 **WAN 2.2 · Text-to-Video · Image-to-Video · RTX 5090 Ready**
 
-Ignition WAN is a RunPod-optimized Docker container for WAN 2.2 video generation via ComfyUI. Built on the same robust infrastructure as Ignition (image generation), it adds WanVideoWrapper and KJNodes at build time and downloads WAN models automatically at startup.
+Ignition WAN is a RunPod-optimized Docker container for WAN 2.2 video generation via ComfyUI. Built on the same infrastructure as Ignition (image generation), it adds WanVideoWrapper, KJNodes, and SageAttention at build time and downloads WAN models automatically at startup.
 
 ## ✨ Features
 
 - **🎬 WAN 2.2 Video Generation**: Text-to-video and image-to-video via ComfyUI-WanVideoWrapper
-- **⚡ Parallel Downloads**: Efficient concurrent downloading from HuggingFace and CivitAI
+- **⚡ Parallel Downloads**: Concurrent downloading from HuggingFace and CivitAI
 - **🔒 Atomic File Operations**: Download → verify → move → cleanup prevents corruption
 - **🔄 Safe Restart Architecture**: Supervisor loop enables in-place restarts without data loss
 - **💾 Flexible Storage**: Ephemeral or persistent model storage
 - **🔐 Privacy Lite**: Automatic telemetry blocking and connection monitoring
-- **📁 File Browser**: Web-based file management on port 8080
-- **🚀 PyTorch Nightly + CUDA 12.8**: Optimized for RTX 5090 Blackwell architecture
+- **📁 File Browser**: Web-based file management on port 8080 (v2.63.3 pinned)
+- **🚀 PyTorch Nightly + CUDA 13.0**: Upgraded from CUDA 12.8 — RTX 5090 Blackwell optimized
+
+## 🆕 v2.0.0 — CUDA 13 Upgrade
+
+- Base images updated: `nvidia/cuda:13.0.3-cudnn-*-ubuntu24.04` (was 12.8.1)
+- PyTorch nightly from `cu130` index (was `cu128`)
+- SageAttention2++ and SA3 unchanged — recompiled against new CUDA toolchain
+- Filebrowser pinned to v2.63.3 direct download (avoids GitHub API rate-limits)
 
 ## 🚀 Quick Start
 
@@ -29,8 +36,8 @@ export RUNPOD_API_KEY="your_runpod_api_key"
 ```
 
 **Interactive prompts:**
-1. **Version**: Enter tag (e.g. `v1.0.1`) or `latest`
-2. **WAN Preset**: Choose from 5 presets (see below)
+1. **Version**: Enter tag (e.g. `v2.0.0`) or `latest`
+2. **WAN Preset**: Choose from 8 presets (see below)
 3. **Storage**: Container disk and volume sizes
 4. **Password**: File browser password
 
@@ -52,15 +59,17 @@ Set `HUGGINGFACE_MODELS` to one of these bundle keys. All models sourced from `C
 
 | Preset Key | Downloads | Size | VRAM | Use Case |
 |---|---|---|---|---|
-| `wan2.2_t2v_bundle` | T2V FP8 + text encoder + VAE | ~15GB | ~20GB | Text-to-video (recommended start) |
-| `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP vision | ~15GB | ~20GB | Image-to-video |
-| `wan2.2_full_bundle` | Both T2V + I2V + shared encoders | ~29GB | ~20GB | Both modes |
-| `wan2.2_t2v_fp16` + extras | T2V full precision + text encoder + VAE | ~29GB | ~35GB | Max quality T2V |
-| `wan2.2_i2v_fp16` + extras | I2V full precision + text encoder + VAE + CLIP | ~29GB | ~35GB | Max quality I2V |
+| `wan2.2_t2v_bundle` | T2V FP8 + text encoder + VAE | ~24GB | ~20GB | Text-to-video (recommended start) |
+| `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP vision | ~24GB | ~20GB | Image-to-video |
+| `wan2.2_full_bundle` | Both T2V + I2V + shared encoders | ~45GB | ~20GB | Both modes |
+| `wan2.2_full_bundle,nsfw_lora_bundle` | Full bundle + NSFW LoRAs | ~46GB | ~20GB | Both modes + NSFW |
+| `remix_nsfw_i2v_bundle` | FX-FeiHou Remix NSFW I2V v3.0 | ~24GB | ~20GB | NSFW image-to-video |
+| `phr00t_mega_nsfw_bundle` | Phr00t MEGA NSFW v12.2 | ~15GB | ~20GB | Unified NSFW T2V+I2V |
+| `nsfw_i2v_full_bundle` | All 3 NSFW I2V workflows | ~70GB | ~20GB | Full NSFW I2V suite |
 
 ### Individual Model Keys
 
-You can also compose your own set:
+Compose your own set:
 
 | Key | File | Directory |
 |---|---|---|
@@ -74,7 +83,7 @@ You can also compose your own set:
 | `wan_vae` | wan_2.1_vae.safetensors | vae/ |
 | `clip_vision_h` | clip_vision_h.safetensors | clip_vision/ |
 
-**Example — T2V + I2V with shared encoders (manual):**
+**Example — T2V + I2V with shared encoders:**
 ```
 HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_vision_h"
 ```
@@ -99,9 +108,9 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 | Variable | Description | Default |
 |---|---|---|
 | `FILEBROWSER_PASSWORD` | File browser login password | `runpod` |
-| `ENABLE_SAGEATTN` | Enable SageAttention GPU health check on boot (SA3 Blackwell-native, pre-compiled for sm_120) | `true` |
-| `ENABLE_MANAGER_UI` | Show ComfyUI-Manager UI | `true` |
-| `COMFY_FLAGS` | ComfyUI startup flags | `--preview-method auto` |
+| `ENABLE_SAGEATTN` | Run SA3 GPU health check on boot; if passed, SA3 Blackwell kernels are active | `true` |
+| `ENABLE_MANAGER_UI` | Show ComfyUI-Manager UI (adds ~2-3s load time) | `false` |
+| `COMFY_FLAGS` | ComfyUI startup flags | `--preview-method auto --enable-cors-header` |
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `false` |
 
 ## 📁 File Organization
@@ -117,11 +126,11 @@ HUGGINGFACE_MODELS="wan2.2_t2v_fp8,wan2.2_i2v_fp8,umt5_xxl_fp8,wan_vae,clip_visi
 └── upscale_models/     # Upscalers (optional)
 ```
 
-## ⚡ SageAttention (Optional Speed Boost)
+## ⚡ SageAttention (Required for WAN 2.2 Performance)
 
-Both SA2++ and SA3 are pre-compiled into the image for RTX 5090 (sm_120). SA3 is the active Blackwell-native backend — it uses native CUDA kernels and avoids the Triton JIT path that is broken on sm_120.
+Both SA2++ (v2.2.0) and SA3 are pre-compiled into the image for RTX 5090 (sm_120). SA3 is the active Blackwell-native backend — it uses native CUDA kernels and avoids the Triton JIT path that is broken on sm_120 with WAN 2.2's MoE architecture.
 
-When `ENABLE_SAGEATTN=true` (default), a real GPU tensor test runs on boot to confirm SA3 works on the detected hardware.
+When `ENABLE_SAGEATTN=true` (default), a real GPU tensor test runs on boot to confirm SA3 works on the detected hardware:
 
 **If startup log shows:**
 ```
@@ -133,9 +142,9 @@ Workflows are pre-configured with `sageattn3` backend — no action needed.
 ```
 ⚡ SageAttention3 runtime check FAILED
 ```
-Set the KJNodes SA patch node backend to `disabled` in your workflow. Generation works normally without SA — it is a performance optimisation only.
+Set the KJNodes SA patch node backend to `disabled` in your workflow. Generation still works — SA is a performance optimisation only.
 
-**Important**: Do NOT use `--use-sage-attention` in `COMFY_FLAGS` — that uses the Triton backend which causes black frames with WAN 2.2's MoE architecture.
+**Important**: Do NOT use `--use-sage-attention` in `COMFY_FLAGS` — that activates the Triton backend which causes black frames with WAN 2.2 MoE.
 
 ## 🔄 Restarting ComfyUI
 
@@ -143,7 +152,7 @@ Set the KJNodes SA patch node backend to `disabled` in your workflow. Generation
 ```bash
 /workspace/scripts/restart-comfyui.sh
 ```
-Restarts ComfyUI in 2 seconds. All models and data remain intact. Container keeps running.
+Restarts ComfyUI in 2 seconds. All models and data remain intact.
 
 ### Hard Stop (Triggers Nuke)
 ```bash
@@ -161,7 +170,7 @@ Exits container and runs nuclear cleanup (deletes all data).
 
 - **Telemetry blocklist**: Blocks 17+ analytics domains via `/etc/hosts` before any downloads
 - **Connection monitoring**: Logs external connections every 2 mins
-- **ComfyUI-Manager offline mode**: No network calls, no 5-min startup delay
+- **ComfyUI-Manager offline mode**: No network calls, no startup delay
 
 ```bash
 # View connection log
@@ -197,10 +206,11 @@ ls -lh /workspace/ComfyUI/models/clip_vision/
 | Issue | Fix |
 |---|---|
 | Models not downloading | Check `HUGGINGFACE_MODELS` key spelling; verify `HF_TOKEN` if needed |
-| Out of VRAM | Use FP8 bundles (need ~20GB); avoid FP16 unless on A100/H100 |
+| Out of VRAM | Use FP8 bundles (~20GB VRAM); avoid FP16 unless on A100/H100 |
 | ComfyUI not responding | Run `restart-comfyui.sh` |
 | Want to re-download | Set `FORCE_MODEL_SYNC=true` and restart pod |
 | Check what downloaded | `tail -f /tmp/ignition_startup.log` |
+| Black frames with SA | Do NOT set `--use-sage-attention`; use KJNodes patch node with `sageattn3` instead |
 
 ## 🏗️ Building Locally
 

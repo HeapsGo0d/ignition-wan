@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 # Configuration
 DOCKER_IMAGE="heapsgo0d/ignition-wan:latest"
 TEMPLATE_NAME="Ignition WAN Latest"
-TEMPLATE_DESCRIPTION="ComfyUI for WAN 2.2 video generation (T2V + I2V) with safe restart architecture and RTX 5090 support"
+TEMPLATE_DESCRIPTION="ComfyUI WAN 2.2 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell ready"
 
 # Disk defaults (can be overridden interactively or via env)
 CONTAINER_DISK_GB="${CONTAINER_DISK_GB:-200}"

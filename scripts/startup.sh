@@ -372,7 +372,7 @@ start_comfyui() {
             done
 
             if [[ "$COMFYUI_STARTED" != "true" ]]; then
-                log "ERROR" "❌ ComfyUI failed to start within 30 seconds"
+                log "ERROR" "❌ ComfyUI failed to start within 120 seconds"
                 exit 5
             fi
         fi
