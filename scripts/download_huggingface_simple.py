@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Simple HuggingFace downloader for Ignition LTX.
-Uses aria2c for single-file downloads, huggingface_hub snapshot_download for multi-file repos.
-Models sourced from Lightricks/LTX-2.3 and google/gemma-3-12b-it-qat-q4_0-unquantized.
+Uses aria2c for all downloads. LTX models from Lightricks/LTX-2.3.
+Gemma text encoder from Comfy-Org/ltx-2 (single-file, spiece_model embedded, no token needed).
 """
 
 import os
@@ -74,24 +74,31 @@ LTX_MODELS = {
         'filename': 'ltx-2.3-temporal-upscaler-x2-1.0.safetensors',
         'subdir': 'latent_upscale_models'
     },
-    # --- Gemma 3 text encoder (snapshot: 5 safetensors shards, ~24 GB, gated — HF_TOKEN required) ---
-    # Downloads entire repo to models/text_encoders/gemma-3-12b-it-qat-q4_0-unquantized/
+    # --- Gemma 3 12B text encoder — ComfyUI-repackaged single file with spiece_model embedded ---
+    # Comfy-Org/ltx-2 is not gated; no HF_TOKEN required.
+    # FP8 (~12 GB): default, pairs well with FP8/NVFP4 LTX checkpoints
     'gemma3_text_encoder': {
-        'type': 'snapshot',
-        'repo_id': 'google/gemma-3-12b-it-qat-q4_0-unquantized',
-        'local_subdir': 'text_encoders/gemma-3-12b-it-qat-q4_0-unquantized'
+        'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors',
+        'filename': 'comfy_gemma_3_12B_it.safetensors',
+        'subdir': 'text_encoders'
+    },
+    # BF16 (~24 GB): full precision, for A100/H100 or maximum quality
+    'gemma3_text_encoder_bf16': {
+        'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it.safetensors',
+        'filename': 'comfy_gemma_3_12B_it.safetensors',
+        'subdir': 'text_encoders'
     },
 }
 
 # Convenience bundle keys that expand to multiple models
 LTX_BUNDLES = {
-    # Quickstart: distilled fp8 + Gemma (~53 GB, needs HF_TOKEN for Gemma)
+    # Quickstart: distilled fp8 + Gemma FP8 (~41 GB, no token needed)
     'ltx2.3_distilled_fp8_bundle': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder'],
-    # Dev fp8 + Gemma (~53 GB)
+    # Dev fp8 + Gemma FP8 (~41 GB)
     'ltx2.3_dev_fp8_bundle': ['ltx2.3_dev_fp8', 'gemma3_text_encoder'],
-    # Blackwell: NVFP4 dev + Gemma (~46 GB, RTX 5090 only)
+    # Blackwell: NVFP4 dev + Gemma FP8 (~34 GB, RTX 5090 only)
     'ltx2.3_nvfp4_bundle': ['ltx2.3_dev_nvfp4', 'gemma3_text_encoder'],
-    # Full distilled: fp8 + distilled LoRA + Gemma + upscalers (~63 GB, two-stage pipeline)
+    # Full distilled: fp8 + distilled LoRA + Gemma FP8 + upscalers (~51 GB, two-stage pipeline)
     'ltx2.3_full_bundle': [
         'ltx2.3_distilled_fp8', 'ltx2.3_distilled_lora',
         'gemma3_text_encoder',
@@ -131,46 +138,13 @@ def parse_generic_repo(model_input: str) -> Optional[Dict[str, str]]:
     }
 
 
-def download_snapshot(repo_id: str, local_dir: Path, token: str = "", force: bool = False) -> bool:
-    """Download entire HuggingFace repo via snapshot_download (for multi-file repos like Gemma)."""
-    try:
-        from huggingface_hub import snapshot_download
-        log('info', f'Snapshot downloading {repo_id} → {local_dir}')
-        tokenizer_present = (local_dir / "tokenizer.model").exists()
-        if not force and local_dir.exists() and any(local_dir.iterdir()) and tokenizer_present:
-            log('info', f'  Skipping {repo_id} (already present at {local_dir})')
-            return True
-        if force and local_dir.exists():
-            import shutil
-            shutil.rmtree(local_dir)
-            log('info', f'  Force re-download: cleared {local_dir}')
-        local_dir.mkdir(parents=True, exist_ok=True)
-        snapshot_download(
-            repo_id=repo_id,
-            local_dir=str(local_dir),
-            token=token or None,
-            ignore_patterns=["*.gitattributes", "*.gitignore", "*.md", "added_tokens.json"],
-        )
-        log('info', f'  ✅ Snapshot complete: {repo_id}')
-        return True
-    except Exception as e:
-        log('error', f'  Snapshot download failed for {repo_id}: {e}')
-        return False
-
-
 def download_ltx_model(model_key: str, base_output_dir: Path, token: str = "", force: bool = False) -> bool:
-    """Download an LTX model — supports predefined, snapshot, and generic HF repo formats."""
+    """Download an LTX model — supports predefined and generic HF repo formats."""
 
     model_info: Optional[Dict[str, str]] = None
 
     if model_key in LTX_MODELS:
         model_info = LTX_MODELS[model_key]
-
-        # Snapshot download (multi-file repos like Gemma)
-        if model_info.get('type') == 'snapshot':
-            local_dir = base_output_dir / model_info['local_subdir']
-            return download_snapshot(model_info['repo_id'], local_dir, token, force=force)
-
         log('info', f'Downloading predefined LTX model: {model_key}')
 
     elif ':' in model_key:
@@ -212,8 +186,10 @@ def main() -> int:
 
     token = args.token or os.getenv('HF_TOKEN', '')
 
-    if not token:
-        log('warning', 'No HuggingFace token provided — Gemma downloads will fail (gated model)')
+    if token:
+        log('info', 'HuggingFace token provided (used for private/gated repos)')
+    else:
+        log('info', 'No HuggingFace token — public models only (Comfy-Org Gemma is not gated)')
 
     force_sync = os.getenv('FORCE_MODEL_SYNC', 'false').lower() == 'true'
     if force_sync:
