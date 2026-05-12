@@ -71,6 +71,12 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-LTXVideo && \
     pip install --no-cache-dir -r requirements.txt
 
+# RES4LYF — advanced samplers (ClownSampler_Beta) used in LTX-2.3 Full workflow
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/ClownsharkBatwing/RES4LYF.git && \
+    cd RES4LYF && \
+    pip install --no-cache-dir -r requirements.txt
+
 # Create model directories
 # latent_upscale_models: LTX-2.3 spatial and temporal upscalers
 RUN mkdir -p \
