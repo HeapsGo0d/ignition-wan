@@ -131,14 +131,19 @@ def parse_generic_repo(model_input: str) -> Optional[Dict[str, str]]:
     }
 
 
-def download_snapshot(repo_id: str, local_dir: Path, token: str = "") -> bool:
+def download_snapshot(repo_id: str, local_dir: Path, token: str = "", force: bool = False) -> bool:
     """Download entire HuggingFace repo via snapshot_download (for multi-file repos like Gemma)."""
     try:
         from huggingface_hub import snapshot_download
         log('info', f'Snapshot downloading {repo_id} → {local_dir}')
-        if local_dir.exists() and any(local_dir.iterdir()):
+        tokenizer_present = (local_dir / "tokenizer.model").exists()
+        if not force and local_dir.exists() and any(local_dir.iterdir()) and tokenizer_present:
             log('info', f'  Skipping {repo_id} (already present at {local_dir})')
             return True
+        if force and local_dir.exists():
+            import shutil
+            shutil.rmtree(local_dir)
+            log('info', f'  Force re-download: cleared {local_dir}')
         local_dir.mkdir(parents=True, exist_ok=True)
         snapshot_download(
             repo_id=repo_id,
@@ -164,7 +169,7 @@ def download_ltx_model(model_key: str, base_output_dir: Path, token: str = "", f
         # Snapshot download (multi-file repos like Gemma)
         if model_info.get('type') == 'snapshot':
             local_dir = base_output_dir / model_info['local_subdir']
-            return download_snapshot(model_info['repo_id'], local_dir, token)
+            return download_snapshot(model_info['repo_id'], local_dir, token, force=force)
 
         log('info', f'Downloading predefined LTX model: {model_key}')
 
