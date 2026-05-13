@@ -89,6 +89,25 @@ LTX_MODELS = {
         'subdir': 'text_encoders'
     },
 
+    # --- Sulphur 2 safetensors (from SulphurAI/Sulphur-2-base) ---
+    # Used by ComfyUI-LTXVideo nodes (same as standard LTX-2.3 safetensors path)
+    # Pair with gemma3_text_encoder or gemma3_text_encoder_bf16
+    'sulphur2_dev_fp8': {
+        'url': 'https://huggingface.co/SulphurAI/Sulphur-2-base/resolve/main/sulphur_dev_fp8mixed.safetensors',
+        'filename': 'sulphur_dev_fp8mixed.safetensors',
+        'subdir': 'checkpoints'
+    },
+    'sulphur2_dev_bf16': {
+        'url': 'https://huggingface.co/SulphurAI/Sulphur-2-base/resolve/main/sulphur_dev_bf16.safetensors',
+        'filename': 'sulphur_dev_bf16.safetensors',
+        'subdir': 'checkpoints'
+    },
+    'sulphur2_distil_bf16': {
+        'url': 'https://huggingface.co/SulphurAI/Sulphur-2-base/resolve/main/sulphur_distil_bf16.safetensors',
+        'filename': 'sulphur_distil_bf16.safetensors',
+        'subdir': 'checkpoints'
+    },
+
     # --- Sulphur 2 GGUF stack (from smthem/LTX-2.3-test-gguf + Kijai/LTX2.3_comfy) ---
     # Used by ComfyUI_LTX2_SM nodes — NOT compatible with ComfyUI-LTXVideo nodes
     # ⚠️ Gemma GGUF must be from smthem repo only; generic llama.cpp GGUFs cause UnboundLocalError
@@ -160,6 +179,14 @@ LTX_BUNDLES = {
         'sulphur2_distil_q6k', 'gemma_gguf', 'sulphur2_connector',
         'ltx23_video_vae', 'ltx23_audio_vae', 'film_net'
     ],
+
+    # Sulphur 2 safetensors — NSFW dev FP8 + Gemma FP8 (~41 GB, ~18-22 GB VRAM)
+    # Uses ComfyUI-LTXVideo nodes (same workflows as standard LTX-2.3)
+    'sulphur2_fp8_bundle': ['sulphur2_dev_fp8', 'gemma3_text_encoder'],
+    # Sulphur 2 safetensors — NSFW dev FP8 + Gemma BF16 (~53 GB, ~18-22 GB VRAM, max text quality)
+    'sulphur2_fp8_bundle_bf16': ['sulphur2_dev_fp8', 'gemma3_text_encoder_bf16'],
+    # Sulphur 2 safetensors — NSFW dev BF16 + Gemma BF16 (~70 GB, ~32+ GB VRAM, full quality)
+    'sulphur2_bf16_bundle': ['sulphur2_dev_bf16', 'gemma3_text_encoder_bf16'],
 }
 
 

@@ -147,61 +147,77 @@ get_configuration() {
 
     # LTX-2.3 Model Preset Selection
     echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
-    echo "  Sulphur 2 GGUF (NSFW, no HF_TOKEN needed):"
-    echo "  1) Sulphur 2 GGUF distilled      (~35 GB, 6 GB VRAM min — recommended)"
-    echo "  Safetensors — Gemma FP8 (~12 GB Gemma, no token needed):"
-    echo "  2) Distilled FP8 + Gemma FP8     (~41 GB, T2V + I2V)"
-    echo "  3) Dev FP8 + Gemma FP8           (~41 GB, highest quality)"
-    echo "  4) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
-    echo "  5) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
-    echo "  Safetensors — Gemma BF16 (~24 GB Gemma, full text quality):"
-    echo "  6) Distilled FP8 + Gemma BF16    (~53 GB)"
-    echo "  7) Dev FP8 + Gemma BF16          (~53 GB)"
-    echo "  8) Full bundle + Gemma BF16      (~63 GB, FP8 + LoRA + upscalers)"
-    echo "  9) Custom (manual entry)"
-    read -p "Select preset [1]: " model_preset
+    echo "  Sulphur 2 GGUF (NSFW — ComfyUI_LTX2_SM nodes, low VRAM):"
+    echo "  1) Sulphur 2 GGUF distilled      (~35 GB, 6 GB VRAM min)"
+    echo "  Sulphur 2 safetensors (NSFW — ComfyUI-LTXVideo nodes, better quality):"
+    echo "  2) Sulphur 2 dev FP8 + Gemma FP8 (~41 GB, ~18-22 GB VRAM — recommended)"
+    echo "  3) Sulphur 2 dev FP8 + Gemma BF16 (~53 GB, ~18-22 GB VRAM, max text quality)"
+    echo "  4) Sulphur 2 dev BF16 + Gemma BF16 (~70 GB, ~32+ GB VRAM, full quality)"
+    echo "  Standard LTX-2.3 safetensors (SFW — Gemma FP8):"
+    echo "  5) Distilled FP8 + Gemma FP8     (~41 GB)"
+    echo "  6) Dev FP8 + Gemma FP8           (~41 GB)"
+    echo "  7) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
+    echo "  8) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
+    echo "  Standard LTX-2.3 safetensors (SFW — Gemma BF16):"
+    echo "  9) Distilled FP8 + Gemma BF16    (~53 GB)"
+    echo " 10) Dev FP8 + Gemma BF16          (~53 GB)"
+    echo " 11) Full bundle + Gemma BF16      (~63 GB)"
+    echo " 12) Custom (manual entry)"
+    read -p "Select preset [2]: " model_preset
 
-    case ${model_preset:-1} in
+    case ${model_preset:-2} in
         1)
             HUGGINGFACE_MODELS="sulphur2_gguf_bundle"
             echo "  → Selected: Sulphur 2 GGUF distilled (~35 GB, 6 GB VRAM)"
             ;;
         2)
-            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
-            echo "  → Selected: Distilled FP8 + Gemma FP8 (~41 GB)"
+            HUGGINGFACE_MODELS="sulphur2_fp8_bundle"
+            echo "  → Selected: Sulphur 2 dev FP8 + Gemma FP8 (~41 GB, ~18-22 GB VRAM)"
             ;;
         3)
-            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
-            echo "  → Selected: Dev FP8 + Gemma FP8 (~41 GB)"
+            HUGGINGFACE_MODELS="sulphur2_fp8_bundle_bf16"
+            echo "  → Selected: Sulphur 2 dev FP8 + Gemma BF16 (~53 GB)"
             ;;
         4)
-            HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
-            echo "  → Selected: NVFP4 + Gemma FP8 (~34 GB, Blackwell/RTX 5090 only)"
+            HUGGINGFACE_MODELS="sulphur2_bf16_bundle"
+            echo "  → Selected: Sulphur 2 dev BF16 + Gemma BF16 (~70 GB, ~32+ GB VRAM)"
             ;;
         5)
-            HUGGINGFACE_MODELS="ltx2.3_full_bundle"
-            echo "  → Selected: Full bundle + Gemma FP8 (~51 GB)"
+            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
+            echo "  → Selected: LTX-2.3 Distilled FP8 + Gemma FP8 (~41 GB)"
             ;;
         6)
-            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle_bf16"
-            echo "  → Selected: Distilled FP8 + Gemma BF16 (~53 GB)"
+            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
+            echo "  → Selected: LTX-2.3 Dev FP8 + Gemma FP8 (~41 GB)"
             ;;
         7)
-            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle_bf16"
-            echo "  → Selected: Dev FP8 + Gemma BF16 (~53 GB)"
+            HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
+            echo "  → Selected: LTX-2.3 NVFP4 + Gemma FP8 (~34 GB, Blackwell/RTX 5090 only)"
             ;;
         8)
-            HUGGINGFACE_MODELS="ltx2.3_full_bundle_bf16"
-            echo "  → Selected: Full bundle + Gemma BF16 (~63 GB)"
+            HUGGINGFACE_MODELS="ltx2.3_full_bundle"
+            echo "  → Selected: LTX-2.3 Full bundle + Gemma FP8 (~51 GB)"
             ;;
         9)
+            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle_bf16"
+            echo "  → Selected: LTX-2.3 Distilled FP8 + Gemma BF16 (~53 GB)"
+            ;;
+        10)
+            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle_bf16"
+            echo "  → Selected: LTX-2.3 Dev FP8 + Gemma BF16 (~53 GB)"
+            ;;
+        11)
+            HUGGINGFACE_MODELS="ltx2.3_full_bundle_bf16"
+            echo "  → Selected: LTX-2.3 Full bundle + Gemma BF16 (~63 GB)"
+            ;;
+        12)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
-            HUGGINGFACE_MODELS="sulphur2_gguf_bundle"
-            echo "  → Invalid selection, defaulting to Sulphur 2 GGUF"
+            HUGGINGFACE_MODELS="sulphur2_fp8_bundle"
+            echo "  → Invalid selection, defaulting to Sulphur 2 dev FP8"
             ;;
     esac
     echo ""
@@ -275,7 +291,7 @@ generate_template() {
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "Model bundle to download on start. GGUF: sulphur2_gguf_bundle (~35 GB, 6 GB VRAM, no HF_TOKEN). Safetensors: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle, ltx2.3_nvfp4_bundle, ltx2.3_full_bundle"
+      "description": "Model bundle. Sulphur2 NSFW: sulphur2_fp8_bundle (~41 GB, best), sulphur2_bf16_bundle (~70 GB, max), sulphur2_gguf_bundle (~35 GB, 6GB VRAM). Standard: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",

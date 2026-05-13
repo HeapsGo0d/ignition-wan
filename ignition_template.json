@@ -1,7 +1,7 @@
 {
-  "name": "Ignition LTX v0.1.6-ltx",
+  "name": "Ignition LTX v0.1.9-ltx",
   "description": "ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell NVFP4 ready",
-  "dockerImage": "heapsgo0d/ignition-ltx:v0.1.6-ltx",
+  "dockerImage": "heapsgo0d/ignition-ltx:v0.1.9-ltx",
   "ports": [
     {
       "privatePort": 8188,
@@ -40,8 +40,8 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "sulphur2_gguf_bundle",
-      "description": "Model bundle to download on start. GGUF (Sulphur 2 NSFW): sulphur2_gguf_bundle (~35 GB, 6 GB VRAM, no HF_TOKEN). Safetensors: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle, ltx2.3_nvfp4_bundle, ltx2.3_full_bundle"
+      "value": "sulphur2_fp8_bundle",
+      "description": "Model bundle. Sulphur2 NSFW: sulphur2_fp8_bundle (~41 GB, best), sulphur2_bf16_bundle (~70 GB, max), sulphur2_gguf_bundle (~35 GB, 6GB VRAM). Standard: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
