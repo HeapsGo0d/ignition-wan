@@ -86,10 +86,11 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     pip install --no-cache-dir -r requirements.txt
 
 # ComfyUI-Frame-Interpolation — FrameInterpolate nodes used in Sulphur 2 GGUF workflow
+# Uses requirements-no-cupy.txt — cupy has no cu130 wheel and isn't needed for film_net
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
     cd ComfyUI-Frame-Interpolation && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements-no-cupy.txt
 
 # Create model directories
 # latent_upscale_models: LTX-2.3 spatial and temporal upscalers
