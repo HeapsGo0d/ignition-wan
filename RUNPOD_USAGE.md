@@ -1,4 +1,4 @@
-# 🎬 Ignition WAN RunPod Deployment Guide
+# Ignition LTX RunPod Deployment Guide
 
 ## Quick Start
 
@@ -8,8 +8,8 @@
    - Upload the `ignition_template.json` file
 
 2. **Deploy Pod**:
-   - Select Ignition WAN template
-   - Choose GPU (RTX 5090 or A100 40GB recommended for 14B FP8 models)
+   - Select Ignition LTX template
+   - Choose GPU (6 GB VRAM min for Sulphur 2 GGUF; RTX 5090 for NVFP4 safetensors)
    - Add network volume for persistent model storage
    - Deploy!
 
@@ -22,43 +22,53 @@ Once your pod is running:
   - Username: `admin`
   - Password: `runpod`
 
-## WAN 2.2 Model Presets
+## Model Presets
 
-Set `HUGGINGFACE_MODELS` to one of these bundle keys:
+**Sulphur 2 GGUF (NSFW, recommended default):**
 
-| Key | Models Downloaded | VRAM | Use Case |
-|-----|------------------|------|----------|
-| `wan2.2_t2v_bundle` | T2V FP8 + text encoder + VAE | ~22GB | Text-to-video (standard) |
-| `wan2.2_t2v_lightx2v_bundle` | Above + LightX2V LoRAs | ~22GB | T2V 4-step (5x faster) |
-| `wan2.2_i2v_bundle` | I2V FP8 + text encoder + VAE + CLIP | ~22GB | Image-to-video (standard) |
-| `wan2.2_i2v_lightx2v_bundle` | I2V FP8 (both variants) + LightX2V LoRAs | ~22GB | I2V 4-step (5x faster) |
-| `wan2.2_full_bundle` | Both T2V + I2V + shared encoders | ~30GB | Both modes |
+| Key | Disk | VRAM | Notes |
+|-----|------|------|-------|
+| `sulphur2_gguf_bundle` | ~35 GB | 6 GB min | Distilled, no HF_TOKEN needed. Use `sulphur2_gguf.json` workflow. |
 
-Individual keys also work: `wan2.2_t2v_fp8`, `wan2.2_i2v_fp8`, `umt5_xxl_fp8`, `wan_vae`, `clip_vision_h`, `lightx2v_t2v_low_noise`, `lightx2v_i2v_low_noise`
+**Safetensors — Gemma FP8 bundles** (no HF token required):
+
+| Key | Disk | VRAM | Use Case |
+|-----|------|------|----------|
+| `ltx2.3_distilled_fp8_bundle` | ~41 GB | ~18-20 GB | T2V + I2V (fast) |
+| `ltx2.3_dev_fp8_bundle` | ~41 GB | ~20-22 GB | T2V + I2V (quality) |
+| `ltx2.3_nvfp4_bundle` | ~34 GB | ~14 GB | RTX 5090 Blackwell only |
+| `ltx2.3_full_bundle` | ~51 GB | ~20 GB | FP8 + LoRA + upscalers |
+
+**Safetensors — Gemma BF16 bundles** (24 GB Gemma, full text quality):
+
+| Key | Disk | VRAM | Use Case |
+|-----|------|------|----------|
+| `ltx2.3_distilled_fp8_bundle_bf16` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
+| `ltx2.3_dev_fp8_bundle_bf16` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
+| `ltx2.3_full_bundle_bf16` | ~63 GB | ~24 GB | BF16 + LoRA + upscalers |
+
+Individual keys: `sulphur2_distil_q6k`, `gemma_gguf`, `sulphur2_connector`, `ltx23_video_vae`, `ltx23_audio_vae`, `film_net`, `ltx2.3_dev_fp8`, `ltx2.3_distilled_fp8`, `gemma3_text_encoder`
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `HUGGINGFACE_MODELS` | WAN model bundle or comma-separated keys | `wan2.2_t2v_bundle` |
-| `HF_TOKEN` | HuggingFace API token (optional) | `hf_xxx` |
+| `HUGGINGFACE_MODELS` | Model bundle or comma-separated keys | `sulphur2_gguf_bundle` |
+| `HF_TOKEN` | HuggingFace token (not needed for Sulphur 2 GGUF) | `hf_xxx` |
 | `CIVITAI_MODELS` | CivitAI checkpoint IDs (optional) | `138977` |
 | `CIVITAI_LORAS` | CivitAI LoRA IDs (optional) | `182404` |
 | `CIVITAI_TOKEN` | CivitAI API token (optional) | `abc123` |
 | `FORCE_MODEL_SYNC` | Re-download all models on start | `true` |
 
-### Storage Configuration
-Storage: Ephemeral volume (0GB; models redownload each start) (Container: 200GB disk, 0GB volume)
-
 ## Startup Process
 
-1. 🔍 System check + GPU detection
-2. 💾 Storage setup (creates model dirs incl. clip_vision)
-3. 📥 WAN model downloads via HuggingFace (parallel with CivitAI if set)
-4. 📁 File browser start (port 8080)
-5. 🎬 ComfyUI start with WanVideoWrapper (port 8188)
+1. System check + GPU detection
+2. Storage setup (creates model dirs incl. gguf, frame_interpolation)
+3. Model downloads via HuggingFace (parallel with CivitAI if set)
+4. File browser start (port 8080)
+5. ComfyUI start with LTXVideo + LTX2_SM + Frame-Interpolation nodes (port 8188)
 
-## 🔄 Restarting ComfyUI
+## Restarting ComfyUI
 
 ### Soft Restart (Models Preserved)
 ```bash
@@ -77,9 +87,9 @@ Storage: Ephemeral volume (0GB; models redownload each start) (Container: 200GB 
 
 | Action | Models | Container | Nuke |
 |--------|--------|-----------|------|
-| Soft Restart | ✅ Preserved | Running | ❌ No |
-| Hard Stop | ❌ Deleted | Exits | ✅ Yes |
-| Crash | ✅ Preserved | Running | ❌ No |
+| Soft Restart | Preserved | Running | No |
+| Hard Stop | Deleted | Exits | Yes |
+| Crash | Preserved | Running | No |
 
 ## Troubleshooting
 
@@ -90,9 +100,10 @@ tail -f /tmp/ignition_startup.log
 
 ### Common Issues
 - **Models not downloading**: Verify `HUGGINGFACE_MODELS` key spelling
-- **Out of VRAM**: Use FP8 bundles instead of FP16; ensure 20GB+ VRAM
+- **Sulphur 2 GGUF loads with UnboundLocalError**: Gemma GGUF must come from smthem repo (bundled automatically — do not substitute other Gemma GGUFs)
+- **Out of VRAM on safetensors**: Switch to `sulphur2_gguf_bundle` (6 GB min) or NVFP4 (~14GB, Blackwell only)
 - **ComfyUI not responding**: Run `/workspace/scripts/restart-comfyui.sh`
 - **Want to re-download models**: Set `FORCE_MODEL_SYNC=true` and restart pod
 
 ---
-**🎬 Ready to generate video with Ignition WAN!**
+**Ready to generate video with Ignition LTX!**

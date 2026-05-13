@@ -78,8 +78,23 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd RES4LYF && \
     pip install --no-cache-dir -r requirements.txt
 
+# ComfyUI_LTX2_SM — GGUF-based LTX-2.3 loader; required for Sulphur 2 GGUF workflows
+# Uses diffusers-style GGUF loading — NOT compatible with Kijai/City96 GGUF nodes
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/smthemex/ComfyUI_LTX2_SM.git && \
+    cd ComfyUI_LTX2_SM && \
+    pip install --no-cache-dir -r requirements.txt
+
+# ComfyUI-Frame-Interpolation — FrameInterpolate nodes used in Sulphur 2 GGUF workflow
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
+    cd ComfyUI-Frame-Interpolation && \
+    pip install --no-cache-dir -r requirements.txt
+
 # Create model directories
 # latent_upscale_models: LTX-2.3 spatial and temporal upscalers
+# gguf: GGUF-format transformers and text encoders (Sulphur 2, vanilla LTX GGUF)
+# frame_interpolation: film_net models for ComfyUI-Frame-Interpolation
 RUN mkdir -p \
     /workspace/ComfyUI/models/checkpoints \
     /workspace/ComfyUI/models/loras \
@@ -92,7 +107,9 @@ RUN mkdir -p \
     /workspace/ComfyUI/models/clip \
     /workspace/ComfyUI/models/clip_vision \
     /workspace/ComfyUI/models/unet \
-    /workspace/ComfyUI/models/latent_upscale_models
+    /workspace/ComfyUI/models/latent_upscale_models \
+    /workspace/ComfyUI/models/gguf \
+    /workspace/ComfyUI/models/frame_interpolation
 
 # Create HuggingFace cache directory
 RUN mkdir -p /workspace/.cache/huggingface

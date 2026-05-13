@@ -147,55 +147,61 @@ get_configuration() {
 
     # LTX-2.3 Model Preset Selection
     echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
-    echo "  Gemma FP8 bundles (~12 GB Gemma, no token needed):"
-    echo "  1) Distilled FP8 + Gemma FP8     (~41 GB, T2V + I2V — recommended)"
-    echo "  2) Dev FP8 + Gemma FP8           (~41 GB, highest quality diffusion)"
-    echo "  3) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
-    echo "  4) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
-    echo "  Gemma BF16 bundles (~24 GB Gemma, full text encoder quality):"
-    echo "  5) Distilled FP8 + Gemma BF16    (~53 GB)"
-    echo "  6) Dev FP8 + Gemma BF16          (~53 GB)"
-    echo "  7) Full bundle + Gemma BF16      (~63 GB, FP8 + LoRA + upscalers)"
-    echo "  8) Custom (manual entry)"
+    echo "  Sulphur 2 GGUF (NSFW, no HF_TOKEN needed):"
+    echo "  1) Sulphur 2 GGUF distilled      (~35 GB, 6 GB VRAM min — recommended)"
+    echo "  Safetensors — Gemma FP8 (~12 GB Gemma, no token needed):"
+    echo "  2) Distilled FP8 + Gemma FP8     (~41 GB, T2V + I2V)"
+    echo "  3) Dev FP8 + Gemma FP8           (~41 GB, highest quality)"
+    echo "  4) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
+    echo "  5) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
+    echo "  Safetensors — Gemma BF16 (~24 GB Gemma, full text quality):"
+    echo "  6) Distilled FP8 + Gemma BF16    (~53 GB)"
+    echo "  7) Dev FP8 + Gemma BF16          (~53 GB)"
+    echo "  8) Full bundle + Gemma BF16      (~63 GB, FP8 + LoRA + upscalers)"
+    echo "  9) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
+            HUGGINGFACE_MODELS="sulphur2_gguf_bundle"
+            echo "  → Selected: Sulphur 2 GGUF distilled (~35 GB, 6 GB VRAM)"
+            ;;
+        2)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
             echo "  → Selected: Distilled FP8 + Gemma FP8 (~41 GB)"
             ;;
-        2)
+        3)
             HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
             echo "  → Selected: Dev FP8 + Gemma FP8 (~41 GB)"
             ;;
-        3)
+        4)
             HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
             echo "  → Selected: NVFP4 + Gemma FP8 (~34 GB, Blackwell/RTX 5090 only)"
             ;;
-        4)
+        5)
             HUGGINGFACE_MODELS="ltx2.3_full_bundle"
             echo "  → Selected: Full bundle + Gemma FP8 (~51 GB)"
             ;;
-        5)
+        6)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle_bf16"
             echo "  → Selected: Distilled FP8 + Gemma BF16 (~53 GB)"
             ;;
-        6)
+        7)
             HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle_bf16"
             echo "  → Selected: Dev FP8 + Gemma BF16 (~53 GB)"
             ;;
-        7)
+        8)
             HUGGINGFACE_MODELS="ltx2.3_full_bundle_bf16"
             echo "  → Selected: Full bundle + Gemma BF16 (~63 GB)"
             ;;
-        8)
+        9)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
-            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
-            echo "  → Invalid selection, defaulting to Distilled FP8 + Gemma FP8"
+            HUGGINGFACE_MODELS="sulphur2_gguf_bundle"
+            echo "  → Invalid selection, defaulting to Sulphur 2 GGUF"
             ;;
     esac
     echo ""
@@ -269,7 +275,7 @@ generate_template() {
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "LTX-2.3 model bundle or comma-separated model keys. Bundles: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle, ltx2.3_nvfp4_bundle, ltx2.3_full_bundle"
+      "description": "Model bundle to download on start. GGUF: sulphur2_gguf_bundle (~35 GB, 6 GB VRAM, no HF_TOKEN). Safetensors: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle, ltx2.3_nvfp4_bundle, ltx2.3_full_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
@@ -350,11 +356,15 @@ Once your pod is running:
   - Username: \`admin\`
   - Password: \`$FILEBROWSER_PASSWORD\`
 
-## LTX-2.3 Model Presets
+## Model Presets
 
-Gemma text encoder sourced from **Comfy-Org/ltx-2** — no HF token required.
+**Sulphur 2 GGUF (NSFW, recommended default):**
 
-**Gemma FP8 bundles** (12 GB Gemma, recommended):
+| Key | Disk | VRAM | Notes |
+|-----|------|------|-------|
+| \`sulphur2_gguf_bundle\` | ~35 GB | 6 GB min | Distilled, no HF_TOKEN needed. Use \`sulphur2_gguf.json\` workflow. |
+
+**Safetensors — Gemma FP8 bundles** (no HF token required):
 
 | Key | Disk | VRAM | Use Case |
 |-----|------|------|----------|
@@ -363,7 +373,7 @@ Gemma text encoder sourced from **Comfy-Org/ltx-2** — no HF token required.
 | \`ltx2.3_nvfp4_bundle\` | ~34 GB | ~14 GB | RTX 5090 Blackwell only |
 | \`ltx2.3_full_bundle\` | ~51 GB | ~20 GB | FP8 + LoRA + upscalers |
 
-**Gemma BF16 bundles** (24 GB Gemma, full text encoder quality):
+**Safetensors — Gemma BF16 bundles** (24 GB Gemma, full text quality):
 
 | Key | Disk | VRAM | Use Case |
 |-----|------|------|----------|
@@ -371,14 +381,14 @@ Gemma text encoder sourced from **Comfy-Org/ltx-2** — no HF token required.
 | \`ltx2.3_dev_fp8_bundle_bf16\` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
 | \`ltx2.3_full_bundle_bf16\` | ~63 GB | ~24 GB | BF16 + LoRA + upscalers |
 
-Individual keys: \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`ltx2.3_dev_nvfp4\`, \`gemma3_text_encoder\`, \`gemma3_text_encoder_bf16\`, \`ltx2.3_spatial_x2\`, \`ltx2.3_temporal_x2\`
+Individual keys: \`sulphur2_distil_q6k\`, \`gemma_gguf\`, \`sulphur2_connector\`, \`ltx23_video_vae\`, \`ltx23_audio_vae\`, \`film_net\`, \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`gemma3_text_encoder\`
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| \`HUGGINGFACE_MODELS\` | LTX-2.3 bundle or comma-separated keys | \`ltx2.3_distilled_fp8_bundle\` |
-| \`HF_TOKEN\` | HuggingFace token (optional — only needed for private repos) | \`hf_xxx\` |
+| \`HUGGINGFACE_MODELS\` | Model bundle or comma-separated keys | \`sulphur2_gguf_bundle\` |
+| \`HF_TOKEN\` | HuggingFace token (not needed for Sulphur 2 GGUF) | \`hf_xxx\` |
 | \`CIVITAI_MODELS\` | CivitAI checkpoint IDs (optional) | \`138977\` |
 | \`CIVITAI_LORAS\` | CivitAI LoRA IDs (optional) | \`182404\` |
 | \`CIVITAI_TOKEN\` | CivitAI API token (optional) | \`abc123\` |

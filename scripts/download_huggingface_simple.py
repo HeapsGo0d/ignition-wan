@@ -88,6 +88,40 @@ LTX_MODELS = {
         'filename': 'comfy_gemma_3_12B_it.safetensors',
         'subdir': 'text_encoders'
     },
+
+    # --- Sulphur 2 GGUF stack (from smthem/LTX-2.3-test-gguf + Kijai/LTX2.3_comfy) ---
+    # Used by ComfyUI_LTX2_SM nodes — NOT compatible with ComfyUI-LTXVideo nodes
+    # ⚠️ Gemma GGUF must be from smthem repo only; generic llama.cpp GGUFs cause UnboundLocalError
+    'sulphur2_distil_q6k': {
+        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/sulphur_distil-Q6_K.gguf',
+        'filename': 'sulphur_distil-Q6_K.gguf',
+        'subdir': 'gguf'
+    },
+    'gemma_gguf': {
+        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/gemma-3-12b-it-qat-Q4_0.gguf',
+        'filename': 'gemma-3-12b-it-qat-Q4_0.gguf',
+        'subdir': 'gguf'
+    },
+    'sulphur2_connector': {
+        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/connector-11.safetensors',
+        'filename': 'connector-11.safetensors',
+        'subdir': 'checkpoints'
+    },
+    'ltx23_video_vae': {
+        'url': 'https://huggingface.co/Kijai/LTX2.3_comfy/resolve/main/vae/LTX23_video_vae_bf16.safetensors',
+        'filename': 'LTX23_video_vae_bf16.safetensors',
+        'subdir': 'vae'
+    },
+    'ltx23_audio_vae': {
+        'url': 'https://huggingface.co/Kijai/LTX2.3_comfy/resolve/main/vae/LTX23_audio_vae_bf16.safetensors',
+        'filename': 'LTX23_audio_vae_bf16.safetensors',
+        'subdir': 'vae'
+    },
+    'film_net': {
+        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/film_net_fp16.safetensors',
+        'filename': 'film_net_fp16.safetensors',
+        'subdir': 'frame_interpolation'
+    },
 }
 
 # Convenience bundle keys that expand to multiple models
@@ -119,6 +153,13 @@ LTX_BUNDLES = {
     ],
     # Upscalers only (if main model already downloaded)
     'ltx2.3_upscalers_bundle': ['ltx2.3_spatial_x2', 'ltx2.3_spatial_x1_5', 'ltx2.3_temporal_x2'],
+
+    # Sulphur 2 GGUF — NSFW distilled (~35 GB, 6 GB VRAM min, no HF_TOKEN needed)
+    # Uses ComfyUI_LTX2_SM nodes; load sulphur2_gguf.json workflow in ComfyUI
+    'sulphur2_gguf_bundle': [
+        'sulphur2_distil_q6k', 'gemma_gguf', 'sulphur2_connector',
+        'ltx23_video_vae', 'ltx23_audio_vae', 'film_net'
+    ],
 }
 
 
