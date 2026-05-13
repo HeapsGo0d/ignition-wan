@@ -92,6 +92,10 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd ComfyUI-Frame-Interpolation && \
     pip install --no-cache-dir -r requirements-no-cupy.txt
 
+# Pin transformers to 4.x — ComfyUI_LTX2_SM accesses SiglipVisionModel.vision_model
+# which was removed in the transformers 5.x rewrite
+RUN pip install --no-cache-dir "transformers<5.0"
+
 # Create model directories
 # latent_upscale_models: LTX-2.3 spatial and temporal upscalers
 # gguf: GGUF-format transformers and text encoders (Sulphur 2, vanilla LTX GGUF)
