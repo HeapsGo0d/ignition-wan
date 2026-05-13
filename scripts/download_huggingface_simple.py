@@ -137,7 +137,7 @@ LTX_MODELS = {
         'subdir': 'vae'
     },
     'film_net': {
-        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/film_net_fp16.safetensors',
+        'url': 'https://huggingface.co/Comfy-Org/frame_interpolation/resolve/main/frame_interpolation/film_net_fp16.safetensors',
         'filename': 'film_net_fp16.safetensors',
         'subdir': 'frame_interpolation'
     },
