@@ -177,8 +177,8 @@ get_configuration() {
     # LTX-2.3 Model Preset Selection
     echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
     echo "  10Eros I2V (NSFW — 10S-Comfy-nodes, no HF token required):"
-    echo "  1) 10Eros FP8 mixed-learned      (~29 GB, ~18-20 GB VRAM — recommended)"
-    echo "  2) 10Eros BF16                   (~46 GB, ~24+ GB VRAM, max quality)"
+    echo "  1) 10Eros FP8 + Gemma FP8        (~44 GB, ~18-20 GB VRAM — recommended)"
+    echo "  2) 10Eros BF16 + Gemma BF16      (~72 GB, ~24+ GB VRAM, A100/H100)"
     echo "  Standard LTX-2.3 safetensors (SFW — Gemma FP8):"
     echo "  3) Distilled FP8 + Gemma FP8     (~41 GB)"
     echo "  4) Dev FP8 + Gemma FP8           (~41 GB)"
@@ -309,7 +309,7 @@ generate_template() {
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~29 GB, recommended), 10eros_bf16_bundle (~46 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
+      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~44 GB, recommended), 10eros_bf16_bundle (~72 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",

@@ -109,9 +109,9 @@ LTX_MODELS = {
         'subdir': 'checkpoints'
     },
 
-    # --- 10Eros (TenStrip/LTX2.3-10Eros) — self-contained checkpoints (VAE+CLIP bundled) ---
+    # --- 10Eros (TenStrip/LTX2.3-10Eros) — transformer checkpoints (image VAE+CLIP bundled) ---
     # Fine-tune of Sulphur-2-base optimised for I2V; loads via ComfyUI-LTXVideo nodes
-    # No HF_TOKEN required. Use with 10Eros workflow JSONs + 10S-Comfy-nodes.
+    # No HF_TOKEN required. Pair with gemma3_text_encoder_10eros + spatial upscaler + condsafe LoRA.
     '10eros_fp8': {
         'url': 'https://huggingface.co/TenStrip/LTX2.3-10Eros/resolve/main/10Eros_v1-fp8mixed_learned.safetensors',
         'filename': '10Eros_v1-fp8mixed_learned.safetensors',
@@ -121,6 +121,22 @@ LTX_MODELS = {
         'url': 'https://huggingface.co/TenStrip/LTX2.3-10Eros/resolve/main/10Eros_v1_bf16.safetensors',
         'filename': '10Eros_v1_bf16.safetensors',
         'subdir': 'checkpoints'
+    },
+
+    # Gemma text encoder saved as the filename the 10Eros workflow hardcodes
+    # (workflow was built against gemma_3_12B_it_fp8_e4m3fn.safetensors; closest public file is fp8_scaled)
+    'gemma3_text_encoder_10eros': {
+        'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors',
+        'filename': 'gemma_3_12B_it_fp8_e4m3fn.safetensors',
+        'subdir': 'text_encoders'
+    },
+
+    # Condition-safe distilled LoRA from TenStrip's experiments repo (~662 MB)
+    # Stored in loras/ltx23/ to match the workflow's hardcoded path
+    '10eros_condsafe_lora': {
+        'url': 'https://huggingface.co/TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments/resolve/main/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors',
+        'filename': 'ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors',
+        'subdir': 'loras/ltx23'
     },
 
     # --- Standalone VAE files (optional — ERos checkpoints bundle VAEs, but available separately) ---
@@ -139,11 +155,11 @@ LTX_MODELS = {
 # Convenience bundle keys that expand to multiple models
 # _fp8 bundles use Gemma FP8 (~12 GB); _bf16 bundles use Gemma BF16 (~24 GB, full quality)
 LTX_BUNDLES = {
-    # --- 10Eros bundles (self-contained, no separate text encoder needed) ---
-    # Recommended default: FP8 mixed-learned (~29 GB, ~18-20 GB VRAM)
-    '10eros_fp8_bundle': ['10eros_fp8'],
-    # Full quality: BF16 (~46 GB, ~24+ GB VRAM, A100/H100)
-    '10eros_bf16_bundle': ['10eros_bf16'],
+    # --- 10Eros bundles ---
+    # FP8: checkpoint (~29 GB) + Gemma FP8 (~13 GB) + spatial upscaler (~1 GB) + condsafe LoRA (~0.7 GB) ≈ 44 GB
+    '10eros_fp8_bundle': ['10eros_fp8', 'gemma3_text_encoder_10eros', 'ltx2.3_spatial_x2', '10eros_condsafe_lora'],
+    # BF16: checkpoint (~46 GB) + Gemma BF16 (~24 GB) + spatial upscaler (~1 GB) + condsafe LoRA (~0.7 GB) ≈ 72 GB
+    '10eros_bf16_bundle': ['10eros_bf16', 'gemma3_text_encoder_bf16', 'ltx2.3_spatial_x2', '10eros_condsafe_lora'],
 
     # --- Standard LTX-2.3 bundles (_fp8 use Gemma FP8; _bf16 use Gemma BF16) ---
     # Quickstart: distilled fp8 + Gemma FP8 (~41 GB)

@@ -120,6 +120,10 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
 RUN cd /workspace/ComfyUI/custom_nodes && \
     git clone https://github.com/jamesWalker55/comfyui-various.git
 
+# ComfyMath — ComfyMathExpression node used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/evanspearman/ComfyMath.git
+
 # Create model directories
 # latent_upscale_models: LTX-2.3 spatial and temporal upscalers
 RUN mkdir -p \

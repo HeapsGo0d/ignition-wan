@@ -9,7 +9,7 @@
 
 2. **Deploy Pod**:
    - Select Ignition LTX template
-   - Choose GPU (4090 for FP8; A100/H100 for BF16)
+   - Choose GPU (RTX 5090 recommended for NVFP4; 4090/A100 for FP8 distilled)
    - Add network volume for persistent model storage
    - Deploy!
 
@@ -28,8 +28,8 @@ Once your pod is running:
 
 | Key | Disk | VRAM | Notes |
 |-----|------|------|-------|
-| `10eros_fp8_bundle` | ~29 GB | ~18-20 GB | FP8 mixed-learned, self-contained (VAE+CLIP bundled). Use `10Eros_10SNodes_I2V_v3_TiledSampler.json` workflow. |
-| `10eros_bf16_bundle` | ~46 GB | ~24+ GB | Full quality, A100/H100. |
+| `10eros_fp8_bundle` | ~44 GB | ~18-20 GB | FP8 checkpoint + Gemma FP8 + upscaler + LoRA. Use `10Eros_10SNodes_I2V_v3_TiledSampler.json` workflow. |
+| `10eros_bf16_bundle` | ~72 GB | ~24+ GB | BF16 checkpoint + Gemma BF16 + upscaler + LoRA. A100/H100. |
 
 **Standard LTX-2.3 bundles (Gemma FP8, no HF token required):**
 
@@ -64,37 +64,13 @@ Individual keys: `10eros_fp8`, `10eros_bf16`, `ltx23_video_vae`, `ltx23_audio_va
 ### Storage Configuration
 Storage: Ephemeral volume (0GB; models redownload each start) (Container: 150GB disk, 0GB volume)
 
-## Prompting for 10Eros
-
-10Eros has minimal self-reasoning — prompts must be explicit and fully command all motion. Use the following structure (ideally via Grok or an uncensored LLM to expand):
-
-```
-Generate a video scene script based on the attached image for an LLM
-with long-context understanding fed into a multimodal video model.
-
-Strict specification:
-- No timestamps
-- No unnecessary embellishment
-- Output only plain English text
-
-Structure:
-1. Describe the initial scene concisely (subject, appearance, composition, pose, background)
-2. Formulate naturally evolving scenario describing every moving body part, composition change, and manipulation
-3. Center around basic concept: [your concept]
-4. Interweave dialogue or sound with descriptions of voice tone and quotations in temporal sequence
-5. Describe only notable audio cues, background noise, foley, and natural sounds paired with motions
-6. If no dialogue/soundscape - describe fitting genre, melodic tone, and mood for background music
-```
-
-**LoRA warning:** Larger distilled LoRAs harm the model. Only use condition-safe LoRAs from [TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments](https://huggingface.co/TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments/tree/main).
-
 ## Startup Process
 
 1. 🔍 System check + GPU detection
 2. 💾 Storage setup (creates model dirs incl. latent_upscale_models)
-3. 📥 10Eros model downloads via HuggingFace (parallel with CivitAI if set)
+3. 📥 LTX-2.3 model downloads via HuggingFace (parallel with CivitAI if set)
 4. 📁 File browser start (port 8080)
-5. 🎬 ComfyUI start with ComfyUI-LTXVideo + 10S-Comfy-nodes (port 8188)
+5. 🎬 ComfyUI start with ComfyUI-LTXVideo nodes (port 8188)
 
 ## 🔄 Restarting ComfyUI
 
@@ -119,15 +95,6 @@ Structure:
 | Hard Stop | ❌ Deleted | Exits | ✅ Yes |
 | Crash | ✅ Preserved | Running | ❌ No |
 
-## Branch Reference
-
-| Branch | Model | Status |
-|--------|-------|--------|
-| `feature/10eros` | 10Eros I2V (this branch) | Active |
-| `spike/ltx-2.3` | Sulphur 2 GGUF + safetensors | Parked — use if switching back to Sulphur |
-
-To switch back to Sulphur: rebuild image from `spike/ltx-2.3` and set `HUGGINGFACE_MODELS=sulphur2_fp8_bundle`.
-
 ## Troubleshooting
 
 ### Logs
@@ -136,11 +103,11 @@ tail -f /tmp/ignition_startup.log
 ```
 
 ### Common Issues
-- **Models not downloading**: Verify `HUGGINGFACE_MODELS` key spelling (e.g. `10eros_fp8_bundle`)
-- **Out of VRAM**: Use `10eros_fp8_bundle` (~18-20 GB) instead of BF16
-- **Node resolution errors**: Ensure 10S-Comfy-nodes is installed; check ComfyUI Manager
+- **Models not downloading**: Verify `HUGGINGFACE_MODELS` key spelling; set `HF_TOKEN` for Gemma
+- **Gemma download fails**: Accept license at huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized
+- **Out of VRAM**: Use FP8 distilled (~18GB) or NVFP4 (~14GB, Blackwell only)
 - **ComfyUI not responding**: Run `/workspace/scripts/restart-comfyui.sh`
 - **Want to re-download models**: Set `FORCE_MODEL_SYNC=true` and restart pod
 
 ---
-**🎬 Ready to generate video with Ignition LTX / 10Eros!**
+**🎬 Ready to generate video with Ignition LTX!**

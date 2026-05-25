@@ -1,7 +1,7 @@
 {
-  "name": "Ignition LTX v0.1.9-ltx",
+  "name": "Ignition LTX v1.0.0-10eros",
   "description": "ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell NVFP4 ready",
-  "dockerImage": "heapsgo0d/ignition-ltx:v0.1.9-ltx",
+  "dockerImage": "heapsgo0d/ignition-ltx:v1.0.0-10eros",
   "ports": [
     {
       "privatePort": 8188,
@@ -41,7 +41,7 @@
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "10eros_fp8_bundle",
-      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~29 GB, recommended), 10eros_bf16_bundle (~46 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
+      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~44 GB, recommended), 10eros_bf16_bundle (~72 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
