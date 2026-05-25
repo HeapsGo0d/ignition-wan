@@ -1,4 +1,4 @@
-# Ignition LTX - ComfyUI for LTX-2.3 Video Generation
+# Ignition LTX - ComfyUI for LTX-2.3 Video Generation (10Eros I2V)
 # Single-stage build: no SageAttention compilation needed for LTX-2.3
 # LTX-2.3 is natively supported in ComfyUI core; ComfyUI-LTXVideo provides extra nodes
 
@@ -78,28 +78,50 @@ RUN cd /workspace/ComfyUI/custom_nodes && \
     cd RES4LYF && \
     pip install --no-cache-dir -r requirements.txt
 
-# ComfyUI_LTX2_SM — GGUF-based LTX-2.3 loader; required for Sulphur 2 GGUF workflows
-# Uses diffusers-style GGUF loading — NOT compatible with Kijai/City96 GGUF nodes
+# 10S-Comfy-nodes (TenStrip) — LTXTiledSampler, LTXLatentAnchorAware, LTXFaceDetector,
+# LTXLikenessAnchor, LTXLikenessGuide — required by both 10Eros I2V workflows
+# No mandatory pip deps; mediapipe optional (falls back to OpenCV face detection)
 RUN cd /workspace/ComfyUI/custom_nodes && \
-    git clone https://github.com/smthemex/ComfyUI_LTX2_SM.git && \
-    cd ComfyUI_LTX2_SM && \
+    git clone https://github.com/TenStrip/10S-Comfy-nodes.git
+
+# ComfyUI-KJNodes — ImageResizeKJv2, LTX2LoraLoaderAdvanced used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/kijai/ComfyUI-KJNodes.git && \
+    cd ComfyUI-KJNodes && \
     pip install --no-cache-dir -r requirements.txt
 
-# ComfyUI-Frame-Interpolation — FrameInterpolate nodes used in Sulphur 2 GGUF workflow
-# Uses requirements-no-cupy.txt — cupy has no cu130 wheel and isn't needed for film_net
+# ComfyUI-VideoHelperSuite — VHS_VideoCombine for video output in 10Eros workflows
 RUN cd /workspace/ComfyUI/custom_nodes && \
-    git clone https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git && \
-    cd ComfyUI-Frame-Interpolation && \
-    pip install --no-cache-dir -r requirements-no-cupy.txt
+    git clone https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git && \
+    cd ComfyUI-VideoHelperSuite && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Pin transformers to 4.x — ComfyUI_LTX2_SM accesses SiglipVisionModel.vision_model
-# which was removed in the transformers 5.x rewrite
-RUN pip install --no-cache-dir "transformers<5.0"
+# rgthree-comfy — Power Lora Loader and Seed nodes used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/rgthree/rgthree-comfy.git && \
+    cd rgthree-comfy && \
+    pip install --no-cache-dir -r requirements.txt
+
+# ControlAltAI-Nodes — TwoWaySwitch node used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/gseth/ControlAltAI-Nodes.git
+
+# ComfyUI-Easy-Use — easy loraNames and utility nodes used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/yolain/ComfyUI-Easy-Use.git && \
+    cd ComfyUI-Easy-Use && \
+    pip install --no-cache-dir -r requirements.txt
+
+# ComfyUI-mxToolkit — mxSlider node used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/Smirnov75/ComfyUI-mxToolkit.git
+
+# comfyui-various — JWStringToFloat node used in 10Eros workflows
+RUN cd /workspace/ComfyUI/custom_nodes && \
+    git clone https://github.com/jamesWalker55/comfyui-various.git
 
 # Create model directories
 # latent_upscale_models: LTX-2.3 spatial and temporal upscalers
-# gguf: GGUF-format transformers and text encoders (Sulphur 2, vanilla LTX GGUF)
-# frame_interpolation: film_net models for ComfyUI-Frame-Interpolation
 RUN mkdir -p \
     /workspace/ComfyUI/models/checkpoints \
     /workspace/ComfyUI/models/loras \
@@ -112,9 +134,7 @@ RUN mkdir -p \
     /workspace/ComfyUI/models/clip \
     /workspace/ComfyUI/models/clip_vision \
     /workspace/ComfyUI/models/unet \
-    /workspace/ComfyUI/models/latent_upscale_models \
-    /workspace/ComfyUI/models/gguf \
-    /workspace/ComfyUI/models/frame_interpolation
+    /workspace/ComfyUI/models/latent_upscale_models
 
 # Create HuggingFace cache directory
 RUN mkdir -p /workspace/.cache/huggingface

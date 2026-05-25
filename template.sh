@@ -147,77 +147,66 @@ get_configuration() {
 
     # LTX-2.3 Model Preset Selection
     echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
-    echo "  Sulphur 2 GGUF (NSFW — ComfyUI_LTX2_SM nodes, low VRAM):"
-    echo "  1) Sulphur 2 GGUF distilled      (~35 GB, 6 GB VRAM min)"
-    echo "  Sulphur 2 safetensors (NSFW — ComfyUI-LTXVideo nodes, better quality):"
-    echo "  2) Sulphur 2 dev FP8 + Gemma FP8 (~41 GB, ~18-22 GB VRAM — recommended)"
-    echo "  3) Sulphur 2 dev FP8 + Gemma BF16 (~53 GB, ~18-22 GB VRAM, max text quality)"
-    echo "  4) Sulphur 2 dev BF16 + Gemma BF16 (~70 GB, ~32+ GB VRAM, full quality)"
+    echo "  10Eros I2V (NSFW — 10S-Comfy-nodes, no HF token required):"
+    echo "  1) 10Eros FP8 mixed-learned      (~29 GB, ~18-20 GB VRAM — recommended)"
+    echo "  2) 10Eros BF16                   (~46 GB, ~24+ GB VRAM, max quality)"
     echo "  Standard LTX-2.3 safetensors (SFW — Gemma FP8):"
-    echo "  5) Distilled FP8 + Gemma FP8     (~41 GB)"
-    echo "  6) Dev FP8 + Gemma FP8           (~41 GB)"
-    echo "  7) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
-    echo "  8) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
+    echo "  3) Distilled FP8 + Gemma FP8     (~41 GB)"
+    echo "  4) Dev FP8 + Gemma FP8           (~41 GB)"
+    echo "  5) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
+    echo "  6) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
     echo "  Standard LTX-2.3 safetensors (SFW — Gemma BF16):"
-    echo "  9) Distilled FP8 + Gemma BF16    (~53 GB)"
-    echo " 10) Dev FP8 + Gemma BF16          (~53 GB)"
-    echo " 11) Full bundle + Gemma BF16      (~63 GB)"
-    echo " 12) Custom (manual entry)"
-    read -p "Select preset [2]: " model_preset
+    echo "  7) Distilled FP8 + Gemma BF16    (~53 GB)"
+    echo "  8) Dev FP8 + Gemma BF16          (~53 GB)"
+    echo "  9) Full bundle + Gemma BF16      (~63 GB)"
+    echo " 10) Custom (manual entry)"
+    read -p "Select preset [1]: " model_preset
 
-    case ${model_preset:-2} in
+    case ${model_preset:-1} in
         1)
-            HUGGINGFACE_MODELS="sulphur2_gguf_bundle"
-            echo "  → Selected: Sulphur 2 GGUF distilled (~35 GB, 6 GB VRAM)"
+            HUGGINGFACE_MODELS="10eros_fp8_bundle"
+            echo "  → Selected: 10Eros FP8 mixed-learned (~29 GB, ~18-20 GB VRAM)"
             ;;
         2)
-            HUGGINGFACE_MODELS="sulphur2_fp8_bundle"
-            echo "  → Selected: Sulphur 2 dev FP8 + Gemma FP8 (~41 GB, ~18-22 GB VRAM)"
+            HUGGINGFACE_MODELS="10eros_bf16_bundle"
+            echo "  → Selected: 10Eros BF16 (~46 GB, ~24+ GB VRAM)"
             ;;
         3)
-            HUGGINGFACE_MODELS="sulphur2_fp8_bundle_bf16"
-            echo "  → Selected: Sulphur 2 dev FP8 + Gemma BF16 (~53 GB)"
-            ;;
-        4)
-            HUGGINGFACE_MODELS="sulphur2_bf16_bundle"
-            echo "  → Selected: Sulphur 2 dev BF16 + Gemma BF16 (~70 GB, ~32+ GB VRAM)"
-            ;;
-        5)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
             echo "  → Selected: LTX-2.3 Distilled FP8 + Gemma FP8 (~41 GB)"
             ;;
-        6)
+        4)
             HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
             echo "  → Selected: LTX-2.3 Dev FP8 + Gemma FP8 (~41 GB)"
             ;;
-        7)
+        5)
             HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
             echo "  → Selected: LTX-2.3 NVFP4 + Gemma FP8 (~34 GB, Blackwell/RTX 5090 only)"
             ;;
-        8)
+        6)
             HUGGINGFACE_MODELS="ltx2.3_full_bundle"
             echo "  → Selected: LTX-2.3 Full bundle + Gemma FP8 (~51 GB)"
             ;;
-        9)
+        7)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle_bf16"
             echo "  → Selected: LTX-2.3 Distilled FP8 + Gemma BF16 (~53 GB)"
             ;;
-        10)
+        8)
             HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle_bf16"
             echo "  → Selected: LTX-2.3 Dev FP8 + Gemma BF16 (~53 GB)"
             ;;
-        11)
+        9)
             HUGGINGFACE_MODELS="ltx2.3_full_bundle_bf16"
             echo "  → Selected: LTX-2.3 Full bundle + Gemma BF16 (~63 GB)"
             ;;
-        12)
+        10)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
-            HUGGINGFACE_MODELS="sulphur2_fp8_bundle"
-            echo "  → Invalid selection, defaulting to Sulphur 2 dev FP8"
+            HUGGINGFACE_MODELS="10eros_fp8_bundle"
+            echo "  → Invalid selection, defaulting to 10Eros FP8"
             ;;
     esac
     echo ""
@@ -291,7 +280,7 @@ generate_template() {
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "Model bundle. Sulphur2 NSFW: sulphur2_fp8_bundle (~41 GB, best), sulphur2_bf16_bundle (~70 GB, max), sulphur2_gguf_bundle (~35 GB, 6GB VRAM). Standard: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
+      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~29 GB, recommended), 10eros_bf16_bundle (~46 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",
@@ -374,13 +363,14 @@ Once your pod is running:
 
 ## Model Presets
 
-**Sulphur 2 GGUF (NSFW, recommended default):**
+**10Eros I2V (recommended default, no HF token required):**
 
 | Key | Disk | VRAM | Notes |
 |-----|------|------|-------|
-| \`sulphur2_gguf_bundle\` | ~35 GB | 6 GB min | Distilled, no HF_TOKEN needed. Use \`sulphur2_gguf.json\` workflow. |
+| \`10eros_fp8_bundle\` | ~29 GB | ~18-20 GB | FP8 mixed-learned, self-contained. Use \`10Eros_10SNodes_I2V_v3_TiledSampler.json\` workflow. |
+| \`10eros_bf16_bundle\` | ~46 GB | ~24+ GB | Full quality, A100/H100. |
 
-**Safetensors — Gemma FP8 bundles** (no HF token required):
+**Standard LTX-2.3 bundles (Gemma FP8, no HF token required):**
 
 | Key | Disk | VRAM | Use Case |
 |-----|------|------|----------|
@@ -389,7 +379,7 @@ Once your pod is running:
 | \`ltx2.3_nvfp4_bundle\` | ~34 GB | ~14 GB | RTX 5090 Blackwell only |
 | \`ltx2.3_full_bundle\` | ~51 GB | ~20 GB | FP8 + LoRA + upscalers |
 
-**Safetensors — Gemma BF16 bundles** (24 GB Gemma, full text quality):
+**Standard LTX-2.3 bundles (Gemma BF16, full text quality):**
 
 | Key | Disk | VRAM | Use Case |
 |-----|------|------|----------|
@@ -397,14 +387,14 @@ Once your pod is running:
 | \`ltx2.3_dev_fp8_bundle_bf16\` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
 | \`ltx2.3_full_bundle_bf16\` | ~63 GB | ~24 GB | BF16 + LoRA + upscalers |
 
-Individual keys: \`sulphur2_distil_q6k\`, \`gemma_gguf\`, \`sulphur2_connector\`, \`ltx23_video_vae\`, \`ltx23_audio_vae\`, \`film_net\`, \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`gemma3_text_encoder\`
+Individual keys: \`10eros_fp8\`, \`10eros_bf16\`, \`ltx23_video_vae\`, \`ltx23_audio_vae\`, \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`gemma3_text_encoder\`
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| \`HUGGINGFACE_MODELS\` | Model bundle or comma-separated keys | \`sulphur2_gguf_bundle\` |
-| \`HF_TOKEN\` | HuggingFace token (not needed for Sulphur 2 GGUF) | \`hf_xxx\` |
+| \`HUGGINGFACE_MODELS\` | Model bundle or comma-separated keys | \`10eros_fp8_bundle\` |
+| \`HF_TOKEN\` | HuggingFace token (not needed for 10Eros or standard LTX bundles) | \`hf_xxx\` |
 | \`CIVITAI_MODELS\` | CivitAI checkpoint IDs (optional) | \`138977\` |
 | \`CIVITAI_LORAS\` | CivitAI LoRA IDs (optional) | \`182404\` |
 | \`CIVITAI_TOKEN\` | CivitAI API token (optional) | \`abc123\` |

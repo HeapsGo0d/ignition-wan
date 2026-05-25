@@ -40,8 +40,8 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "sulphur2_fp8_bundle",
-      "description": "Model bundle. Sulphur2 NSFW: sulphur2_fp8_bundle (~41 GB, best), sulphur2_bf16_bundle (~70 GB, max), sulphur2_gguf_bundle (~35 GB, 6GB VRAM). Standard: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
+      "value": "10eros_fp8_bundle",
+      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~29 GB, recommended), 10eros_bf16_bundle (~46 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
     },
     {
       "key": "CIVITAI_TOKEN",

@@ -115,7 +115,7 @@ check_system() {
 setup_storage() {
     log "INFO" "💾 Setting up model directories..."
     
-    mkdir -p "$COMFYUI_ROOT/models"/{checkpoints,loras,vae,embeddings,controlnet,upscale_models,diffusion_models,text_encoders,clip,clip_vision,unet,latent_upscale_models,gguf,frame_interpolation}
+    mkdir -p "$COMFYUI_ROOT/models"/{checkpoints,loras,vae,embeddings,controlnet,upscale_models,diffusion_models,text_encoders,clip,clip_vision,unet,latent_upscale_models}
 
     for model_type in checkpoints loras vae embeddings controlnet upscale_models diffusion_models text_encoders clip clip_vision unet latent_upscale_models; do
         log "INFO" "  • Created $model_type directory"

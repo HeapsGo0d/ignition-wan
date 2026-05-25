@@ -2,6 +2,7 @@
 """
 Simple HuggingFace downloader for Ignition LTX.
 Uses aria2c for all downloads. LTX models from Lightricks/LTX-2.3.
+10Eros model from TenStrip/LTX2.3-10Eros (self-contained, no HF_TOKEN required).
 Gemma text encoder from Comfy-Org/ltx-2 (single-file, spiece_model embedded, no token needed).
 """
 
@@ -108,24 +109,21 @@ LTX_MODELS = {
         'subdir': 'checkpoints'
     },
 
-    # --- Sulphur 2 GGUF stack (from smthem/LTX-2.3-test-gguf + Kijai/LTX2.3_comfy) ---
-    # Used by ComfyUI_LTX2_SM nodes — NOT compatible with ComfyUI-LTXVideo nodes
-    # ⚠️ Gemma GGUF must be from smthem repo only; generic llama.cpp GGUFs cause UnboundLocalError
-    'sulphur2_distil_q6k': {
-        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/sulphur_distil-Q6_K.gguf',
-        'filename': 'sulphur_distil-Q6_K.gguf',
-        'subdir': 'gguf'
-    },
-    'gemma_gguf': {
-        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/gemma-3-12b-it-qat-Q4_0.gguf',
-        'filename': 'gemma-3-12b-it-qat-Q4_0.gguf',
-        'subdir': 'gguf'
-    },
-    'sulphur2_connector': {
-        'url': 'https://huggingface.co/smthem/LTX-2.3-test-gguf/resolve/main/connector-11.safetensors',
-        'filename': 'connector-11.safetensors',
+    # --- 10Eros (TenStrip/LTX2.3-10Eros) — self-contained checkpoints (VAE+CLIP bundled) ---
+    # Fine-tune of Sulphur-2-base optimised for I2V; loads via ComfyUI-LTXVideo nodes
+    # No HF_TOKEN required. Use with 10Eros workflow JSONs + 10S-Comfy-nodes.
+    '10eros_fp8': {
+        'url': 'https://huggingface.co/TenStrip/LTX2.3-10Eros/resolve/main/10Eros_v1-fp8mixed_learned.safetensors',
+        'filename': '10Eros_v1-fp8mixed_learned.safetensors',
         'subdir': 'checkpoints'
     },
+    '10eros_bf16': {
+        'url': 'https://huggingface.co/TenStrip/LTX2.3-10Eros/resolve/main/10Eros_v1_bf16.safetensors',
+        'filename': '10Eros_v1_bf16.safetensors',
+        'subdir': 'checkpoints'
+    },
+
+    # --- Standalone VAE files (optional — ERos checkpoints bundle VAEs, but available separately) ---
     'ltx23_video_vae': {
         'url': 'https://huggingface.co/Kijai/LTX2.3_comfy/resolve/main/vae/LTX23_video_vae_bf16.safetensors',
         'filename': 'LTX23_video_vae_bf16.safetensors',
@@ -136,16 +134,18 @@ LTX_MODELS = {
         'filename': 'LTX23_audio_vae_bf16.safetensors',
         'subdir': 'vae'
     },
-    'film_net': {
-        'url': 'https://huggingface.co/Comfy-Org/frame_interpolation/resolve/main/frame_interpolation/film_net_fp16.safetensors',
-        'filename': 'film_net_fp16.safetensors',
-        'subdir': 'frame_interpolation'
-    },
 }
 
 # Convenience bundle keys that expand to multiple models
 # _fp8 bundles use Gemma FP8 (~12 GB); _bf16 bundles use Gemma BF16 (~24 GB, full quality)
 LTX_BUNDLES = {
+    # --- 10Eros bundles (self-contained, no separate text encoder needed) ---
+    # Recommended default: FP8 mixed-learned (~29 GB, ~18-20 GB VRAM)
+    '10eros_fp8_bundle': ['10eros_fp8'],
+    # Full quality: BF16 (~46 GB, ~24+ GB VRAM, A100/H100)
+    '10eros_bf16_bundle': ['10eros_bf16'],
+
+    # --- Standard LTX-2.3 bundles (_fp8 use Gemma FP8; _bf16 use Gemma BF16) ---
     # Quickstart: distilled fp8 + Gemma FP8 (~41 GB)
     'ltx2.3_distilled_fp8_bundle': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder'],
     # Quickstart BF16 Gemma: distilled fp8 + Gemma BF16 (~53 GB, full text encoder quality)
@@ -173,19 +173,10 @@ LTX_BUNDLES = {
     # Upscalers only (if main model already downloaded)
     'ltx2.3_upscalers_bundle': ['ltx2.3_spatial_x2', 'ltx2.3_spatial_x1_5', 'ltx2.3_temporal_x2'],
 
-    # Sulphur 2 GGUF — NSFW distilled (~35 GB, 6 GB VRAM min, no HF_TOKEN needed)
-    # Uses ComfyUI_LTX2_SM nodes; load sulphur2_gguf.json workflow in ComfyUI
-    'sulphur2_gguf_bundle': [
-        'sulphur2_distil_q6k', 'gemma_gguf', 'sulphur2_connector',
-        'ltx23_video_vae', 'ltx23_audio_vae', 'film_net'
-    ],
-
-    # Sulphur 2 safetensors — NSFW dev FP8 + Gemma FP8 (~41 GB, ~18-22 GB VRAM)
-    # Uses ComfyUI-LTXVideo nodes (same workflows as standard LTX-2.3)
+    # --- Sulphur 2 safetensors — parked on spike/ltx-2.3; kept here for reference ---
+    # Uses ComfyUI-LTXVideo nodes (same workflows as standard LTX-2.3); pair with Gemma text encoder
     'sulphur2_fp8_bundle': ['sulphur2_dev_fp8', 'gemma3_text_encoder'],
-    # Sulphur 2 safetensors — NSFW dev FP8 + Gemma BF16 (~53 GB, ~18-22 GB VRAM, max text quality)
     'sulphur2_fp8_bundle_bf16': ['sulphur2_dev_fp8', 'gemma3_text_encoder_bf16'],
-    # Sulphur 2 safetensors — NSFW dev BF16 + Gemma BF16 (~70 GB, ~32+ GB VRAM, full quality)
     'sulphur2_bf16_bundle': ['sulphur2_dev_bf16', 'gemma3_text_encoder_bf16'],
 }
 
