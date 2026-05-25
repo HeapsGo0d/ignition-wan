@@ -22,11 +22,18 @@ TEMPLATE_DESCRIPTION="ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0
 CONTAINER_DISK_GB="${CONTAINER_DISK_GB:-150}"
 VOLUME_GB="${VOLUME_GB:-0}"
 
-# Check for command line arguments
-DEPLOY_MODE="local"  # Default to local file generation
-if [[ "$1" == "--deploy" || "$1" == "-d" ]]; then
-    DEPLOY_MODE="api"
-fi
+# Parse command line arguments
+DEPLOY_MODE="local"
+YES_MODE=false
+VERSION_ARG=""
+
+for arg in "$@"; do
+    case "$arg" in
+        --deploy|-d) DEPLOY_MODE="api" ;;
+        --yes|-y)    YES_MODE=true ;;
+        v*)          VERSION_ARG="$arg" ;;
+    esac
+done
 
 # Print banner
 print_banner() {
@@ -51,7 +58,9 @@ print_usage() {
         echo ""
     else
         echo -e "${BLUE}📁 Local File Mode${NC} - Will generate files for manual upload"
-        echo -e "${YELLOW}💡 Tip: Use './template.sh --deploy' for automatic deployment${NC}"
+        echo -e "${YELLOW}💡 Tips:${NC}"
+        echo "  • './template.sh --deploy' for automatic RunPod deployment"
+        echo "  • './template.sh -y v1.0.0-10eros --deploy' to skip all prompts"
         echo ""
     fi
     
@@ -108,7 +117,27 @@ check_api_requirements() {
 get_configuration() {
     echo -e "${YELLOW}🔧 Configuration Setup${NC}"
     echo ""
-    
+
+    if [[ "$YES_MODE" == true ]]; then
+        VERSION_TAG="${VERSION_ARG:-latest}"
+        CIVITAI_MODELS=""
+        CIVITAI_LORAS=""
+        CIVITAI_VAES=""
+        HUGGINGFACE_MODELS="10eros_fp8_bundle"
+        FILEBROWSER_PASSWORD="runpod"
+        if [[ "$VERSION_TAG" == "latest" ]]; then
+            DOCKER_IMAGE="heapsgo0d/ignition-ltx:latest"
+            TEMPLATE_NAME="Ignition LTX Latest"
+        else
+            DOCKER_IMAGE="heapsgo0d/ignition-ltx:$VERSION_TAG"
+            TEMPLATE_NAME="Ignition LTX $VERSION_TAG"
+        fi
+        echo "  → Docker Image: $DOCKER_IMAGE"
+        echo "  → Model preset: $HUGGINGFACE_MODELS (default)"
+        echo ""
+        return
+    fi
+
     # Version input (easy mode)
     echo -e "${BLUE}Version:${NC}"
     read -p "Enter version tag (e.g., v1.0.12) [latest]: " version_input
@@ -558,9 +587,11 @@ main() {
     # Check API requirements if in deploy mode
     check_api_requirements
     
-    echo -e "${YELLOW}Press Enter to continue with template creation...${NC}"
-    read
-    
+    if [[ "$YES_MODE" != true ]]; then
+        echo -e "${YELLOW}Press Enter to continue with template creation...${NC}"
+        read
+    fi
+
     get_configuration
     
     echo -e "${YELLOW}🔨 Generating template files...${NC}"
