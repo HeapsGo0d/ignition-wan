@@ -194,11 +194,11 @@ get_configuration() {
     case ${model_preset:-1} in
         1)
             HUGGINGFACE_MODELS="10eros_fp8_bundle"
-            echo "  → Selected: 10Eros FP8 mixed-learned (~29 GB, ~18-20 GB VRAM)"
+            echo "  → Selected: 10Eros FP8 + Gemma FP8 (~44 GB, ~18-20 GB VRAM)"
             ;;
         2)
             HUGGINGFACE_MODELS="10eros_bf16_bundle"
-            echo "  → Selected: 10Eros BF16 (~46 GB, ~24+ GB VRAM)"
+            echo "  → Selected: 10Eros BF16 + Gemma BF16 (~72 GB, ~24+ GB VRAM)"
             ;;
         3)
             HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
