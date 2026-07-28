@@ -28,8 +28,11 @@ Once your pod is running:
 
 | Key | Disk | VRAM | Notes |
 |-----|------|------|-------|
-| `10eros_fp8_bundle` | ~44 GB | ~18-20 GB | FP8 checkpoint + Gemma FP8 + upscaler + LoRA. Use `10Eros_10SNodes_I2V_v3_TiledSampler.json` workflow. |
-| `10eros_bf16_bundle` | ~72 GB | ~24+ GB | BF16 checkpoint + Gemma BF16 + upscaler + LoRA. A100/H100. |
+| `10eros_fp8_bundle` | ~44 GB | ~18-20 GB | FP8 checkpoint + Gemma FP8 + upscaler + LoRA. Filenames match the shipped workflows — no UI changes needed. |
+| `10eros_bf16_bundle` | ~72 GB | ~24+ GB | BF16 checkpoint + Gemma BF16 + upscaler + LoRA. A100/H100. Requires repointing 4 loader dropdowns to the BF16 files. |
+
+Use the `10Eros_10SNodes_I2V_v3_TiledSampler.json` workflow (or `..._LikenessGuideHelper_I2V_v3.2.json` for face-likeness work).
+`RTXVideoSuperResolution` ships bypassed — it needs NVIDIA's `nvvfx` SDK, which is not available in the Linux container.
 
 **Standard LTX-2.3 bundles (Gemma FP8, no HF token required):**
 

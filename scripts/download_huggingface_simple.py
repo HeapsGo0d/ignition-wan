@@ -123,8 +123,9 @@ LTX_MODELS = {
         'subdir': 'checkpoints'
     },
 
-    # Gemma text encoder saved as the filename the 10Eros workflow hardcodes
-    # (workflow was built against gemma_3_12B_it_fp8_e4m3fn.safetensors; closest public file is fp8_scaled)
+    # Gemma text encoder saved as the filename the 10Eros workflows hardcode
+    # (workflows were built against gemma_3_12B_it_fp8_e4m3fn.safetensors; closest public file is fp8_scaled).
+    # Both are FP8, so this is a naming alias only — do NOT point a BF16 file at this filename.
     'gemma3_text_encoder_10eros': {
         'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors',
         'filename': 'gemma_3_12B_it_fp8_e4m3fn.safetensors',
@@ -157,8 +158,14 @@ LTX_MODELS = {
 LTX_BUNDLES = {
     # --- 10Eros bundles ---
     # FP8: checkpoint (~29 GB) + Gemma FP8 (~13 GB) + spatial upscaler (~1 GB) + condsafe LoRA (~0.7 GB) ≈ 44 GB
+    # Filenames match the shipped 10Eros workflows exactly — loads with no UI changes.
     '10eros_fp8_bundle': ['10eros_fp8', 'gemma3_text_encoder_10eros', 'ltx2.3_spatial_x2', '10eros_condsafe_lora'],
     # BF16: checkpoint (~46 GB) + Gemma BF16 (~24 GB) + spatial upscaler (~1 GB) + condsafe LoRA (~0.7 GB) ≈ 72 GB
+    # NOTE: the 10Eros workflows hardcode the FP8 filenames. After downloading this bundle you must
+    # repoint four dropdowns to the BF16 files (they will be present, just not selected):
+    #   CheckpointLoaderSimple (646)   -> 10Eros_v1_bf16.safetensors
+    #   LTXVAudioVAELoader (617)       -> 10Eros_v1_bf16.safetensors
+    #   LTXAVTextEncoderLoader (616)   -> comfy_gemma_3_12B_it.safetensors  AND  10Eros_v1_bf16.safetensors
     '10eros_bf16_bundle': ['10eros_bf16', 'gemma3_text_encoder_bf16', 'ltx2.3_spatial_x2', '10eros_condsafe_lora'],
 
     # --- Standard LTX-2.3 bundles (_fp8 use Gemma FP8; _bf16 use Gemma BF16) ---
