@@ -60,7 +60,7 @@ print_usage() {
         echo -e "${BLUE}📁 Local File Mode${NC} - Will generate files for manual upload"
         echo -e "${YELLOW}💡 Tips:${NC}"
         echo "  • './template.sh --deploy' for automatic RunPod deployment"
-        echo "  • './template.sh -y v1.0.2-10eros --deploy' to skip all prompts"
+        echo "  • './template.sh -y v1.0.3-10eros --deploy' to skip all prompts"
         echo ""
     fi
     

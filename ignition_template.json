@@ -1,7 +1,7 @@
 {
-  "name": "Ignition LTX v1.0.2-10eros",
+  "name": "Ignition LTX v1.0.3-10eros",
   "description": "ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell NVFP4 ready",
-  "dockerImage": "heapsgo0d/ignition-ltx:v1.0.2-10eros",
+  "dockerImage": "heapsgo0d/ignition-ltx:v1.0.3-10eros",
   "ports": [
     {
       "privatePort": 8188,

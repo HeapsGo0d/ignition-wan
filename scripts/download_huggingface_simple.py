@@ -133,11 +133,15 @@ LTX_MODELS = {
     },
 
     # Condition-safe distilled LoRA from TenStrip's experiments repo (~662 MB)
-    # Stored in loras/ltx23/ to match the workflow's hardcoded path
+    # Must live in loras/ root, NOT a subdirectory: the workflows' `easy loraNames`
+    # node (783) emits the bare filename and drives the four LTX2LoraLoaderAdvanced
+    # lora_name widget inputs by link, which overrides their stored widget values.
+    # A nested subdir makes ComfyUI list the file as "ltx23/<name>", which the bare
+    # name emitted by node 783 will not match.
     '10eros_condsafe_lora': {
         'url': 'https://huggingface.co/TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments/resolve/main/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors',
         'filename': 'ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors',
-        'subdir': 'loras/ltx23'
+        'subdir': 'loras'
     },
 
     # --- Standalone VAE files (optional — ERos checkpoints bundle VAEs, but available separately) ---
