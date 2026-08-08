@@ -127,7 +127,7 @@ def validate_huggingface_repo(repo: str) -> bool:
     repo = repo.strip()
 
     # Accept predefined model/bundle keys: alphanumeric with dots, underscores, hyphens — no slashes or colons.
-    # Unknown keys are caught downstream in download_wan_model with a helpful error.
+    # Unknown keys are caught downstream in download_h3_model with a helpful error.
     if re.match(r'^[a-zA-Z0-9][a-zA-Z0-9._-]*$', repo):
         return True
 

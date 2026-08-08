@@ -118,7 +118,7 @@ download_models() {
         log "INFO" "CivitAI download started (PID: $civitai_pid)"
     fi
     
-    # Start HuggingFace downloads (using WAN model keys, e.g. wan2.2_t2v_bundle)
+    # Start HuggingFace downloads (bundle or model keys, e.g. h3_int8_bundle)
     if [[ -n "$HUGGINGFACE_MODELS" && "$hf_needed" == "true" ]]; then
         log "INFO" "$DOWNLOAD Starting HuggingFace downloads..."
         download_needed=true

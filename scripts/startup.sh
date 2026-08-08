@@ -68,8 +68,8 @@ export ENABLE_MANAGER_UI="${ENABLE_MANAGER_UI:-true}"
 print_banner() {
     log "INFO" ""
     log "INFO" "╔═══════════════════════════════════════════╗"
-    log "INFO" "║       🎬 IGNITION LTX v1.0.0             ║"
-    log "INFO" "║    ComfyUI LTX-2.3 Video Generation      ║"
+    log "INFO" "║        🎬 IGNITION H3 v2.0.0             ║"
+    log "INFO" "║  MiniMax H3 — video + native audio       ║"
     log "INFO" "║          RunPod Edition                  ║"
     log "INFO" "╚═══════════════════════════════════════════╝"
     log "INFO" ""
@@ -115,9 +115,10 @@ check_system() {
 setup_storage() {
     log "INFO" "💾 Setting up model directories..."
     
-    mkdir -p "$COMFYUI_ROOT/models"/{checkpoints,loras,vae,embeddings,controlnet,upscale_models,diffusion_models,text_encoders,clip,clip_vision,unet,latent_upscale_models}
+    # Keep in sync with the mkdir -p list in Dockerfile
+    mkdir -p "$COMFYUI_ROOT/models"/{diffusion_models,text_encoders,vae,loras,checkpoints,upscale_models,embeddings,controlnet,clip,clip_vision}
 
-    for model_type in checkpoints loras vae embeddings controlnet upscale_models diffusion_models text_encoders clip clip_vision unet latent_upscale_models; do
+    for model_type in diffusion_models text_encoders vae loras checkpoints upscale_models embeddings controlnet clip clip_vision; do
         log "INFO" "  • Created $model_type directory"
     done
     
@@ -146,6 +147,21 @@ download_models() {
     log "INFO" ""
 }
 
+
+# Point the shipped workflows at whichever model quant actually downloaded.
+# Without this, selecting h3_fp8_bundle leaves the workflows asking for the int8
+# files and ComfyUI shows a missing-model dialog on load.
+retarget_workflows() {
+    log "INFO" "🎯 Retargeting workflows to downloaded models..."
+    if "$PYBIN" "$SCRIPT_DIR/retarget_workflows.py" \
+            --models-root "$COMFYUI_ROOT/models" \
+            --workflows "$COMFYUI_ROOT/user/default/workflows"; then
+        log "INFO" "✅ Workflows retargeted"
+    else
+        log "WARN" "⚠️  Workflow retargeting failed; loaders may need repointing by hand"
+    fi
+    log "INFO" ""
+}
 
 start_filebrowser() {
     log "INFO" "📁 Starting file browser..."
@@ -415,22 +431,12 @@ main() {
     fi
 
     download_models
+    retarget_workflows
     start_filebrowser
     gpu_preflight
     disable_manager_network
     toggle_manager_ui
     remove_manager_web_extensions
-
-    # Install performance plugins on first run
-    if [[ ! -f "$COMFYUI_ROOT/plugins.lock" ]]; then
-        log "INFO" "🔧 Installing performance plugins (first run)..."
-        if /workspace/scripts/optional/install-performance-plugins.sh; then
-            log "INFO" "✅ Performance plugins installed"
-        else
-            log "WARN" "⚠️  Performance plugin installation had issues, continuing"
-        fi
-        log "INFO" ""
-    fi
 
     log "INFO" "🚀 All services started successfully"
     log "INFO" "💡 ComfyUI: http://0.0.0.0:$COMFYUI_PORT"

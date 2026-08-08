@@ -7,12 +7,25 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ignition-ltx
+  IMAGE_NAME: ignition-h3
 
 jobs:
-  build-and-push:
+  # Fails in seconds on a workflow/registry mismatch, instead of after the
+  # ~78-minute image build. The Dockerfile runs the same check as a backstop.
+  check-workflows:
     runs-on: ubuntu-latest
-    
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Validate workflows against the model registry
+      run: python3 scripts/check_workflows.py
+
+  build-and-push:
+    needs: check-workflows
+    runs-on: ubuntu-latest
+
     steps:
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
@@ -95,7 +108,7 @@ jobs:
         # Exclude current tag from the list
         echo "Fetching tags..."
         TAGS=$(curl -s -H "Authorization: JWT $TOKEN" \
-          "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-ltx/tags/?page_size=100" \
+          "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-h3/tags/?page_size=100" \
           | jq -r '.results | sort_by(.last_updated) | reverse | .[].name' \
           | grep -E '^v[0-9]' \
           | grep -v "^${CURRENT_TAG}$")
@@ -120,7 +133,7 @@ jobs:
           echo "  Deleting: $tag"
           RESULT=$(curl -s -X DELETE \
             -H "Authorization: JWT $TOKEN" \
-            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-ltx/tags/$tag/")
+            "https://hub.docker.com/v2/repositories/${{ secrets.DOCKER_USERNAME }}/ignition-h3/tags/$tag/")
           echo "    Response: $(echo $RESULT | jq -r '.detail // "deleted"')"
         done
 

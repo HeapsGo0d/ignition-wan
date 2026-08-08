@@ -1,6 +1,6 @@
 #!/bin/bash
-# Ignition LTX RunPod Template Creator
-# Creates a RunPod template with pre-configured settings for LTX-2.3 video generation
+# Ignition H3 RunPod Template Creator
+# Creates a RunPod template with pre-configured settings for MiniMax H3 video + audio generation
 # Supports both local file generation and direct RunPod API deployment
 
 set -e
@@ -14,9 +14,9 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOCKER_IMAGE="heapsgo0d/ignition-ltx:latest"
-TEMPLATE_NAME="Ignition LTX Latest"
-TEMPLATE_DESCRIPTION="ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell NVFP4 ready"
+DOCKER_IMAGE="heapsgo0d/ignition-h3:latest"
+TEMPLATE_NAME="Ignition H3 Latest"
+TEMPLATE_DESCRIPTION="ComfyUI MiniMax H3 video + native 32 kHz stereo audio (I2V + T2V) — CUDA 13.0, PyTorch nightly cu130, 4-step Turbo LoRA"
 
 # Disk defaults (can be overridden interactively or via env)
 CONTAINER_DISK_GB="${CONTAINER_DISK_GB:-150}"
@@ -39,8 +39,8 @@ done
 print_banner() {
     echo -e "${CYAN}"
     echo "╔═══════════════════════════════════════════╗"
-    echo "║        🎬 IGNITION LTX TEMPLATE          ║"
-    echo "║     RunPod LTX-2.3 Template Creator       ║"
+    echo "║        🎬 IGNITION H3 TEMPLATE           ║"
+    echo "║   RunPod MiniMax H3 Template Creator      ║"
     echo "╚═══════════════════════════════════════════╝"
     echo -e "${NC}"
 }
@@ -60,7 +60,7 @@ print_usage() {
         echo -e "${BLUE}📁 Local File Mode${NC} - Will generate files for manual upload"
         echo -e "${YELLOW}💡 Tips:${NC}"
         echo "  • './template.sh --deploy' for automatic RunPod deployment"
-        echo "  • './template.sh -y v1.0.3-10eros --deploy' to skip all prompts"
+        echo "  • './template.sh -y v2.0.0-h3 --deploy' to skip all prompts"
         echo ""
     fi
     
@@ -123,14 +123,14 @@ get_configuration() {
         CIVITAI_MODELS=""
         CIVITAI_LORAS=""
         CIVITAI_VAES=""
-        HUGGINGFACE_MODELS="10eros_fp8_bundle"
+        HUGGINGFACE_MODELS="h3_int8_bundle"
         FILEBROWSER_PASSWORD="runpod"
         if [[ "$VERSION_TAG" == "latest" ]]; then
-            DOCKER_IMAGE="heapsgo0d/ignition-ltx:latest"
-            TEMPLATE_NAME="Ignition LTX Latest"
+            DOCKER_IMAGE="heapsgo0d/ignition-h3:latest"
+            TEMPLATE_NAME="Ignition H3 Latest"
         else
-            DOCKER_IMAGE="heapsgo0d/ignition-ltx:$VERSION_TAG"
-            TEMPLATE_NAME="Ignition LTX $VERSION_TAG"
+            DOCKER_IMAGE="heapsgo0d/ignition-h3:$VERSION_TAG"
+            TEMPLATE_NAME="Ignition H3 $VERSION_TAG"
         fi
         echo "  → Docker Image: $DOCKER_IMAGE"
         echo "  → Model preset: $HUGGINGFACE_MODELS (default)"
@@ -145,11 +145,11 @@ get_configuration() {
     
     # Auto-generate image and template names based on version
     if [[ "$VERSION_TAG" == "latest" ]]; then
-        DOCKER_IMAGE="heapsgo0d/ignition-ltx:latest"
-        TEMPLATE_NAME="Ignition LTX Latest"
+        DOCKER_IMAGE="heapsgo0d/ignition-h3:latest"
+        TEMPLATE_NAME="Ignition H3 Latest"
     else
-        DOCKER_IMAGE="heapsgo0d/ignition-ltx:$VERSION_TAG"
-        TEMPLATE_NAME="Ignition LTX $VERSION_TAG"
+        DOCKER_IMAGE="heapsgo0d/ignition-h3:$VERSION_TAG"
+        TEMPLATE_NAME="Ignition H3 $VERSION_TAG"
     fi
     
     echo "  → Docker Image: $DOCKER_IMAGE"
@@ -174,68 +174,32 @@ get_configuration() {
     CIVITAI_VAES=${input_vaes:-""}
     echo ""
 
-    # LTX-2.3 Model Preset Selection
-    echo -e "${BLUE}LTX-2.3 Video Model Preset:${NC}"
-    echo "  10Eros I2V (NSFW — 10S-Comfy-nodes, no HF token required):"
-    echo "  1) 10Eros FP8 + Gemma FP8        (~44 GB, ~18-20 GB VRAM — recommended)"
-    echo "  2) 10Eros BF16 + Gemma BF16      (~72 GB, ~24+ GB VRAM, A100/H100)"
-    echo "  Standard LTX-2.3 safetensors (SFW — Gemma FP8):"
-    echo "  3) Distilled FP8 + Gemma FP8     (~41 GB)"
-    echo "  4) Dev FP8 + Gemma FP8           (~41 GB)"
-    echo "  5) NVFP4 + Gemma FP8             (~34 GB, RTX 5090 Blackwell only)"
-    echo "  6) Full bundle + Gemma FP8       (~51 GB, FP8 + LoRA + upscalers)"
-    echo "  Standard LTX-2.3 safetensors (SFW — Gemma BF16):"
-    echo "  7) Distilled FP8 + Gemma BF16    (~53 GB)"
-    echo "  8) Dev FP8 + Gemma BF16          (~53 GB)"
-    echo "  9) Full bundle + Gemma BF16      (~63 GB)"
-    echo " 10) Custom (manual entry)"
+    # MiniMax H3 Model Preset Selection
+    # Both bundles are ~43 GB and differ only in the diffusion model quant;
+    # startup.sh retargets the workflows to whichever one lands on disk.
+    echo -e "${BLUE}MiniMax H3 Model Preset:${NC}"
+    echo "  1) INT8  (~43 GB, ~21 GB VRAM, any 24 GB+ card — recommended)"
+    echo "  2) FP8   (~43 GB, native kernels on Ada/Hopper/Blackwell)"
+    echo "  3) Custom (manual entry)"
     read -p "Select preset [1]: " model_preset
 
     case ${model_preset:-1} in
         1)
-            HUGGINGFACE_MODELS="10eros_fp8_bundle"
-            echo "  → Selected: 10Eros FP8 + Gemma FP8 (~44 GB, ~18-20 GB VRAM)"
+            HUGGINGFACE_MODELS="h3_int8_bundle"
+            echo "  → Selected: H3 pruned INT8 + Qwen3-VL NVFP4 + VAEs + Turbo LoRA (~43 GB)"
             ;;
         2)
-            HUGGINGFACE_MODELS="10eros_bf16_bundle"
-            echo "  → Selected: 10Eros BF16 + Gemma BF16 (~72 GB, ~24+ GB VRAM)"
+            HUGGINGFACE_MODELS="h3_fp8_bundle"
+            echo "  → Selected: H3 pruned FP8 + Qwen3-VL NVFP4 + VAEs + Turbo LoRA (~43 GB)"
             ;;
         3)
-            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle"
-            echo "  → Selected: LTX-2.3 Distilled FP8 + Gemma FP8 (~41 GB)"
-            ;;
-        4)
-            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle"
-            echo "  → Selected: LTX-2.3 Dev FP8 + Gemma FP8 (~41 GB)"
-            ;;
-        5)
-            HUGGINGFACE_MODELS="ltx2.3_nvfp4_bundle"
-            echo "  → Selected: LTX-2.3 NVFP4 + Gemma FP8 (~34 GB, Blackwell/RTX 5090 only)"
-            ;;
-        6)
-            HUGGINGFACE_MODELS="ltx2.3_full_bundle"
-            echo "  → Selected: LTX-2.3 Full bundle + Gemma FP8 (~51 GB)"
-            ;;
-        7)
-            HUGGINGFACE_MODELS="ltx2.3_distilled_fp8_bundle_bf16"
-            echo "  → Selected: LTX-2.3 Distilled FP8 + Gemma BF16 (~53 GB)"
-            ;;
-        8)
-            HUGGINGFACE_MODELS="ltx2.3_dev_fp8_bundle_bf16"
-            echo "  → Selected: LTX-2.3 Dev FP8 + Gemma BF16 (~53 GB)"
-            ;;
-        9)
-            HUGGINGFACE_MODELS="ltx2.3_full_bundle_bf16"
-            echo "  → Selected: LTX-2.3 Full bundle + Gemma BF16 (~63 GB)"
-            ;;
-        10)
             read -p "Enter model keys (comma-separated): " input_hf
             HUGGINGFACE_MODELS=${input_hf}
             echo "  → Selected: Custom"
             ;;
         *)
-            HUGGINGFACE_MODELS="10eros_fp8_bundle"
-            echo "  → Invalid selection, defaulting to 10Eros FP8"
+            HUGGINGFACE_MODELS="h3_int8_bundle"
+            echo "  → Invalid selection, defaulting to H3 INT8"
             ;;
     esac
     echo ""
@@ -309,7 +273,7 @@ generate_template() {
     {
       "key": "HUGGINGFACE_MODELS",
       "value": "$HUGGINGFACE_MODELS",
-      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~44 GB, recommended), 10eros_bf16_bundle (~72 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
+      "description": "Model bundle: h3_int8_bundle (~43 GB, any 24 GB+ card, recommended) or h3_fp8_bundle (~43 GB, native fp8 kernels on Ada/Hopper/Blackwell). Workflows are retargeted automatically to whichever downloads."
     },
     {
       "key": "CIVITAI_TOKEN",
@@ -351,7 +315,7 @@ print_summary() {
     echo "  Storage: $(make_storage_note)"
     echo ""
     echo -e "${BLUE}Model Configuration:${NC}"
-    echo "  LTX Model Preset: ${HUGGINGFACE_MODELS:-'None specified'}"
+    echo "  H3 Model Preset: ${HUGGINGFACE_MODELS:-'None specified'}"
     echo "  CivitAI Models: ${CIVITAI_MODELS:-'None'}"
     echo "  CivitAI LoRAs: ${CIVITAI_LORAS:-'None'}"
     echo "  CivitAI VAEs: ${CIVITAI_VAES:-'None'}"
@@ -366,7 +330,9 @@ print_summary() {
 # Generate usage instructions
 generate_instructions() {
     cat > RUNPOD_USAGE.md << EOF
-# 🎬 Ignition LTX RunPod Deployment Guide
+# 🎬 Ignition H3 RunPod Deployment Guide
+
+MiniMax H3 — 768p video with **native 32 kHz stereo audio** generated in a single pass.
 
 ## Quick Start
 
@@ -376,9 +342,8 @@ generate_instructions() {
    - Upload the \`ignition_template.json\` file
 
 2. **Deploy Pod**:
-   - Select Ignition LTX template
-   - Choose GPU (RTX 5090 recommended for NVFP4; 4090/A100 for FP8 distilled)
-   - Add network volume for persistent model storage
+   - Select the Ignition H3 template
+   - Choose a GPU with **24 GB+ VRAM** (5090 preferred; INT8 uses ~21 GB)
    - Deploy!
 
 ## Access URLs
@@ -392,41 +357,46 @@ Once your pod is running:
 
 ## Model Presets
 
-**10Eros I2V (recommended default, no HF token required):**
+No HF token required — \`Comfy-Org/MiniMax-H3\` is ungated.
 
 | Key | Disk | VRAM | Notes |
 |-----|------|------|-------|
-| \`10eros_fp8_bundle\` | ~44 GB | ~18-20 GB | FP8 checkpoint + Gemma FP8 + upscaler + LoRA. Filenames match the shipped workflows — no UI changes needed. |
-| \`10eros_bf16_bundle\` | ~72 GB | ~24+ GB | BF16 checkpoint + Gemma BF16 + upscaler + LoRA. A100/H100. Requires repointing 4 loader dropdowns to the BF16 files. |
+| \`h3_int8_bundle\` | ~43 GB | ~21 GB | Pruned INT8 convrot. Runs on any 24 GB+ card. **Default.** |
+| \`h3_fp8_bundle\` | ~43 GB | ~21 GB | Pruned FP8 scaled. Native kernels on Ada/Hopper/Blackwell, emulated (slower) on older cards. |
 
-Use the \`10Eros_10SNodes_I2V_v3_TiledSampler.json\` workflow (or \`..._LikenessGuideHelper_I2V_v3.2.json\` for face-likeness work).
-\`RTXVideoSuperResolution\` ships bypassed — it needs NVIDIA's \`nvvfx\` SDK, which is not available in the Linux container.
+Both bundles include the Qwen3-VL-32B NVFP4 text encoder (15.69 GB), both VAEs
+(video fp16 5.21 GB + audio fp32 0.61 GB) and the 4-step Turbo LoRA (~744 MB).
 
-**Standard LTX-2.3 bundles (Gemma FP8, no HF token required):**
+Switching bundles needs no rebuild: \`startup.sh\` runs
+\`scripts/retarget_workflows.py\`, which repoints every loader — including the
+subgraph's promoted widget and \`properties.models\` — at whichever quant
+actually downloaded.
 
-| Key | Disk | VRAM | Use Case |
-|-----|------|------|----------|
-| \`ltx2.3_distilled_fp8_bundle\` | ~41 GB | ~18-20 GB | T2V + I2V (fast) |
-| \`ltx2.3_dev_fp8_bundle\` | ~41 GB | ~20-22 GB | T2V + I2V (quality) |
-| \`ltx2.3_nvfp4_bundle\` | ~34 GB | ~14 GB | RTX 5090 Blackwell only |
-| \`ltx2.3_full_bundle\` | ~51 GB | ~20 GB | FP8 + LoRA + upscalers |
+Individual keys: \`h3_fl2va_int8\`, \`h3_fl2va_fp8\`, \`h3_ref2va_int8\`,
+\`h3_ref2va_fp8\`, \`h3_text_encoder_nvfp4\`, \`h3_text_encoder_int8\`,
+\`h3_video_vae\`, \`h3_audio_vae\`, \`h3_turbo_lora\`
 
-**Standard LTX-2.3 bundles (Gemma BF16, full text quality):**
+## Workflows
 
-| Key | Disk | VRAM | Use Case |
-|-----|------|------|----------|
-| \`ltx2.3_distilled_fp8_bundle_bf16\` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
-| \`ltx2.3_dev_fp8_bundle_bf16\` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
-| \`ltx2.3_full_bundle_bf16\` | ~63 GB | ~24 GB | BF16 + LoRA + upscalers |
+Two workflows ship, both adapted from Comfy's official templates:
 
-Individual keys: \`10eros_fp8\`, \`10eros_bf16\`, \`ltx23_video_vae\`, \`ltx23_audio_vae\`, \`ltx2.3_dev_fp8\`, \`ltx2.3_distilled_fp8\`, \`gemma3_text_encoder\`
+- \`minimax_h3_i2v_turbo.json\` — image to video (first/last frame)
+- \`minimax_h3_t2v_turbo.json\` — text to video
+
+**The Turbo LoRA is ON by default at 6 steps.** For final renders, select the
+\`Turbo LoRA\` node inside the subgraph, press \`Ctrl+B\` to bypass it, and raise
+\`BasicScheduler\` steps back to \`20\`. A 4 s 720p clip is roughly 7 minutes on a
+4090 at full steps, so turbo is what makes prompt iteration bearable.
+
+Constraints baked into the model: 768 px short edge, capped at 768×1344, each
+axis rounded to a multiple of 32; duration snaps to a 17k+5 frame grid at 24 fps.
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| \`HUGGINGFACE_MODELS\` | Model bundle or comma-separated keys | \`10eros_fp8_bundle\` |
-| \`HF_TOKEN\` | HuggingFace token (not needed for 10Eros or standard LTX bundles) | \`hf_xxx\` |
+| \`HUGGINGFACE_MODELS\` | Model bundle or comma-separated keys | \`h3_int8_bundle\` |
+| \`HF_TOKEN\` | HuggingFace token (not needed — H3 is ungated) | \`hf_xxx\` |
 | \`CIVITAI_MODELS\` | CivitAI checkpoint IDs (optional) | \`138977\` |
 | \`CIVITAI_LORAS\` | CivitAI LoRA IDs (optional) | \`182404\` |
 | \`CIVITAI_TOKEN\` | CivitAI API token (optional) | \`abc123\` |
@@ -438,10 +408,11 @@ Storage: $(make_storage_note) (Container: ${CONTAINER_DISK_GB}GB disk, ${VOLUME_
 ## Startup Process
 
 1. 🔍 System check + GPU detection
-2. 💾 Storage setup (creates model dirs incl. latent_upscale_models)
-3. 📥 LTX-2.3 model downloads via HuggingFace (parallel with CivitAI if set)
-4. 📁 File browser start (port 8080)
-5. 🎬 ComfyUI start with ComfyUI-LTXVideo nodes (port 8188)
+2. 💾 Storage setup (creates model dirs)
+3. 📥 Model downloads via HuggingFace (parallel with CivitAI if set)
+4. 🎯 Workflow retargeting to the downloaded quant
+5. 📁 File browser start (port 8080)
+6. 🎬 ComfyUI start (port 8188) — no custom node packs, all nodes are core
 
 ## 🔄 Restarting ComfyUI
 
@@ -474,14 +445,13 @@ tail -f /tmp/ignition_startup.log
 \`\`\`
 
 ### Common Issues
-- **Models not downloading**: Verify \`HUGGINGFACE_MODELS\` key spelling; set \`HF_TOKEN\` for Gemma
-- **Gemma download fails**: Accept license at huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized
+- **Models not downloading**: Verify \`HUGGINGFACE_MODELS\` key spelling (\`h3_int8_bundle\` or \`h3_fp8_bundle\`)
 - **Out of VRAM**: Use FP8 distilled (~18GB) or NVFP4 (~14GB, Blackwell only)
 - **ComfyUI not responding**: Run \`/workspace/scripts/restart-comfyui.sh\`
 - **Want to re-download models**: Set \`FORCE_MODEL_SYNC=true\` and restart pod
 
 ---
-**🎬 Ready to generate video with Ignition LTX!**
+**🎬 Ready to generate video + audio with Ignition H3!**
 EOF
 }
 
@@ -511,7 +481,7 @@ deploy_template() {
   "volumeMountPath": "/workspace",
   "dockerArgs": "",
   "ports": "8188/http,8080/http",
-  "readme": "# $TEMPLATE_NAME\\n\\n$TEMPLATE_DESCRIPTION\\n\\n## Configuration\\n- LTX Model Preset: $HUGGINGFACE_MODELS\\n- CivitAI Models: ${CIVITAI_MODELS:-none}\\n- CivitAI LoRAs: ${CIVITAI_LORAS:-none}\\n- Storage: ${STORAGE_NOTE} (${CONTAINER_DISK_GB}GB container disk, ${VOLUME_GB}GB volume)",
+  "readme": "# $TEMPLATE_NAME\\n\\n$TEMPLATE_DESCRIPTION\\n\\n## Configuration\\n- H3 Model Preset: $HUGGINGFACE_MODELS\\n- CivitAI Models: ${CIVITAI_MODELS:-none}\\n- CivitAI LoRAs: ${CIVITAI_LORAS:-none}\\n- Storage: ${STORAGE_NOTE} (${CONTAINER_DISK_GB}GB container disk, ${VOLUME_GB}GB volume)",
   "env": [
     {"key": "HUGGINGFACE_MODELS", "value": "$HUGGINGFACE_MODELS"},
     {"key": "CIVITAI_MODELS", "value": "$CIVITAI_MODELS"},
@@ -636,7 +606,7 @@ main() {
     fi
     
     echo ""
-    echo -e "${GREEN}🎬 Happy generating with Ignition LTX!${NC}"
+    echo -e "${GREEN}🎬 Happy generating with Ignition H3!${NC}"
 }
 
 # Run main function

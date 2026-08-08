@@ -1,7 +1,7 @@
 {
-  "name": "Ignition LTX v1.0.3-10eros",
-  "description": "ComfyUI LTX-2.3 video generation (T2V + I2V) — CUDA 13.0, PyTorch nightly cu130, RTX 5090 / Blackwell NVFP4 ready",
-  "dockerImage": "heapsgo0d/ignition-ltx:v1.0.3-10eros",
+  "name": "Ignition H3 v2.0.0-h3",
+  "description": "ComfyUI MiniMax H3 video + native 32 kHz stereo audio (I2V + T2V) — CUDA 13.0, PyTorch nightly cu130, 4-step Turbo LoRA",
+  "dockerImage": "heapsgo0d/ignition-h3:v2.0.0-h3",
   "ports": [
     {
       "privatePort": 8188,
@@ -40,8 +40,8 @@
     },
     {
       "key": "HUGGINGFACE_MODELS",
-      "value": "10eros_fp8_bundle",
-      "description": "Model bundle. 10Eros I2V: 10eros_fp8_bundle (~44 GB, recommended), 10eros_bf16_bundle (~72 GB, max quality). Standard LTX-2.3: ltx2.3_distilled_fp8_bundle, ltx2.3_dev_fp8_bundle"
+      "value": "h3_int8_bundle",
+      "description": "Model bundle: h3_int8_bundle (~43 GB, any 24 GB+ card, recommended) or h3_fp8_bundle (~43 GB, native fp8 kernels on Ada/Hopper/Blackwell). Workflows are retargeted automatically to whichever downloads."
     },
     {
       "key": "CIVITAI_TOKEN",

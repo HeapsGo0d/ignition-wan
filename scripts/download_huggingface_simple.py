@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-Simple HuggingFace downloader for Ignition LTX.
-Uses aria2c for all downloads. LTX models from Lightricks/LTX-2.3.
-10Eros model from TenStrip/LTX2.3-10Eros (self-contained, no HF_TOKEN required).
-Gemma text encoder from Comfy-Org/ltx-2 (single-file, spiece_model embedded, no token needed).
+HuggingFace downloader for Ignition H3.
+
+All MiniMax H3 weights come from Comfy-Org/MiniMax-H3, repackaged for ComfyUI's
+native nodes. Nothing here is gated, so HF_TOKEN is optional.
+
+Downloads use aria2c (see download_utils.download_with_aria2).
 """
 
 import os
@@ -15,204 +17,84 @@ from typing import Dict, List, Optional
 # Import shared utilities
 from download_utils import log, download_with_aria2, validate_huggingface_repo, validate_models_list
 
-LTX_MAIN_REPO = "Lightricks/LTX-2.3"
-LTX_FP8_REPO = "Lightricks/LTX-2.3-fp8"
-LTX_NVFP4_REPO = "Lightricks/LTX-2.3-nvfp4"
+H3_REPO = "Comfy-Org/MiniMax-H3"
+TURBO_LORA_REPO = "larryvrh/MiniMax-H3-Turbo-Lora"
 
-# Single-file model downloads (aria2c)
-# All main LTX-2.3 model files go into models/checkpoints/ (ComfyUI-LTXVideo convention)
-# Upscalers go into models/latent_upscale_models/
-# VAE is bundled inside the main model — no separate VAE download needed
-LTX_MODELS = {
-    # --- Main models (BF16, ~46 GB each) ---
-    'ltx2.3_dev': {
-        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-22b-dev.safetensors',
-        'filename': 'ltx-2.3-22b-dev.safetensors',
-        'subdir': 'checkpoints'
-    },
-    'ltx2.3_distilled': {
-        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-22b-distilled-1.1.safetensors',
-        'filename': 'ltx-2.3-22b-distilled-1.1.safetensors',
-        'subdir': 'checkpoints'
-    },
-    # --- FP8 models (~29 GB each) ---
-    'ltx2.3_dev_fp8': {
-        'url': f'https://huggingface.co/{LTX_FP8_REPO}/resolve/main/ltx-2.3-22b-dev-fp8.safetensors',
-        'filename': 'ltx-2.3-22b-dev-fp8.safetensors',
-        'subdir': 'checkpoints'
-    },
-    'ltx2.3_distilled_fp8': {
-        'url': f'https://huggingface.co/{LTX_FP8_REPO}/resolve/main/ltx-2.3-22b-distilled-fp8.safetensors',
-        'filename': 'ltx-2.3-22b-distilled-fp8.safetensors',
-        'subdir': 'checkpoints'
-    },
-    # --- NVFP4 model (~21.7 GB, RTX 5090 / Blackwell only) ---
-    'ltx2.3_dev_nvfp4': {
-        'url': f'https://huggingface.co/{LTX_NVFP4_REPO}/resolve/main/ltx-2.3-22b-dev-nvfp4.safetensors',
-        'filename': 'ltx-2.3-22b-dev-nvfp4.safetensors',
-        'subdir': 'checkpoints'
-    },
-    # --- Distilled LoRA (7.61 GB, required for two-stage upscale pipelines) ---
-    'ltx2.3_distilled_lora': {
-        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-22b-distilled-lora-384-1.1.safetensors',
-        'filename': 'ltx-2.3-22b-distilled-lora-384-1.1.safetensors',
-        'subdir': 'loras'
-    },
-    # --- Spatial upscalers (~1 GB each, latent_upscale_models/) ---
-    'ltx2.3_spatial_x2': {
-        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-spatial-upscaler-x2-1.1.safetensors',
-        'filename': 'ltx-2.3-spatial-upscaler-x2-1.1.safetensors',
-        'subdir': 'latent_upscale_models'
-    },
-    'ltx2.3_spatial_x1_5': {
-        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-spatial-upscaler-x1.5-1.0.safetensors',
-        'filename': 'ltx-2.3-spatial-upscaler-x1.5-1.0.safetensors',
-        'subdir': 'latent_upscale_models'
-    },
-    # --- Temporal upscaler (262 MB) ---
-    'ltx2.3_temporal_x2': {
-        'url': f'https://huggingface.co/{LTX_MAIN_REPO}/resolve/main/ltx-2.3-temporal-upscaler-x2-1.0.safetensors',
-        'filename': 'ltx-2.3-temporal-upscaler-x2-1.0.safetensors',
-        'subdir': 'latent_upscale_models'
-    },
-    # --- Gemma 3 12B text encoder — ComfyUI-repackaged single file with spiece_model embedded ---
-    # Comfy-Org/ltx-2 is not gated; no HF_TOKEN required.
-    # FP8 (~12 GB): default, pairs well with FP8/NVFP4 LTX checkpoints
-    'gemma3_text_encoder': {
-        'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors',
-        'filename': 'comfy_gemma_3_12B_it.safetensors',
-        'subdir': 'text_encoders'
-    },
-    # BF16 (~24 GB): full precision, for A100/H100 or maximum quality
-    'gemma3_text_encoder_bf16': {
-        'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it.safetensors',
-        'filename': 'comfy_gemma_3_12B_it.safetensors',
-        'subdir': 'text_encoders'
-    },
 
-    # --- Sulphur 2 safetensors (from SulphurAI/Sulphur-2-base) ---
-    # Used by ComfyUI-LTXVideo nodes (same as standard LTX-2.3 safetensors path)
-    # Pair with gemma3_text_encoder or gemma3_text_encoder_bf16
-    'sulphur2_dev_fp8': {
-        'url': 'https://huggingface.co/SulphurAI/Sulphur-2-base/resolve/main/sulphur_dev_fp8mixed.safetensors',
-        'filename': 'sulphur_dev_fp8mixed.safetensors',
-        'subdir': 'checkpoints'
-    },
-    'sulphur2_dev_bf16': {
-        'url': 'https://huggingface.co/SulphurAI/Sulphur-2-base/resolve/main/sulphur_dev_bf16.safetensors',
-        'filename': 'sulphur_dev_bf16.safetensors',
-        'subdir': 'checkpoints'
-    },
-    'sulphur2_distil_bf16': {
-        'url': 'https://huggingface.co/SulphurAI/Sulphur-2-base/resolve/main/sulphur_distil_bf16.safetensors',
-        'filename': 'sulphur_distil_bf16.safetensors',
-        'subdir': 'checkpoints'
-    },
+def _h3(path: str, subdir: str) -> Dict[str, str]:
+    """Registry entry for a file in Comfy-Org/MiniMax-H3."""
+    return {
+        'url': f'https://huggingface.co/{H3_REPO}/resolve/main/{path}',
+        'filename': path.rsplit('/', 1)[-1],
+        'subdir': subdir,
+    }
 
-    # --- 10Eros (TenStrip/LTX2.3-10Eros) — transformer checkpoints (image VAE+CLIP bundled) ---
-    # Fine-tune of Sulphur-2-base optimised for I2V; loads via ComfyUI-LTXVideo nodes
-    # No HF_TOKEN required. Pair with gemma3_text_encoder_10eros + spatial upscaler + condsafe LoRA.
-    '10eros_fp8': {
-        'url': 'https://huggingface.co/TenStrip/LTX2.3-10Eros/resolve/main/10Eros_v1-fp8mixed_learned.safetensors',
-        'filename': '10Eros_v1-fp8mixed_learned.safetensors',
-        'subdir': 'checkpoints'
-    },
-    '10eros_bf16': {
-        'url': 'https://huggingface.co/TenStrip/LTX2.3-10Eros/resolve/main/10Eros_v1_bf16.safetensors',
-        'filename': '10Eros_v1_bf16.safetensors',
-        'subdir': 'checkpoints'
-    },
 
-    # Gemma text encoder saved as the filename the 10Eros workflows hardcode
-    # (workflows were built against gemma_3_12B_it_fp8_e4m3fn.safetensors; closest public file is fp8_scaled).
-    # Both are FP8, so this is a naming alias only — do NOT point a BF16 file at this filename.
-    'gemma3_text_encoder_10eros': {
-        'url': 'https://huggingface.co/Comfy-Org/ltx-2/resolve/main/split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors',
-        'filename': 'gemma_3_12B_it_fp8_e4m3fn.safetensors',
-        'subdir': 'text_encoders'
-    },
+# Single-file model downloads.
+#
+# The `subdir` values are what ComfyUI's loader dropdowns list, so they must
+# match the workflow widget values exactly. Note in particular that the LoRA
+# goes in loras/ ROOT, not a nested folder: on the parked feature/10eros branch
+# a nested loras/ltx23/ subdir silently broke every generation, because the node
+# that emitted the filename used the bare name. Don't nest without a reason.
+H3_MODELS = {
+    # --- Diffusion models (fl2va = text/first/last-frame to video+audio) ---
+    # "pruned" = precomputed adaLN curve tables, ~40% smaller than plain int8.
+    # int8_convrot runs on any GPU; fp8_scaled has native kernels on Ada/Hopper/
+    # Blackwell and is emulated (slower) on older cards. Same download size.
+    'h3_fl2va_int8': _h3('diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors',
+                         'diffusion_models'),          # 20.97 GB
+    'h3_fl2va_fp8': _h3('diffusion_models/minimax_h3_fl2va_pruned_fp8_scaled.safetensors',
+                        'diffusion_models'),           # 20.96 GB
 
-    # Condition-safe distilled LoRA from TenStrip's experiments repo (~662 MB)
-    # Must live in loras/ root, NOT a subdirectory: the workflows' `easy loraNames`
-    # node (783) emits the bare filename and drives the four LTX2LoraLoaderAdvanced
-    # lora_name widget inputs by link, which overrides their stored widget values.
-    # A nested subdir makes ComfyUI list the file as "ltx23/<name>", which the bare
-    # name emitted by node 783 will not match.
-    '10eros_condsafe_lora': {
-        'url': 'https://huggingface.co/TenStrip/LTX2.3_Distilled_Lora_1.1_Experiments/resolve/main/ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors',
-        'filename': 'ltx-2.3-22b-distilled-lora-1.1_fro90_ceil72_condsafe.safetensors',
-        'subdir': 'loras'
-    },
+    # ref2va = reference-driven (up to 9 images or 3 video/audio clips).
+    # Not in any default bundle — the R2V workflow is not shipped yet.
+    'h3_ref2va_int8': _h3('diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors',
+                          'diffusion_models'),         # 20.97 GB
+    'h3_ref2va_fp8': _h3('diffusion_models/minimax_h3_ref2va_pruned_fp8_scaled.safetensors',
+                         'diffusion_models'),          # 20.96 GB
 
-    # --- Standalone VAE files (optional — ERos checkpoints bundle VAEs, but available separately) ---
-    'ltx23_video_vae': {
-        'url': 'https://huggingface.co/Kijai/LTX2.3_comfy/resolve/main/vae/LTX23_video_vae_bf16.safetensors',
-        'filename': 'LTX23_video_vae_bf16.safetensors',
-        'subdir': 'vae'
-    },
-    'ltx23_audio_vae': {
-        'url': 'https://huggingface.co/Kijai/LTX2.3_comfy/resolve/main/vae/LTX23_audio_vae_bf16.safetensors',
-        'filename': 'LTX23_audio_vae_bf16.safetensors',
-        'subdir': 'vae'
+    # --- Text encoder (Qwen3-VL-32B) ---
+    # nvfp4_awq is the default: smallest by far and runs on any GPU.
+    'h3_text_encoder_nvfp4': _h3('text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors',
+                                 'text_encoders'),     # 15.69 GB
+    'h3_text_encoder_int8': _h3('text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors',
+                                'text_encoders'),      # 27.14 GB
+
+    # --- VAEs — one quant each, always needed, regardless of GPU ---
+    'h3_video_vae': _h3('vae/minimax_h3_video_vae_fp16.safetensors', 'vae'),   # 5.21 GB
+    'h3_audio_vae': _h3('vae/minimax_h3_audio_vae_fp32.safetensors', 'vae'),   # 0.61 GB
+
+    # --- Community 4-step Turbo LoRA (~744 MB) ---
+    # Cuts ~20 sampling steps to 4-8. Strength 1.0, simple scheduler.
+    # Autodetects the base variant at runtime, so it works with int8 and fp8 alike.
+    'h3_turbo_lora': {
+        'url': f'https://huggingface.co/{TURBO_LORA_REPO}/resolve/main/minimax_h3_turbo_v4_step600_ema.safetensors',
+        'filename': 'minimax_h3_turbo_v4_step600_ema.safetensors',
+        'subdir': 'loras',
     },
 }
 
-# Convenience bundle keys that expand to multiple models
-# _fp8 bundles use Gemma FP8 (~12 GB); _bf16 bundles use Gemma BF16 (~24 GB, full quality)
-LTX_BUNDLES = {
-    # --- 10Eros bundles ---
-    # FP8: checkpoint (~29 GB) + Gemma FP8 (~13 GB) + spatial upscaler (~1 GB) + condsafe LoRA (~0.7 GB) ≈ 44 GB
-    # Filenames match the shipped 10Eros workflows exactly — loads with no UI changes.
-    '10eros_fp8_bundle': ['10eros_fp8', 'gemma3_text_encoder_10eros', 'ltx2.3_spatial_x2', '10eros_condsafe_lora'],
-    # BF16: checkpoint (~46 GB) + Gemma BF16 (~24 GB) + spatial upscaler (~1 GB) + condsafe LoRA (~0.7 GB) ≈ 72 GB
-    # NOTE: the 10Eros workflows hardcode the FP8 filenames. After downloading this bundle you must
-    # repoint four dropdowns to the BF16 files (they will be present, just not selected):
-    #   CheckpointLoaderSimple (646)   -> 10Eros_v1_bf16.safetensors
-    #   LTXVAudioVAELoader (617)       -> 10Eros_v1_bf16.safetensors
-    #   LTXAVTextEncoderLoader (616)   -> comfy_gemma_3_12B_it.safetensors  AND  10Eros_v1_bf16.safetensors
-    '10eros_bf16_bundle': ['10eros_bf16', 'gemma3_text_encoder_bf16', 'ltx2.3_spatial_x2', '10eros_condsafe_lora'],
-
-    # --- Standard LTX-2.3 bundles (_fp8 use Gemma FP8; _bf16 use Gemma BF16) ---
-    # Quickstart: distilled fp8 + Gemma FP8 (~41 GB)
-    'ltx2.3_distilled_fp8_bundle': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder'],
-    # Quickstart BF16 Gemma: distilled fp8 + Gemma BF16 (~53 GB, full text encoder quality)
-    'ltx2.3_distilled_fp8_bundle_bf16': ['ltx2.3_distilled_fp8', 'gemma3_text_encoder_bf16'],
-    # Dev fp8 + Gemma FP8 (~41 GB)
-    'ltx2.3_dev_fp8_bundle': ['ltx2.3_dev_fp8', 'gemma3_text_encoder'],
-    # Dev fp8 + Gemma BF16 (~53 GB)
-    'ltx2.3_dev_fp8_bundle_bf16': ['ltx2.3_dev_fp8', 'gemma3_text_encoder_bf16'],
-    # Blackwell: NVFP4 dev + Gemma FP8 (~34 GB, RTX 5090 only)
-    'ltx2.3_nvfp4_bundle': ['ltx2.3_dev_nvfp4', 'gemma3_text_encoder'],
-    # Blackwell BF16 Gemma: NVFP4 dev + Gemma BF16 (~46 GB, RTX 5090 only)
-    'ltx2.3_nvfp4_bundle_bf16': ['ltx2.3_dev_nvfp4', 'gemma3_text_encoder_bf16'],
-    # Full distilled: fp8 + distilled LoRA + Gemma FP8 + upscalers (~51 GB, two-stage pipeline)
-    'ltx2.3_full_bundle': [
-        'ltx2.3_distilled_fp8', 'ltx2.3_distilled_lora',
-        'gemma3_text_encoder',
-        'ltx2.3_spatial_x2', 'ltx2.3_temporal_x2'
-    ],
-    # Full BF16 Gemma: fp8 + distilled LoRA + Gemma BF16 + upscalers (~63 GB)
-    'ltx2.3_full_bundle_bf16': [
-        'ltx2.3_distilled_fp8', 'ltx2.3_distilled_lora',
-        'gemma3_text_encoder_bf16',
-        'ltx2.3_spatial_x2', 'ltx2.3_temporal_x2'
-    ],
-    # Upscalers only (if main model already downloaded)
-    'ltx2.3_upscalers_bundle': ['ltx2.3_spatial_x2', 'ltx2.3_spatial_x1_5', 'ltx2.3_temporal_x2'],
-
-    # --- Sulphur 2 safetensors — parked on spike/ltx-2.3; kept here for reference ---
-    # Uses ComfyUI-LTXVideo nodes (same workflows as standard LTX-2.3); pair with Gemma text encoder
-    'sulphur2_fp8_bundle': ['sulphur2_dev_fp8', 'gemma3_text_encoder'],
-    'sulphur2_fp8_bundle_bf16': ['sulphur2_dev_fp8', 'gemma3_text_encoder_bf16'],
-    'sulphur2_bf16_bundle': ['sulphur2_dev_bf16', 'gemma3_text_encoder_bf16'],
+# Convenience bundle keys that expand to multiple model keys.
+#
+# Both bundles are ~43.2 GB and differ only in the diffusion model quant, so
+# switching is a bundle-key change with no rebuild. scripts/retarget_workflows.py
+# repoints the workflow loaders at whichever one actually landed on disk.
+H3_BUNDLES = {
+    # Default. ~21 GB VRAM in use — runs on any 24 GB+ card.
+    'h3_int8_bundle': ['h3_fl2va_int8', 'h3_text_encoder_nvfp4',
+                       'h3_video_vae', 'h3_audio_vae', 'h3_turbo_lora'],
+    # Native fp8 kernels on Ada/Hopper/Blackwell (4090/5090/H100).
+    'h3_fp8_bundle': ['h3_fl2va_fp8', 'h3_text_encoder_nvfp4',
+                      'h3_video_vae', 'h3_audio_vae', 'h3_turbo_lora'],
 }
 
 
-def normalize_ltx_key(model_input: str) -> str:
+def normalize_h3_key(model_input: str) -> str:
     """Expand bundle keys to comma-separated model key lists."""
-    if model_input in LTX_BUNDLES:
-        return ','.join(LTX_BUNDLES[model_input])
-    if model_input in LTX_MODELS:
+    if model_input in H3_BUNDLES:
+        return ','.join(H3_BUNDLES[model_input])
+    if model_input in H3_MODELS:
         return model_input
     return model_input
 
@@ -237,14 +119,14 @@ def parse_generic_repo(model_input: str) -> Optional[Dict[str, str]]:
     }
 
 
-def download_ltx_model(model_key: str, base_output_dir: Path, token: str = "", force: bool = False) -> bool:
-    """Download an LTX model — supports predefined and generic HF repo formats."""
+def download_h3_model(model_key: str, base_output_dir: Path, token: str = "", force: bool = False) -> bool:
+    """Download a model — supports predefined keys and generic HF repo format."""
 
     model_info: Optional[Dict[str, str]] = None
 
-    if model_key in LTX_MODELS:
-        model_info = LTX_MODELS[model_key]
-        log('info', f'Downloading predefined LTX model: {model_key}')
+    if model_key in H3_MODELS:
+        model_info = H3_MODELS[model_key]
+        log('info', f'Downloading predefined H3 model: {model_key}')
 
     elif ':' in model_key:
         model_info = parse_generic_repo(model_key)
@@ -255,8 +137,8 @@ def download_ltx_model(model_key: str, base_output_dir: Path, token: str = "", f
             return False
 
     else:
-        available = list(LTX_MODELS.keys()) + list(LTX_BUNDLES.keys())
-        log('error', f'Unknown LTX model: {model_key}. Available: {", ".join(available)}')
+        available = list(H3_MODELS.keys()) + list(H3_BUNDLES.keys())
+        log('error', f'Unknown H3 model: {model_key}. Available: {", ".join(available)}')
         log('info', 'Or use generic format: repo:filename:subdir[:branch]')
         return False
 
@@ -271,10 +153,10 @@ def download_ltx_model(model_key: str, base_output_dir: Path, token: str = "", f
 
 def main() -> int:
     """Main entry point."""
-    available_keys = list(LTX_MODELS.keys()) + list(LTX_BUNDLES.keys())
-    parser = argparse.ArgumentParser(description='HuggingFace downloader for Ignition LTX')
+    available_keys = list(H3_MODELS.keys()) + list(H3_BUNDLES.keys())
+    parser = argparse.ArgumentParser(description='HuggingFace downloader for Ignition H3')
     parser.add_argument('--repos', required=True,
-                        help=('Comma-separated list of LTX model keys. '
+                        help=('Comma-separated list of H3 model keys. '
                               f'Predefined: {", ".join(available_keys)}. '
                               'Generic format: repo:filename:subdir[:branch]'))
     parser.add_argument('--token', default='', help='HuggingFace API token')
@@ -288,7 +170,7 @@ def main() -> int:
     if token:
         log('info', 'HuggingFace token provided (used for private/gated repos)')
     else:
-        log('info', 'No HuggingFace token — public models only (Comfy-Org Gemma is not gated)')
+        log('info', 'No HuggingFace token — Comfy-Org/MiniMax-H3 is not gated, none needed')
 
     force_sync = os.getenv('FORCE_MODEL_SYNC', 'false').lower() == 'true'
     if force_sync:
@@ -301,13 +183,13 @@ def main() -> int:
 
     if not valid_model_inputs:
         log('error', 'No valid HuggingFace models provided after validation')
-        log('info', 'Use predefined bundle keys like ltx2.3_distilled_fp8_bundle or individual keys')
+        log('info', 'Use a bundle key like h3_int8_bundle, or individual model keys')
         return 1
 
     # Expand bundles and deduplicate
     all_model_keys: List[str] = []
     for model_input in valid_model_inputs:
-        normalized = normalize_ltx_key(model_input)
+        normalized = normalize_h3_key(model_input)
         if ',' in normalized:
             all_model_keys.extend([k.strip() for k in normalized.split(',')])
         else:
@@ -321,12 +203,12 @@ def main() -> int:
             unique_keys.append(k)
     all_model_keys = unique_keys
 
-    log('info', f'Starting download of {len(all_model_keys)} LTX models to {output_dir}')
+    log('info', f'Starting download of {len(all_model_keys)} models to {output_dir}')
     log('info', f'Model keys: {", ".join(all_model_keys)}')
 
     success_count = 0
     for model_key in all_model_keys:
-        if download_ltx_model(model_key, output_dir, token, force=force_sync):
+        if download_h3_model(model_key, output_dir, token, force=force_sync):
             success_count += 1
         else:
             log('warning', f'Failed to download model {model_key}')

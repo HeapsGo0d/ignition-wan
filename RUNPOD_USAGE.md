@@ -1,4 +1,6 @@
-# 🎬 Ignition LTX RunPod Deployment Guide
+# 🎬 Ignition H3 RunPod Deployment Guide
+
+MiniMax H3 — 768p video with **native 32 kHz stereo audio** generated in a single pass.
 
 ## Quick Start
 
@@ -8,9 +10,8 @@
    - Upload the `ignition_template.json` file
 
 2. **Deploy Pod**:
-   - Select Ignition LTX template
-   - Choose GPU (RTX 5090 recommended for NVFP4; 4090/A100 for FP8 distilled)
-   - Add network volume for persistent model storage
+   - Select the Ignition H3 template
+   - Choose a GPU with **24 GB+ VRAM** (5090 preferred; INT8 uses ~21 GB)
    - Deploy!
 
 ## Access URLs
@@ -24,41 +25,46 @@ Once your pod is running:
 
 ## Model Presets
 
-**10Eros I2V (recommended default, no HF token required):**
+No HF token required — `Comfy-Org/MiniMax-H3` is ungated.
 
 | Key | Disk | VRAM | Notes |
 |-----|------|------|-------|
-| `10eros_fp8_bundle` | ~44 GB | ~18-20 GB | FP8 checkpoint + Gemma FP8 + upscaler + LoRA. Filenames match the shipped workflows — no UI changes needed. |
-| `10eros_bf16_bundle` | ~72 GB | ~24+ GB | BF16 checkpoint + Gemma BF16 + upscaler + LoRA. A100/H100. Requires repointing 4 loader dropdowns to the BF16 files. |
+| `h3_int8_bundle` | ~43 GB | ~21 GB | Pruned INT8 convrot. Runs on any 24 GB+ card. **Default.** |
+| `h3_fp8_bundle` | ~43 GB | ~21 GB | Pruned FP8 scaled. Native kernels on Ada/Hopper/Blackwell, emulated (slower) on older cards. |
 
-Use the `10Eros_10SNodes_I2V_v3_TiledSampler.json` workflow (or `..._LikenessGuideHelper_I2V_v3.2.json` for face-likeness work).
-`RTXVideoSuperResolution` ships bypassed — it needs NVIDIA's `nvvfx` SDK, which is not available in the Linux container.
+Both bundles include the Qwen3-VL-32B NVFP4 text encoder (15.69 GB), both VAEs
+(video fp16 5.21 GB + audio fp32 0.61 GB) and the 4-step Turbo LoRA (~744 MB).
 
-**Standard LTX-2.3 bundles (Gemma FP8, no HF token required):**
+Switching bundles needs no rebuild: `startup.sh` runs
+`scripts/retarget_workflows.py`, which repoints every loader — including the
+subgraph's promoted widget and `properties.models` — at whichever quant
+actually downloaded.
 
-| Key | Disk | VRAM | Use Case |
-|-----|------|------|----------|
-| `ltx2.3_distilled_fp8_bundle` | ~41 GB | ~18-20 GB | T2V + I2V (fast) |
-| `ltx2.3_dev_fp8_bundle` | ~41 GB | ~20-22 GB | T2V + I2V (quality) |
-| `ltx2.3_nvfp4_bundle` | ~34 GB | ~14 GB | RTX 5090 Blackwell only |
-| `ltx2.3_full_bundle` | ~51 GB | ~20 GB | FP8 + LoRA + upscalers |
+Individual keys: `h3_fl2va_int8`, `h3_fl2va_fp8`, `h3_ref2va_int8`,
+`h3_ref2va_fp8`, `h3_text_encoder_nvfp4`, `h3_text_encoder_int8`,
+`h3_video_vae`, `h3_audio_vae`, `h3_turbo_lora`
 
-**Standard LTX-2.3 bundles (Gemma BF16, full text quality):**
+## Workflows
 
-| Key | Disk | VRAM | Use Case |
-|-----|------|------|----------|
-| `ltx2.3_distilled_fp8_bundle_bf16` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
-| `ltx2.3_dev_fp8_bundle_bf16` | ~53 GB | ~24-26 GB | T2V + I2V (max quality) |
-| `ltx2.3_full_bundle_bf16` | ~63 GB | ~24 GB | BF16 + LoRA + upscalers |
+Two workflows ship, both adapted from Comfy's official templates:
 
-Individual keys: `10eros_fp8`, `10eros_bf16`, `ltx23_video_vae`, `ltx23_audio_vae`, `ltx2.3_dev_fp8`, `ltx2.3_distilled_fp8`, `gemma3_text_encoder`
+- `minimax_h3_i2v_turbo.json` — image to video (first/last frame)
+- `minimax_h3_t2v_turbo.json` — text to video
+
+**The Turbo LoRA is ON by default at 6 steps.** For final renders, select the
+`Turbo LoRA` node inside the subgraph, press `Ctrl+B` to bypass it, and raise
+`BasicScheduler` steps back to `20`. A 4 s 720p clip is roughly 7 minutes on a
+4090 at full steps, so turbo is what makes prompt iteration bearable.
+
+Constraints baked into the model: 768 px short edge, capped at 768×1344, each
+axis rounded to a multiple of 32; duration snaps to a 17k+5 frame grid at 24 fps.
 
 ## Environment Variables
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `HUGGINGFACE_MODELS` | Model bundle or comma-separated keys | `10eros_fp8_bundle` |
-| `HF_TOKEN` | HuggingFace token (not needed for 10Eros or standard LTX bundles) | `hf_xxx` |
+| `HUGGINGFACE_MODELS` | Model bundle or comma-separated keys | `h3_int8_bundle` |
+| `HF_TOKEN` | HuggingFace token (not needed — H3 is ungated) | `hf_xxx` |
 | `CIVITAI_MODELS` | CivitAI checkpoint IDs (optional) | `138977` |
 | `CIVITAI_LORAS` | CivitAI LoRA IDs (optional) | `182404` |
 | `CIVITAI_TOKEN` | CivitAI API token (optional) | `abc123` |
@@ -70,10 +76,11 @@ Storage: Ephemeral volume (0GB; models redownload each start) (Container: 150GB 
 ## Startup Process
 
 1. 🔍 System check + GPU detection
-2. 💾 Storage setup (creates model dirs incl. latent_upscale_models)
-3. 📥 LTX-2.3 model downloads via HuggingFace (parallel with CivitAI if set)
-4. 📁 File browser start (port 8080)
-5. 🎬 ComfyUI start with ComfyUI-LTXVideo nodes (port 8188)
+2. 💾 Storage setup (creates model dirs)
+3. 📥 Model downloads via HuggingFace (parallel with CivitAI if set)
+4. 🎯 Workflow retargeting to the downloaded quant
+5. 📁 File browser start (port 8080)
+6. 🎬 ComfyUI start (port 8188) — no custom node packs, all nodes are core
 
 ## 🔄 Restarting ComfyUI
 
@@ -106,11 +113,10 @@ tail -f /tmp/ignition_startup.log
 ```
 
 ### Common Issues
-- **Models not downloading**: Verify `HUGGINGFACE_MODELS` key spelling; set `HF_TOKEN` for Gemma
-- **Gemma download fails**: Accept license at huggingface.co/google/gemma-3-12b-it-qat-q4_0-unquantized
+- **Models not downloading**: Verify `HUGGINGFACE_MODELS` key spelling (`h3_int8_bundle` or `h3_fp8_bundle`)
 - **Out of VRAM**: Use FP8 distilled (~18GB) or NVFP4 (~14GB, Blackwell only)
 - **ComfyUI not responding**: Run `/workspace/scripts/restart-comfyui.sh`
 - **Want to re-download models**: Set `FORCE_MODEL_SYNC=true` and restart pod
 
 ---
-**🎬 Ready to generate video with Ignition LTX!**
+**🎬 Ready to generate video + audio with Ignition H3!**
