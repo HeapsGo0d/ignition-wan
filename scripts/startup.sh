@@ -342,9 +342,20 @@ start_comfyui() {
     # Remove stale stop marker
     rm -f /tmp/comfyui.stop
 
-    # ---- ignition flags (env-tunable) ----
-    # --enable-cors-header required for RunPod reverse proxy access
-    : "${COMFY_FLAGS:=--preview-method auto --enable-cors-header}"
+    # ---- ignition flags (env-tunable: set COMFY_FLAGS to replace wholesale) ----
+    #
+    # No --enable-cors-header. It was here with the comment "required for RunPod
+    # reverse proxy access", which is wrong — the proxy serves the frontend and
+    # the API on the same origin, so CORS never enters into it. Passing the flag
+    # without a value means "*" (cli_args.py: nargs="?", const="*"), and ComfyUI
+    # has no authentication, so wildcard CORS let any page you visited script
+    # this pod's API: /history exposes every prompt, /view fetches any output.
+    # Add it back only if you drive the pod from a genuinely different origin.
+    #
+    # --disable-metadata stops the prompt text and full workflow JSON being
+    # embedded in every output file. Costs workflow-recovery-by-drag-and-drop;
+    # worth it because outputs leave the pod and metadata travels with them.
+    : "${COMFY_FLAGS:=--preview-method auto --disable-metadata}"
 
     log "INFO" "  • Startup flags: ${COMFY_FLAGS}"
 

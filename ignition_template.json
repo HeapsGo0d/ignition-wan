@@ -1,7 +1,7 @@
 {
-  "name": "Ignition H3 v2.0.1-h3",
+  "name": "Ignition H3 v2.0.2-h3",
   "description": "ComfyUI MiniMax H3 video + native 32 kHz stereo audio (I2V + T2V) — CUDA 13.0, PyTorch nightly cu130, 4-step Turbo LoRA",
-  "dockerImage": "heapsgo0d/ignition-h3:v2.0.1-h3",
+  "dockerImage": "heapsgo0d/ignition-h3:v2.0.2-h3",
   "ports": [
     {
       "privatePort": 8188,

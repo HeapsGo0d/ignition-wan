@@ -101,6 +101,37 @@ scripts/nuke                    4-phase wipe on clean shutdown
 workflows/                      the two shipped workflows
 ```
 
+## Privacy
+
+Carried over from the earlier images and still wired into `startup.sh`:
+a telemetry blocklist applied to `/etc/hosts` before any download (19 domains,
+IPv4 + IPv6), connection monitoring, ComfyUI-Manager forced to
+`network_mode = offline`, and `nuke` on clean shutdown — which deliberately
+does *not* run if ComfyUI failed to start, so a broken pod stays debuggable.
+It is "privacy lite": a hosts-file blocklist stops name resolution, not
+direct-IP traffic.
+
+Two deliberate choices in the default `COMFY_FLAGS`:
+
+- **No `--enable-cors-header`.** It used to be set, annotated "required for
+  RunPod reverse proxy access" — which is wrong, the proxy is same-origin.
+  Passed without a value it means `*`, and since ComfyUI has no authentication,
+  that let any page you visited script this pod's API. Add it back only if you
+  genuinely drive the pod cross-origin.
+- **`--disable-metadata`.** ComfyUI otherwise embeds prompt text and the full
+  workflow JSON in every output file, which travels with the file when it
+  leaves the pod. The cost is that you can no longer drag an output back into
+  ComfyUI to recover its workflow.
+
+`COMFY_FLAGS` replaces both wholesale if you set it.
+
+Dropping the ten custom node packs also removed the largest untrusted-code
+surface in the image — nothing third-party now executes at startup.
+
+**Still open:** `FILEBROWSER_PASSWORD` defaults to `runpod` (and `-y` takes the
+default), with filebrowser rooted at all of `/workspace` on a public proxy URL.
+Set a real password when deploying.
+
 ## Notes
 
 - Everything lives under `/workspace` and `VOLUME_GB` defaults to `0`
