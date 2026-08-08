@@ -3,13 +3,26 @@
 # workflows use ships in ComfyUI core (comfy_extras/nodes_minimax_h3.py,
 # nodes_video.py, nodes_math.py, nodes_resolution.py, nodes_audio.py).
 
-FROM nvidia/cuda:13.0.3-cudnn-runtime-ubuntu24.04
+# Base is the plain runtime, NOT the -cudnn variant. The PyTorch wheel bundles
+# its own cuDNN; shipping the base image's copy as well gives two installs, and
+# whichever one the loader picks for libcudnn.so.9 then fails to dlopen the
+# other's sublibraries:
+#   RuntimeError: CUDNN_BACKEND_TENSOR_DESCRIPTOR cudnnFinalize failed
+#   cudnn_status: CUDNN_STATUS_SUBLIBRARY_LOADING_FAILED
+# That surfaced on v2.0.0-h3 at the first conv3d (the Qwen3-VL vision tower's
+# patch_embed), long after gpu_preflight passed — torch.cuda.is_available()
+# never touches cuDNN. One cuDNN only.
+FROM nvidia/cuda:13.0.3-runtime-ubuntu24.04
 
+# LD_LIBRARY_PATH deliberately does NOT include /usr/lib/x86_64-linux-gnu:
+# it is already on the default loader path via ldconfig, and prepending it put
+# a system cuDNN ahead of the wheel's. /usr/local/nvidia/lib64 is where RunPod
+# injects the driver libraries.
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     NVIDIA_VISIBLE_DEVICES=all \
     NVIDIA_DRIVER_CAPABILITIES=compute,utility \
-    LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH \
+    LD_LIBRARY_PATH=/usr/local/nvidia/lib64:$LD_LIBRARY_PATH \
     CUDA_DEVICE_ORDER=PCI_BUS_ID \
     PATH="/opt/venv/bin:$PATH" \
     XDG_CACHE_HOME=/workspace/.cache \
@@ -43,6 +56,24 @@ RUN pip install --no-cache-dir --pre torch torchvision torchaudio \
 
 # Verify PyTorch (fail build immediately if broken)
 RUN python3 -c "import torch; v=torch.__version__; print(f'✅ PyTorch: {v} CUDA: {torch.version.cuda}'); assert torch.version.cuda is not None, 'No CUDA'"
+
+# Verify there is exactly one cuDNN and it is the wheel's.
+# No GPU in the build runner, so this checks linkage and provenance, not kernels:
+#   1. the wheel actually ships cuDNN (if a future wheel stops bundling it, the
+#      plain -runtime base would leave us with none — fail here, not on a pod)
+#   2. every sublibrary is present alongside it
+#   3. no second copy in the system lib dir to be picked up instead
+RUN python3 - <<'PY'
+import glob, pathlib, torch
+lib = pathlib.Path(torch.__file__).parent.parent / "nvidia/cudnn/lib"
+libs = sorted(p.name for p in lib.glob("libcudnn*.so*")) if lib.is_dir() else []
+assert libs, f"PyTorch wheel bundles no cuDNN at {lib} — re-add a -cudnn base image"
+subs = [n for n in libs if n.startswith("libcudnn_")]
+assert subs, f"cuDNN sublibraries missing in {lib}: {libs}"
+system = glob.glob("/usr/lib/x86_64-linux-gnu/libcudnn*.so*")
+assert not system, f"second cuDNN found in system lib dir: {system}"
+print(f"✅ cuDNN: {torch.backends.cudnn.version()} from wheel, {len(subs)} sublibraries, no system copy")
+PY
 
 # Runtime Python libraries
 # Our scripts fetch with aria2c and use only `requests` directly (see

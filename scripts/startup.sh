@@ -215,22 +215,46 @@ gpu_preflight() {
     fi
 
     # Ensure driver libs are in path
-    export LD_LIBRARY_PATH="/usr/local/nvidia/lib64:/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
+    # Driver libs only. Do NOT prepend /usr/lib/x86_64-linux-gnu here — it is
+    # already on the default loader path, and putting it first is what let a
+    # system cuDNN shadow the wheel's on v2.0.0-h3. See the Dockerfile.
+    export LD_LIBRARY_PATH="/usr/local/nvidia/lib64:${LD_LIBRARY_PATH:-}"
 
     # Use one Python everywhere
     log "INFO" "  • Using Python at: $PYBIN"
 
-    # Single source of truth: PyTorch must see CUDA
+    # Single source of truth: PyTorch must see CUDA, and cuDNN must actually
+    # launch a kernel. torch.cuda.is_available() never touches cuDNN, so on
+    # v2.0.0-h3 preflight passed and generation then died at the first conv3d
+    # with CUDNN_STATUS_SUBLIBRARY_LOADING_FAILED. The conv3d below is the same
+    # op the Qwen3-VL vision tower runs in patch_embed — fail at boot instead.
     "$PYBIN" - <<'PY'
 import torch, sys
+import torch.nn.functional as F
 print(f"[GPU] torch: {torch.__version__} cuda: {torch.version.cuda}")
 ok = torch.cuda.is_available()
 print(f"[GPU] cuda available: {ok}")
 if not ok:
     sys.exit(2)
 print(f"[GPU] device: {torch.cuda.get_device_name(0)} cap: {torch.cuda.get_device_capability(0)}")
+print(f"[GPU] cudnn: {torch.backends.cudnn.version()} enabled: {torch.backends.cudnn.enabled}")
+try:
+    x = torch.randn(1, 3, 2, 64, 64, device="cuda", dtype=torch.float32)
+    w = torch.randn(32, 3, 2, 16, 16, device="cuda", dtype=torch.float32)
+    F.conv3d(x, w, stride=(2, 16, 16))
+    torch.cuda.synchronize()
+    print("[GPU] cudnn conv3d kernel: OK")
+except Exception as exc:
+    print(f"[GPU] cudnn conv3d kernel FAILED: {exc}")
+    sys.exit(4)
 PY
     rc=$?
+    if [[ $rc -eq 4 ]]; then
+        log "ERROR" "cuDNN cannot launch a conv3d kernel — generation would fail at the"
+        log "ERROR" "text encoder's vision tower. Usually two cuDNN installs fighting;"
+        log "ERROR" "check LD_LIBRARY_PATH and that only the wheel's cuDNN is present."
+        exit 4
+    fi
     if [[ $rc -ne 0 ]]; then
         log "ERROR" "PyTorch CUDA initialization failed"
         exit 2
